@@ -1,0 +1,10 @@
+[submodule "HamEngine/lib/imgui/imgui"]
+	path = HamEngine/lib/imgui/imgui
+	url = https://github.com/ocornut/imgui
+	branch = docking
+[submodule "HamEngine/lib/glm"]
+	path = HamEngine/lib/glm
+	url = https://github.com/g-truc/glm
+[submodule "HamEngine/lib/glfw"]
+	path = HamEngine/lib/glfw
+	url = https://github.com/glfw/glfw
