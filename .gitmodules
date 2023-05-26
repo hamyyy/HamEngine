@@ -8,3 +8,6 @@
 [submodule "HamEngine/lib/glfw"]
 	path = HamEngine/lib/glfw
 	url = https://github.com/glfw/glfw
+[submodule "HamEngine/lib/spdlog"]
+	path = HamEngine/lib/spdlog
+	url = https://github.com/gabime/spdlog

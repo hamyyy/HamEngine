@@ -3,20 +3,23 @@
 
 #include <iostream>
 
-extern Ham::Application* Ham::CreateApplication();
+extern Ham::Application *Ham::CreateApplication(Ham::ApplicationCommandLineArgs args);
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-	// Hazel::Log::Init();
+	Ham::Log::Init();
 
 	// HZ_PROFILE_BEGIN_SESSION("Startup", "HazelProfile-Startup.json");
-	auto app = Ham::CreateApplication(); // { argc, argv };
+	auto app = Ham::CreateApplication({argc, argv});
 	// HZ_PROFILE_END_SESSION();
+
+	app->Init();
 
 	// HZ_PROFILE_BEGIN_SESSION("Runtime", "HazelProfile-Runtime.json");
 	if (app->Run())
 	{
-		std::cout << "Error setting up Ham Application" << std::endl;
+		HAM_CORE_ERROR("Error running Ham Engine Application");
+		HAM_CORE_ERROR("Quitting...");
 		return 1;
 	}
 	// HZ_PROFILE_END_SESSION();
