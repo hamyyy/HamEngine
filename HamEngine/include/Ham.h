@@ -2,6 +2,7 @@
 
 // libraries
 #include <imgui.h>
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 //  Ham Engine Core
@@ -11,9 +12,13 @@
 #include "Ham/Core/Log.h"
 #include "Ham/Core/Assert.h"
 
+#include "Ham/Renderer/Shader.h"
+
 #include "Ham/Util/TimeStep.h"
 
 //  stdlib
 #include <vector>
 #include <string>
 #include <filesystem>
+#include <cstdint>
+#include <format>

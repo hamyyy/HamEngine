@@ -18,6 +18,9 @@ namespace Ham
 
     private:
         Application *m_App;
+        std::unique_ptr<Shader> shader;
+        std::vector<glm::vec3> vertices;
+        unsigned int VBO, VAO;
     };
 
 }

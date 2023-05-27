@@ -8,7 +8,8 @@
 
 namespace Ham
 {
-    Application::Application(const ApplicationSpecification &spec) : m_Specification(spec) {
+    Application::Application(const ApplicationSpecification &spec) : m_Specification(spec)
+    {
         m_Specification.DefaultWidth = m_Specification.Width;
         m_Specification.DefaultHeight = m_Specification.Height;
     }
@@ -45,7 +46,7 @@ namespace Ham
     int Application::Run()
     {
         HAM_CORE_INFO("Ham Engine Version: 0.0.1");
-        
+
         m_Window.SetIsRunning(true);
         for (Layer *layer : m_LayerStack)
             layer->OnAttach();
@@ -64,16 +65,16 @@ namespace Ham
             if (m_Window.ShouldClose())
                 m_Window.SetIsRunning(false);
 
+            m_Window.SetContextCurrent();
+            auto display = m_Window.GetFramebufferSize();
+            glViewport(0, 0, display.x, display.y);
+            m_Window.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             {
                 // HZ_PROFILE_SCOPE("LayerStack OnUpdate");
                 for (Layer *layer : m_LayerStack)
                     layer->OnUpdate(timestep);
             }
-
-            m_Window.SetContextCurrent();
-            auto display = m_Window.GetFramebufferSize();
-            glViewport(0, 0, display.x, display.y);
-            m_Window.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             m_imgui.NewFrame();
             {

@@ -76,8 +76,26 @@ namespace Ham
     {
     }
 
-    int Window::GetWidth() const { return m_Application->GetSpecification().Width; }
-    int Window::GetHeight() const { return m_Application->GetSpecification().Height; }
+    int Window::GetWidth() const
+    {
+        int width, height;
+        glfwGetWindowSize(GetWindowHandle(), &width, &height);
+        return width;
+    }
+
+    int Window::GetHeight() const
+    {
+        int width, height;
+        glfwGetWindowSize(GetWindowHandle(), &width, &height);
+        return height;
+    }
+
+    float Window::GetAspectRatio() const
+    {
+        int width, height;
+        glfwGetWindowSize(GetWindowHandle(), &width, &height);
+        return (float)width / (float)height;
+    }
     bool Window::IsVSync() const { return m_Application->GetSpecification().VSync; }
     const std::string &Window::GetTitle() const { return m_Application->GetSpecification().Name; }
     const ApplicationSpecification &Window::GetSpecification() const { return m_Application->GetSpecification(); }
@@ -119,6 +137,7 @@ namespace Ham
         }
 
         SetVSync(GetSpecification().VSync);
+        glfwSetWindowSizeLimits(GetWindowHandle(), 200, 200, GLFW_DONT_CARE, GLFW_DONT_CARE);
     }
 
     // Serialize Imgui

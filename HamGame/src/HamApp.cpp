@@ -19,7 +19,7 @@ namespace Ham
         // create app specification
         ApplicationSpecification spec;
         spec.Name = "Ham Engine Demo";
-        // spec.Width = 800;
+        // spec.Width = 600;
         // spec.Height = 600;
         spec.CommandLineArgs = args;
 

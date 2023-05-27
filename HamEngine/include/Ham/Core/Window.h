@@ -60,6 +60,7 @@ namespace Ham
         std::string GetGLSLVersion() const { return m_glsl_version; }
         int GetWidth() const;
         int GetHeight() const;
+        float GetAspectRatio() const;
         float GetTime() { return (float)glfwGetTime(); }
         auto GetFramebufferSize() const
         {
@@ -71,6 +72,9 @@ namespace Ham
         bool IsVSync() const;
         const std::string &GetTitle() const;
         const ApplicationSpecification &GetSpecification() const;
+
+        operator GLFWwindow *() const { return m_Window; }
+        operator GLFWwindow *() { return m_Window; }
 
         // void SetEventCallback(const EventCallbackFn &callback) { m_Application->GetSpecification().EventCallback = callback; }
 
