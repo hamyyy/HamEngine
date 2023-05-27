@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Ham/Layer.h"
-#include "Ham/Window.h"
+#include "Ham/Core/Layer.h"
+#include "Ham/Core/Window.h"
 #include "Ham/ImGui/ImGuiImpl.h"
-#include "Ham/Assert.h"
-#include "Ham/LayerStack.h"
+#include "Ham/Core/Assert.h"
+#include "Ham/Core/LayerStack.h"
 
 namespace Ham
 {
@@ -21,12 +21,30 @@ namespace Ham
         }
     };
 
+    enum FullscreenMode
+    {
+        APPLICATION_WINDOWED,
+        APPLICATION_FULLSCREEN,
+        APPLICATION_FULLSCREEN_BORDERLESS
+    };
+
     struct ApplicationSpecification
     {
         std::string Name = "Ham Engine Application";
-        int Width = 1280;
-        int Height = 720;
-        std::string WorkingDirectory;
+
+        // settings
+        int DefaultWidth = 1280;
+        int DefaultHeight = 720;
+
+        int Width = DefaultWidth;
+        int Height = DefaultHeight;
+        int XPos = -1;
+        int YPos = -1;
+        bool VSync = true;
+        bool Maximized = false;
+        int Display = 0;
+        FullscreenMode Fullscreen = APPLICATION_WINDOWED;
+
         ApplicationCommandLineArgs CommandLineArgs;
     };
 
@@ -48,6 +66,13 @@ namespace Ham
         float GetTime() { return m_Window.GetTime(); }
         const ApplicationSpecification &GetSpecification() const { return m_Specification; }
 
+        void SetWindowed() { m_Window.SetWindowed(); }
+        void SetFullscreen() { m_Window.SetFullscreen(); }
+        void SetFullscreenBorderless() { m_Window.SetFullscreenBorderless(); }
+        void SetVSync(bool enabled) { m_Window.SetVSync(enabled); }
+
+        bool IsVSync() const { return m_Window.IsVSync(); }
+
     protected:
         Window m_Window;
         ImGuiImpl m_imgui;
@@ -56,6 +81,8 @@ namespace Ham
         ApplicationSpecification m_Specification;
         LayerStack m_LayerStack;
         float m_LastFrameTime;
+
+        friend ::Ham::Window;
     };
 
     // To be defined in CLIENT

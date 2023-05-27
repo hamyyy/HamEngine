@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Ham/Base.h"
-#include "Ham/Layer.h"
+#include "Ham/Core/Base.h"
+#include "Ham/Core/Layer.h"
 
 #include <vector>
 

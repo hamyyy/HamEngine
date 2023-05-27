@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Ham/ImGui/ImGuiImpl.h"
+
 #ifndef GL_SILENCE_DEPRECATION
 #define GL_SILENCE_DEPRECATION
 #endif
@@ -10,7 +12,7 @@
 
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 #include <glad/glad.h>  // Initialize with gladLoadGL()
-
+#include <imgui_internal.h>
 #include <glm/glm.hpp>
 
 #include <string>
@@ -18,6 +20,7 @@
 namespace Ham
 {
     struct ApplicationSpecification;
+    class Application;
 
     class Window
     {
@@ -26,7 +29,7 @@ namespace Ham
         Window(const Window &other) = default;
         ~Window();
 
-        void Init(ApplicationSpecification &specification);
+        void Init(Application *app);
         void Update();
         void Shutdown();
 
@@ -40,21 +43,23 @@ namespace Ham
             glClear(mask);
         }
         void Present() { glfwSwapBuffers(m_Window); }
+        void ApplySavedSettings();
 
-        void SetTitle(const std::string &title) { glfwSetWindowTitle(m_Window, title.c_str()); }
-        void SetSize(int width, int height) { glfwSetWindowSize(m_Window, width, height); }
-        void SetPosition(int x, int y) { glfwSetWindowPos(m_Window, x, y); }
-        void SetVSync(bool enabled) { glfwSwapInterval(enabled); }
+        void SetTitle(const std::string &title);
+        void SetSize(int width, int height);
+        void SetPosition(int x, int y);
         void SetIcon(const std::string &path);
         void SetClearColor(const glm::vec4 &color) { m_ClearColor = color; }
         void SetContextCurrent() { glfwMakeContextCurrent(m_Window); }
+        void SetWindowed();
+        void SetFullscreen();
+        void SetFullscreenBorderless();
+        void SetVSync(bool enabled);
 
-        GLFWwindow *GetGLFWWindow() const { return m_Window; }
+        GLFWwindow *GetWindowHandle() const { return m_Window; }
         std::string GetGLSLVersion() const { return m_glsl_version; }
-        int GetWidth() const { return m_Data.Width; }
-        int GetHeight() const { return m_Data.Height; }
-        int GetX() const { return m_Data.X; }
-        int GetY() const { return m_Data.Y; }
+        int GetWidth() const;
+        int GetHeight() const;
         float GetTime() { return (float)glfwGetTime(); }
         auto GetFramebufferSize() const
         {
@@ -63,28 +68,27 @@ namespace Ham
             return glm::ivec2(width, height);
         }
         glm::vec4 &GetClearColor() { return m_ClearColor; }
-        bool IsVSync() const { return m_Data.VSync; }
-        const std::string &GetTitle() const { return m_Data.Title; }
+        bool IsVSync() const;
+        const std::string &GetTitle() const;
+        const ApplicationSpecification &GetSpecification() const;
 
-        // void SetEventCallback(const EventCallbackFn &callback) { m_Data.EventCallback = callback; }
+        // void SetEventCallback(const EventCallbackFn &callback) { m_Application->GetSpecification().EventCallback = callback; }
 
     private:
-        GLFWwindow *m_Window;
-        bool m_IsRunning = false;
-        glm::vec4 m_ClearColor;
+        static void *ReadOpenCallback(ImGuiContext *, ImGuiSettingsHandler *handler, const char *name) { return handler->UserData; }
+        static void ReadLineCallback(ImGuiContext *, ImGuiSettingsHandler *, void *entry, const char *line);
+        static void WriteAllCallback(ImGuiContext *, ImGuiSettingsHandler *handler, ImGuiTextBuffer *buf);
 
+    private:
+        bool m_IsRunning = false;
+
+        GLFWwindow *m_Window;
+        Application *m_Application;
+
+        glm::vec4 m_ClearColor;
         std::string m_glsl_version = "#version 460";
 
-        struct WindowData
-        {
-            std::string Title;
-            int Width, Height;
-            int X, Y;
-            bool VSync;
-            // EventCallbackFn EventCallback;
-        };
-
-        WindowData m_Data;
+        friend ::Ham::ImGuiImpl;
     };
 
 } // namespace Ham

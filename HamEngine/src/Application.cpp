@@ -1,18 +1,22 @@
-#include "Ham/Application.h"
+#include "Ham/Core/Application.h"
 
 #include "imgui.h"
 
-#include "Ham/Log.h"
-#include "Ham/TimeStep.h"
+#include "Ham/Core/Log.h"
+#include "Ham/Util/TimeStep.h"
+#include "Ham/Util/GLFWExtra.h"
 
 namespace Ham
 {
-    Application::Application(const ApplicationSpecification &spec) : m_Specification(spec) {}
+    Application::Application(const ApplicationSpecification &spec) : m_Specification(spec) {
+        m_Specification.DefaultWidth = m_Specification.Width;
+        m_Specification.DefaultHeight = m_Specification.Height;
+    }
     Application::~Application() { Shutdown(); }
 
     void Application::Init()
     {
-        m_Window.Init(m_Specification);
+        m_Window.Init(this);
         m_imgui.Init(&m_Window);
     }
 
@@ -41,9 +45,7 @@ namespace Ham
     int Application::Run()
     {
         HAM_CORE_INFO("Ham Engine Version: 0.0.1");
-
-        m_Window.SetVSync(true);
-
+        
         m_Window.SetIsRunning(true);
         for (Layer *layer : m_LayerStack)
             layer->OnAttach();

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "Ham/Base.h"
-#include "Ham/Log.h"
+#include "Ham/Core/Base.h"
+#include "Ham/Core/Log.h"
 #include <filesystem>
 
 #define HAM_INTERNAL_ASSERT_IMPL(type, check, msg, ...) { if(!(check)) { HAM##type##ERROR(msg, __VA_ARGS__); HAM_DEBUGBREAK(); } }

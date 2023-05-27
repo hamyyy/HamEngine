@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Ham/Base.h"
-#include "Ham/TimeStep.h"
+#include "Ham/Core/Base.h"
+#include "Ham/Util/TimeStep.h"
 // #include "Hazel/Events/Event.h"
 
 namespace Ham

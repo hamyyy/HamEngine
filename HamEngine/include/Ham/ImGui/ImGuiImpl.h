@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Ham/Window.h"
+
+#include <imgui_internal.h>
 
 namespace Ham
 {
+    class Window;
     class ImGuiImpl
     {
     public:
@@ -18,5 +20,6 @@ namespace Ham
     private:
         Window* m_Window;
         bool m_IsShutDown = false;
+        ImGuiSettingsHandler m_ImGuiSettingsHandler;
     };
 } // namespace Ham

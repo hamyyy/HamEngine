@@ -1,4 +1,4 @@
-#include "Ham/Log.h"
+#include "Ham/Core/Log.h"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>

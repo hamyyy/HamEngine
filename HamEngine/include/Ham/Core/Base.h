@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Ham/PlatformDetection.h"
+#include "Ham/Core/PlatformDetection.h"
 
 #include <memory>
 
@@ -44,5 +44,5 @@ namespace Hazel {
 
 }
 
-#include "Ham/Log.h"
-#include "Ham/Assert.h"
+#include "Ham/Core/Log.h"
+#include "Ham/Core/Assert.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "Ham/Application.h"
+#include "Ham/Core/Application.h"
 
 #include <iostream>
 

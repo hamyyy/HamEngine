@@ -1,5 +1,5 @@
 #include "Ham.h"
-#include "Ham/EntryPoint.h"
+#include "Ham/Core/EntryPoint.h"
 #include "HamLayer.h"
 
 namespace Ham
@@ -19,8 +19,8 @@ namespace Ham
         // create app specification
         ApplicationSpecification spec;
         spec.Name = "Ham Engine Demo";
-        spec.Width = 800;
-        spec.Height = 600;
+        // spec.Width = 800;
+        // spec.Height = 600;
         spec.CommandLineArgs = args;
 
         return new HamApp(spec);

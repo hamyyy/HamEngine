@@ -5,13 +5,13 @@
 #include <glm/glm.hpp>
 
 //  Ham Engine Core
-#include "Ham/Base.h" // includes core and assert
+#include "Ham/Core/Base.h" // includes core and assert
+#include "Ham/Core/Application.h"
+#include "Ham/Core/Layer.h"
+#include "Ham/Core/Log.h"
+#include "Ham/Core/Assert.h"
 
-#include "Ham/Application.h"
-#include "Ham/Layer.h"
-#include "Ham/Log.h"
-#include "Ham/Assert.h"
-#include "Ham/TimeStep.h"
+#include "Ham/Util/TimeStep.h"
 
 //  stdlib
 #include <vector>

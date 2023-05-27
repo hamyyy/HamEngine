@@ -4,9 +4,9 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
-#include "Ham/Log.h"
-#include "Ham/Assert.h"
-#include "Ham/Window.h"
+#include "Ham/Core/Log.h"
+#include "Ham/Core/Assert.h"
+#include "Ham/Core/Window.h"
 
 namespace Ham
 {
@@ -17,12 +17,23 @@ namespace Ham
     {
         HAM_ASSERT(window != nullptr, "Window is nullptr!");
         m_Window = window;
-        
+
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
-        (void)io;
+        io.IniFilename = "settings.ini";
+
+        m_ImGuiSettingsHandler.UserData = m_Window->m_Application;
+        m_ImGuiSettingsHandler.TypeName = "AppSettings";
+        m_ImGuiSettingsHandler.TypeHash = ImHashStr(m_ImGuiSettingsHandler.TypeName);
+        m_ImGuiSettingsHandler.ReadOpenFn = &Window::ReadOpenCallback;
+        m_ImGuiSettingsHandler.ReadLineFn = &Window::ReadLineCallback;
+        m_ImGuiSettingsHandler.WriteAllFn = &Window::WriteAllCallback;
+        GImGui->SettingsHandlers.push_back(m_ImGuiSettingsHandler);
+        ImGui::LoadIniSettingsFromDisk(io.IniFilename);
+        m_Window->ApplySavedSettings();
+
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
@@ -43,7 +54,7 @@ namespace Ham
         }
 
         // Setup Platform/Renderer backends
-        ImGui_ImplGlfw_InitForOpenGL(m_Window->GetGLFWWindow(), true);
+        ImGui_ImplGlfw_InitForOpenGL(m_Window->GetWindowHandle(), true);
         ImGui_ImplOpenGL3_Init(m_Window->GetGLSLVersion().c_str());
     }
 

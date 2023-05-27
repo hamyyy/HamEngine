@@ -6,10 +6,7 @@ namespace Ham
     HamLayer::HamLayer(Application *app) : Layer("HamLayer"), m_App(app) {}
     HamLayer::~HamLayer() {}
 
-    void HamLayer::OnAttach()
-    {
-        m_App->GetWindow().SetVSync(false);
-    }
+    void HamLayer::OnAttach() {}
 
     void HamLayer::OnDetach() {}
 
@@ -62,6 +59,18 @@ namespace Ham
                 show_another_window = false;
             ImGui::End();
         }
+
+        ImGui::Begin("Ham Engine");
+        if (ImGui::Button("Windowed"))
+            m_App->SetWindowed();
+        if (ImGui::Button("Fullscreen"))
+            m_App->SetFullscreen();
+        if (ImGui::Button("Fullscreen Borderless"))
+            m_App->SetFullscreenBorderless();
+        static auto vsync = m_App->IsVSync();
+        if (ImGui::Checkbox("VSync", &vsync))
+            m_App->SetVSync(vsync);
+        ImGui::End();
     }
 
     // void HamLayer::OnEvent(Event &event) {}
