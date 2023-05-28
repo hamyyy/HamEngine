@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Ham/Util/File.h"
+
 #include <glm/glm.hpp>
 
 #include <string>
@@ -17,8 +19,16 @@ namespace Ham
         void Unbind() const;
 
         void SetUniform1i(const std::string &name, int value);
+        void SetUniform2i(const std::string &name, glm::ivec2 value);
+        void SetUniform3i(const std::string &name, glm::ivec3 value);
+        void SetUniform4i(const std::string &name, glm::ivec4 value);
+
         void SetUniform1f(const std::string &name, float value);
-        void SetUniform4f(const std::string &name, float v0, float v1, float v2, float v3);
+        void SetUniform2f(const std::string &name, glm::vec2 value);
+        void SetUniform3f(const std::string &name, glm::vec3 value);
+        void SetUniform4f(const std::string &name, glm::vec4 value);
+        
+        void SetUniformMat3f(const std::string &name, const glm::mat3 &matrix);
         void SetUniformMat4f(const std::string &name, const glm::mat4 &matrix);
 
     private:

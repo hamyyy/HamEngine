@@ -1,12 +1,14 @@
 #include "Ham/ImGui/ImGuiImpl.h"
 
-#include "imgui.h"
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
-
 #include "Ham/Core/Log.h"
 #include "Ham/Core/Assert.h"
 #include "Ham/Core/Window.h"
+
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <ImGuizmo.h>
+
 
 namespace Ham
 {
@@ -32,7 +34,6 @@ namespace Ham
         m_ImGuiSettingsHandler.WriteAllFn = &Window::WriteAllCallback;
         GImGui->SettingsHandlers.push_back(m_ImGuiSettingsHandler);
         ImGui::LoadIniSettingsFromDisk(io.IniFilename);
-        m_Window->ApplySavedSettings();
 
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
@@ -64,15 +65,18 @@ namespace Ham
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
     }
 
     void ImGuiImpl::Render()
     {
-
         // Rendering
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
 
+    void ImGuiImpl::UpdateWindows()
+    {
         // Update and Render additional Platform Windows
         // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
         //  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)

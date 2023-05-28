@@ -4,6 +4,13 @@
 
 namespace Ham
 {
+    struct VertexData
+    {
+        glm::vec3 position;
+        glm::vec3 normal;
+        // glm::vec2 texCoords;
+    };
+
     class HamLayer : public Layer
     {
     public:
@@ -19,8 +26,13 @@ namespace Ham
     private:
         Application *m_App;
         std::unique_ptr<Shader> shader;
-        std::vector<glm::vec3> vertices;
-        unsigned int VBO, VAO;
+        std::vector<VertexData> vertices;
+        std::vector<uint32_t> indices;
+        unsigned int cubeVBO, cubeVAO;
+
+        glm::mat4 transform;
+        glm::mat4 projection;
+        glm::mat4 view;
     };
 
 }

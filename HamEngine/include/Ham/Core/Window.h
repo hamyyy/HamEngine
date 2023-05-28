@@ -16,6 +16,7 @@
 #include <glm/glm.hpp>
 
 #include <string>
+#include <atomic>
 
 namespace Ham
 {
@@ -33,7 +34,7 @@ namespace Ham
         void Update();
         void Shutdown();
 
-        bool IsRunning() const { return m_IsRunning; }
+        std::atomic_bool &IsRunning() { return m_IsRunning; }
         void SetIsRunning(bool isRunning) { m_IsRunning = isRunning; }
         bool ShouldClose() const { return glfwWindowShouldClose(m_Window); }
         void PollEvents() { glfwPollEvents(); }
@@ -60,6 +61,8 @@ namespace Ham
         std::string GetGLSLVersion() const { return m_glsl_version; }
         int GetWidth() const;
         int GetHeight() const;
+        int GetXPos() const;
+        int GetYPos() const;
         float GetAspectRatio() const;
         float GetTime() { return (float)glfwGetTime(); }
         auto GetFramebufferSize() const
@@ -84,7 +87,7 @@ namespace Ham
         static void WriteAllCallback(ImGuiContext *, ImGuiSettingsHandler *handler, ImGuiTextBuffer *buf);
 
     private:
-        bool m_IsRunning = false;
+        std::atomic_bool m_IsRunning = false;
 
         GLFWwindow *m_Window;
         Application *m_Application;

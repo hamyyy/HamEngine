@@ -5,7 +5,9 @@ add_subdirectory(lib/glad)
 add_subdirectory(lib/glfw)
 add_subdirectory(lib/glm)
 add_subdirectory(lib/imgui)
+add_subdirectory(lib/ImGuizmo)
 add_subdirectory(lib/spdlog)
+add_subdirectory(lib/optick)
 
 file(GLOB_RECURSE HAM_SOURCES "src/*.cpp" "src/*.c")
 file(GLOB_RECURSE HAM_HEADERS "src/*.hpp" "src/*.h")
@@ -22,5 +24,7 @@ target_link_libraries(${PROJECT_NAME}
     glfw
     glm
     imgui
+    ImGuizmo
     spdlog
+    optick
 )

@@ -11,3 +11,9 @@
 [submodule "HamEngine/lib/spdlog"]
 	path = HamEngine/lib/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "HamEngine/lib/ImGuizmo/ImGuizmo"]
+	path = HamEngine/lib/ImGuizmo/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo
+[submodule "HamEngine/lib/optick/optick"]
+	path = HamEngine/lib/optick
+	url = https://github.com/bombomby/optick

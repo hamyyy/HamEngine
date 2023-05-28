@@ -3,119 +3,192 @@
 namespace Ham
 {
 
+    std::vector<VertexData> getCubeVertices()
+    {
+        std::vector<VertexData> vertices;
+
+        // Top face
+        vertices.push_back({{-0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}});
+        vertices.push_back({{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}});
+        vertices.push_back({{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}});
+        vertices.push_back({{-0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}});
+
+        // Back face
+        vertices.push_back({{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}});
+        vertices.push_back({{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}});
+        vertices.push_back({{0.5f, 0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}});
+        vertices.push_back({{-0.5f, 0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}});
+
+        // Left face
+        vertices.push_back({{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}});
+        vertices.push_back({{-0.5f, -0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}});
+        vertices.push_back({{-0.5f, 0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}});
+        vertices.push_back({{-0.5f, 0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}});
+
+        // Right face
+        vertices.push_back({{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}});
+        vertices.push_back({{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}});
+        vertices.push_back({{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}});
+        vertices.push_back({{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}});
+
+        // Top face
+        vertices.push_back({{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}});
+        vertices.push_back({{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}});
+        vertices.push_back({{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}});
+        vertices.push_back({{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}});
+
+        // Bottom face
+        vertices.push_back({{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}});
+        vertices.push_back({{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}});
+        vertices.push_back({{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, -1.0f}});
+        vertices.push_back({{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, -1.0f}});
+
+        return vertices;
+    }
+
+    std::vector<unsigned int> getCubeIndices()
+    {
+        std::vector<unsigned int> indices = {
+            0, 2, 1, 2, 0, 3,       // Top face
+            4, 5, 6, 6, 7, 4,       // Bottom face
+            8, 10, 9, 10, 8, 11,    // Right face
+            12, 13, 14, 14, 15, 12, // Left face
+            16, 17, 18, 18, 19, 16, // Front face
+            20, 22, 21, 22, 20, 23  // Back face
+        };
+
+        return indices;
+    }
+
     HamLayer::HamLayer(Application *app) : Layer("HamLayer"), m_App(app) {}
     HamLayer::~HamLayer() {}
 
     void HamLayer::OnAttach()
     {
-        // opengl hellp triangle
+        // opengl simple cube
 
-        // vertex shader
-        const char *vertexShaderSource = "#version 460 core\n"
-                                         "layout (location = 0) in vec3 VERTEX_POS;\n"
-                                         "uniform mat4 transform;\n"
-                                         "void main()\n"
-                                         "{\n"
-                                         "gl_Position = transform * vec4(VERTEX_POS.x, VERTEX_POS.y, VERTEX_POS.z, 1.0);\n"
-                                         "}\0";
-        // fragment shader
-        const char *fragmentShaderSource = "#version 460 core\n"
-                                           "layout (location = 0) out vec4 FRAG_COLOR;\n"
-                                           "vec3 dirLight = vec3(1.0f, 1.0f, 1.0f);\n"
-                                           "uniform mat4 transform;\n"
-                                           "void main()\n"
-                                           "{\n"
-                                           //    calculate normal
-                                           "vec3 normal = vec3(0.0, 0.0, 1.0);\n"
-                                           "normal = normalize(mat3(transform) * normal);\n"
-                                           //    calculate light intensity
-                                           "float lightIntensity = dot(normalize(dirLight), normalize(vec3(0.0, 0.0, 1.0)));\n"
-                                           //    calculate light color
-                                           "vec3 lightColor = vec3(1.0f, 1.0f, 1.0f) + vec3(1.0, 0.5, 0.0);\n"
-                                           //    calculate final color
-                                           "vec3 finalColor = lightIntensity * lightColor;\n"
-                                           //    set final color
-                                           "FRAG_COLOR = vec4(finalColor, 1.0f);\n"
-                                           "}\n\0";
+        // read from file using std::filesystem
+        std::string vertexShaderSource = File::Read("assets/shaders/cube.vert");
+        std::string fragmentShaderSource = File::Read("assets/shaders/cube.frag");
 
         //  create Shader
         shader = std::make_unique<Shader>(vertexShaderSource, fragmentShaderSource);
 
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
-        float L = 1.0f;
-        vertices = {
-            {0.0f, 0.0f, 0.0f},     // v0
-            {-0.866f, -0.5f, 0.0f}, // v1
-            {0.866f, -0.5f, 0.0f},  // v2
-            {0.0f, 1.0f, 0.0f},     // v3
 
-            {0.0f, 0.0f, 0.0f},     // v0
-            {0.0f, -0.866f, -0.5f}, // v1
-            {0.0f, 0.866f, -0.5f},  // v2
-            {0.0f, 0.0f, 1.0f},     // v3
-        };
-
-        // vertices = {
-        //     {0.5, 0.5f, 0.0f},   // v0
-        //     {0.5, -0.5f, 0.0f},  // v1
-        //     {-0.5, -0.5f, 0.0f}, // v2
-        //     {-0.5, 0.5f, 0.0f},  // v3
+        // struct VertexData
+        // {
+        //     glm::vec3 position;
+        //     glm::vec3 normal;
         // };
 
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
+        vertices = getCubeVertices();
 
-        // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-        glBindVertexArray(VAO);
+        indices = getCubeIndices();
 
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        int sizeOfBuffer = (int)vertices.size() * sizeof(glm::vec3);
-        glBufferData(GL_ARRAY_BUFFER, sizeOfBuffer, &vertices[0], GL_STATIC_DRAW);
+        // Generate and bind the Vertex Array Object (VAO)
+        glGenVertexArrays(1, &cubeVAO);
+        glBindVertexArray(cubeVAO);
 
-        // position attribute
-        int sizeOfSingleVertex = sizeof(glm::vec3);
-        int numberOfElementsPerVertex = sizeof(glm::vec3) / sizeof(float);
-        glVertexAttribPointer(0, numberOfElementsPerVertex, GL_FLOAT, GL_FALSE, sizeOfSingleVertex, nullptr);
+        // Generate and bind the Vertex Buffer Object (VBO) for the vertex data
+        glGenBuffers(1, &cubeVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+        glBufferData(GL_ARRAY_BUFFER, (int)vertices.size() * sizeof(VertexData), vertices.data(), GL_STATIC_DRAW);
+
+        // Enable and specify the vertex attribute pointers
         glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, position));
 
-        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, normal));
 
-        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+        // Generate and bind the Element Buffer Object (EBO) for the index data
+        unsigned int cubeEBO;
+        glGenBuffers(1, &cubeEBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (int)indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+        // Unbind the VAO and buffers
         glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        // uncomment this call to draw in wireframe polygons.
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        transform = glm::mat4(1.0f);
+        projection = glm::perspective(glm::radians(45.0f), m_App->GetWindow().GetAspectRatio(), 0.001f, 1000.0f);
+        view = glm::lookAt(glm::vec3(0.0f, 3.0f, 0.0f),
+                           glm::vec3(0.0f, 0.0f, 0.0f),
+                           glm::vec3(0.0f, 0.0f, 1.0f));
     }
 
     void HamLayer::OnDetach() {}
 
     void HamLayer::OnUpdate(TimeStep deltaTime)
     {
+        static float speed = 10.0f;
+        // if (Input::IsKeyDown(KeyCode::W))
+        // {
+        //     transform = glm::translate(transform, glm::up() * speed * deltaTime);
+        // }
+
+        // if (Input::IsKeyDown(KeyCode::S))
+        // {
+        //     transform = glm::translate(transform, glm::down() * speed * deltaTime);
+        // }
+
+        // if (Input::IsKeyDown(KeyCode::A))
+        // {
+        //     transform = glm::translate(transform, glm::right() * speed * deltaTime);
+        // }
+
+        // if (Input::IsKeyDown(KeyCode::D))
+        // {
+        //     transform = glm::translate(transform, glm::left() * speed * deltaTime);
+        // }
+
+        glm::vec2 mouse = Input::GetMousePosition();
+        static glm::vec2 prevMouse = mouse;
+        static float sensitivity = 0.2f;
+        glm::vec2 mouseDelta = mouse - prevMouse;
+        prevMouse = mouse;
+        if (Input::IsMouseButtonDown(MouseButton::LEFT))
+        {
+            // local space
+            // view = glm::rotate(view, glm::radians(mouseDelta.x * sensitivity), glm::vec3(0.0f, 0.0f, 1.0f));
+            // view = glm::rotate(view, glm::radians(-mouseDelta.y * sensitivity), glm::vec3(1.0f, 0.0f, 0.0f));
+
+            // world space
+            // transform = glm::rotate(transform, glm::radians(-mouseDelta.y * sensitivity), glm::vec3(1.0f, 0.0f, 0.0f));
+            // transform = glm::rotate(transform, glm::radians(mouseDelta.x * sensitivity), glm::vec3(0.0f, 0.0f, 1.0f));
+        }
+
         shader->Bind();
 
-        // create transformations
-        glm::mat4 transform = glm::mat4(1.0f);
-        // first translate (transformations are: scale happens first, then rotation and then finall translation happens; reversed order)
-        // transform = glm::scale(transform, glm::vec3((float)height / (float)width, 1.0f, 1.0f));
-        // transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-        transform = glm::rotate(transform, m_App->GetTime(), glm::vec3(1.0f, 1.0f, 0.0f));
+        // transform = glm::rotate(transform, glm::quarter_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
+        // Camera
 
-        auto camera = glm::perspective(glm::radians(45.0f), m_App->GetWindow().GetAspectRatio(), 0.1f, 100.0f);
-        auto view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
-                                glm::vec3(0.0f, 0.0f, 0.0f),
-                                glm::vec3(0.0f, 1.0f, 0.0f));
-        transform = camera * view * transform;
+        shader->SetUniformMat4f("uModel", transform);
+        shader->SetUniformMat4f("uView", view);
+        shader->SetUniformMat4f("uProjection", projection);
 
-        // get matrix's uniform location and set matrix
-        shader->SetUniformMat4f("transform", transform);
+        shader->SetUniform3f("uLightPos", glm::vec3(1.0f, 0.0f, -1.0f));
+        shader->SetUniform3f("uLightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
-        // render the triangle
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, (int)vertices.size());
-        glDrawArrays(GL_LINE_LOOP, 0, (int)vertices.size());
+        // render the cube
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+        glBindVertexArray(cubeVAO);
+
+        shader->SetUniform3f("uObjectColor", glm::vec3());
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, 0);
+
+        shader->SetUniform3f("uObjectColor", glm::vec3(1, 1, 1));
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(0);
     }
 
     void HamLayer::OnUIRender(TimeStep deltaTime)
@@ -147,6 +220,39 @@ namespace Ham
             ImGui::SliderFloat("float", &f, 0.0f, 1.0f);                                    // Edit 1 float using a slider from 0.0f to 1.0f
             ImGui::ColorEdit3("clear color", (float *)&m_App->GetWindow().GetClearColor()); // Edit 3 floats representing a color
 
+            static glm::vec4 light = {0.95f, 0.88f, 0.77f, 1.0f};  // light
+            static glm::vec4 darker = {0.79f, 0.72f, 0.61f, 1.0f}; // darker but still light
+            static glm::vec4 red = {0.84f, 0.16f, 0.22f, 1.0f};    // red
+            static glm::vec4 green = {0.44f, 0.51f, 0.43f, 1.0f};  // greenish grey
+            static glm::vec4 brown = {0.2f, 0.16f, 0.13f, 1.0f};   // brown (dark)
+
+            ImGui::Separator();
+            ImGui::PushID("0");
+            if (ImGui::ColorButton("Clear Color", {light.r, light.g, light.b, light.a}))
+                m_App->GetWindow().SetClearColor(light);
+            ImGui::PopID();
+            ImGui::PushID("1");
+            ImGui::SameLine();
+            if (ImGui::ColorButton("Clear Color", {darker.r, darker.g, darker.b, darker.a}))
+                m_App->GetWindow().SetClearColor(darker);
+            ImGui::PopID();
+            ImGui::PushID("2");
+            ImGui::SameLine();
+            if (ImGui::ColorButton("Clear Color", {red.r, red.g, red.b, red.a}))
+                m_App->GetWindow().SetClearColor(red);
+            ImGui::PopID();
+            ImGui::PushID("3");
+            ImGui::SameLine();
+            if (ImGui::ColorButton("Clear Color", {green.r, green.g, green.b, green.a}))
+                m_App->GetWindow().SetClearColor(green);
+            ImGui::PopID();
+            ImGui::PushID("4");
+            ImGui::SameLine();
+            if (ImGui::ColorButton("Clear Color", {brown.r, brown.g, brown.b, brown.a}))
+                m_App->GetWindow().SetClearColor(brown);
+            ImGui::PopID();
+            ImGui::Separator();
+
             if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
                 counter++;
             ImGui::SameLine();
@@ -176,7 +282,67 @@ namespace Ham
         static auto vsync = m_App->IsVSync();
         if (ImGui::Checkbox("VSync", &vsync))
             m_App->SetVSync(vsync);
+
+        static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
+        static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::LOCAL);
+        static bool enableGizmo = true;
+        bool useSnap = false;
+        float snapValue;
+        if (Input::IsKeyDown(KeyCode::LEFT_CONTROL))
+            useSnap = true;
+
+        if (Input::IsKeyDown(KeyCode::Q))
+            enableGizmo = false;
+        if (ImGui::Button("Translate") || Input::IsKeyDown(KeyCode::W))
+        {
+            enableGizmo = true;
+            mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Rotate") || Input::IsKeyDown(KeyCode::E))
+        {
+            enableGizmo = true;
+            mCurrentGizmoOperation = ImGuizmo::ROTATE;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Scale") || Input::IsKeyDown(KeyCode::R))
+        {
+            enableGizmo = true;
+            mCurrentGizmoOperation = ImGuizmo::SCALE;
+        }
+        if (ImGui::Button("World"))
+        {
+            enableGizmo = true;
+            mCurrentGizmoMode = ImGuizmo::WORLD;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Local"))
+        {
+            enableGizmo = true;
+            mCurrentGizmoMode = ImGuizmo::LOCAL;
+        }
         ImGui::End();
+
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
+        ImGuizmo::SetRect((float)m_App->GetWindow().GetXPos(), (float)m_App->GetWindow().GetYPos(), (float)m_App->GetWindow().GetWidth(), (float)m_App->GetWindow().GetHeight());
+
+        if (useSnap)
+        {
+            switch (mCurrentGizmoOperation)
+            {
+            case ImGuizmo::OPERATION::ROTATE:
+                snapValue = 45.0f * 0.5f;
+                break;
+            default:
+                snapValue = 0.25f;
+                break;
+            }
+        }
+
+        float snapValues[3] = {snapValue, snapValue, snapValue};
+        if (enableGizmo)
+            ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr);
     }
 
     // void HamLayer::OnEvent(Event &event) {}

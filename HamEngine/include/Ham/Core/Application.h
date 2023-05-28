@@ -6,6 +6,9 @@
 #include "Ham/Core/Assert.h"
 #include "Ham/Core/LayerStack.h"
 
+#include <thread>
+#include <atomic>
+
 namespace Ham
 {
 
@@ -57,11 +60,15 @@ namespace Ham
         int Run();
         void Init();
         void Shutdown();
+        void RenderThread();
+
+        static Application &Get() { return *s_Instance; }
 
         void PushLayer(Layer *layer);
         void PushOverlay(Layer *layer);
 
         Window &GetWindow() { return m_Window; }
+        GLFWwindow *GetWindowHandle() { return m_Window.GetWindowHandle(); }
         ImGuiImpl &GetImGui() { return m_imgui; }
         float GetTime() { return m_Window.GetTime(); }
         const ApplicationSpecification &GetSpecification() const { return m_Specification; }
@@ -78,9 +85,15 @@ namespace Ham
         ImGuiImpl m_imgui;
 
     private:
+        static Application *s_Instance;
+
         ApplicationSpecification m_Specification;
         LayerStack m_LayerStack;
         float m_LastFrameTime;
+
+        std::thread m_RenderThread;
+
+        std::atomic_bool m_FramebufferResized = false;
 
         friend ::Ham::Window;
     };

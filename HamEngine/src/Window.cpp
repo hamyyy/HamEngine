@@ -15,6 +15,11 @@ namespace Ham
         HAM_CORE_ERROR("GLFW Error ({0}): {1}", error, std::string(description));
     }
 
+    static void opengl_error_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
+    {
+        HAM_CORE_ERROR("OpenGL Error ({0}): {1}", id, std::string(message));
+    }
+
     Window::Window() {}
     Window::~Window() {}
 
@@ -29,12 +34,16 @@ namespace Ham
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        // glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); // Debug
 
         // Create window with graphics context
         m_Window = glfwCreateWindow(GetSpecification().Width, GetSpecification().Height, GetSpecification().Name.c_str(), nullptr, nullptr);
         HAM_CORE_ASSERT(m_Window != nullptr, "Could not create GLFW window!");
         glfwMakeContextCurrent(m_Window);
         gladLoadGL(); // Initialize OpenGL loader
+
+        // glEnable(GL_DEBUG_OUTPUT);                              // Debug
+        glDebugMessageCallback(opengl_error_callback, nullptr);
 
         // print version information
         HAM_CORE_INFO("OpenGL Version: {}", std::string((char *)glGetString(GL_VERSION)));
@@ -90,6 +99,20 @@ namespace Ham
         return height;
     }
 
+    int Window::GetXPos() const
+    {
+        int x, y;
+        glfwGetWindowPos(GetWindowHandle(), &x, &y);
+        return x;
+    }
+
+    int Window::GetYPos() const
+    {
+        int x, y;
+        glfwGetWindowPos(GetWindowHandle(), &x, &y);
+        return y;
+    }
+
     float Window::GetAspectRatio() const
     {
         int width, height;
@@ -136,8 +159,8 @@ namespace Ham
             break;
         }
 
-        SetVSync(GetSpecification().VSync);
         glfwSetWindowSizeLimits(GetWindowHandle(), 200, 200, GLFW_DONT_CARE, GLFW_DONT_CARE);
+        // glfwShowWindow(GetWindowHandle());
     }
 
     // Serialize Imgui
