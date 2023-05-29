@@ -9,3 +9,4 @@ target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} HamEngine)
 
 target_copy_assets(${PROJECT_NAME} assets)
+target_kill_executable(${PROJECT_NAME})
