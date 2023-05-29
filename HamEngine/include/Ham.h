@@ -23,6 +23,8 @@
 #include "Ham/Renderer/Shader.h"
 
 #include "Ham/Util/TimeStep.h"
+#include "Ham/Util/UUID.h"
+
 #include "Ham/Input/Input.h"
 #include "Ham/Input/KeyCodes.h"
 

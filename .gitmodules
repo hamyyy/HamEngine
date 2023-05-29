@@ -20,3 +20,6 @@
 [submodule "HamEngine/lib/entt"]
 	path = HamEngine/lib/entt
 	url = https://github.com/skypjack/entt
+[submodule "HamEngine/lib/stduuid"]
+	path = HamEngine/lib/stduuid
+	url = https://github.com/mariusbancila/stduuid
