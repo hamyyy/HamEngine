@@ -60,7 +60,7 @@ namespace Ham
         return indices;
     }
 
-    HamLayer::HamLayer(Application *app) : Layer("HamLayer"), m_App(app) {}
+    HamLayer::HamLayer(Application *app) : Layer("HamLayer"), m_App(app), m_Scene(m_App->GetScene()) {}
     HamLayer::~HamLayer() {}
 
     void HamLayer::OnAttach()
@@ -115,10 +115,6 @@ namespace Ham
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         transform = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), m_App->GetWindow().GetAspectRatio(), 0.001f, 1000.0f);
-        view = glm::lookAt(glm::vec3(0.0f, 3.0f, 0.0f),
-                           glm::vec3(0.0f, 0.0f, 0.0f),
-                           glm::vec3(0.0f, 0.0f, 1.0f));
     }
 
     void HamLayer::OnDetach() {}
@@ -166,6 +162,9 @@ namespace Ham
 
         // transform = glm::rotate(transform, glm::quarter_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
         // Camera
+        auto cameraEntity = GetCamera();
+        auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
+        auto &view = cameraEntity.GetComponent<Component::Transform>().Value;
 
         shader->SetUniformMat4f("uModel", transform);
         shader->SetUniformMat4f("uView", view);
@@ -173,6 +172,7 @@ namespace Ham
 
         shader->SetUniform3f("uLightPos", glm::vec3(1.0f, 0.0f, -1.0f));
         shader->SetUniform3f("uLightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+        shader->SetUniform1f("uTime", m_App->GetTime());
 
         // render the cube
         glEnable(GL_DEPTH_TEST);
@@ -339,6 +339,10 @@ namespace Ham
                 break;
             }
         }
+
+        auto cameraEntity = GetCamera();
+        auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
+        auto &view = cameraEntity.GetComponent<Component::Transform>().Value;
 
         float snapValues[3] = {snapValue, snapValue, snapValue};
         if (enableGizmo)

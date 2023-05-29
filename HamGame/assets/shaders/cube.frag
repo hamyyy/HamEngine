@@ -9,6 +9,7 @@ out vec4 FragColor;
 uniform vec3 uLightPos;
 uniform vec3 uLightColor;
 uniform vec3 uObjectColor;
+uniform float uTime;
 
 void main()
 {
@@ -33,5 +34,5 @@ void main()
     FragColor = vec4(result, 1.0);
 
     // color based on normal
-    FragColor = vec4(abs(LocalNormal) * uObjectColor + 0.0001 * result, 1.0);
+    FragColor = vec4(abs(LocalNormal * sin(uTime)) * uObjectColor + 0.0001 * result, 1.0);
 }

@@ -5,6 +5,7 @@
 #include "Ham/ImGui/ImGuiImpl.h"
 #include "Ham/Core/Assert.h"
 #include "Ham/Core/LayerStack.h"
+#include "Ham/Scene/Scene.h"
 
 #include <thread>
 #include <atomic>
@@ -69,6 +70,7 @@ namespace Ham
 
         Window &GetWindow() { return m_Window; }
         GLFWwindow *GetWindowHandle() { return m_Window.GetWindowHandle(); }
+        Scene &GetScene() { return m_Scene; }
         ImGuiImpl &GetImGui() { return m_imgui; }
         float GetTime() { return m_Window.GetTime(); }
         const ApplicationSpecification &GetSpecification() const { return m_Specification; }
@@ -86,6 +88,7 @@ namespace Ham
 
     private:
         static Application *s_Instance;
+        Scene m_Scene;
 
         ApplicationSpecification m_Specification;
         LayerStack m_LayerStack;

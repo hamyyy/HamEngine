@@ -26,6 +26,10 @@
 #include "Ham/Input/Input.h"
 #include "Ham/Input/KeyCodes.h"
 
+#include "Ham/Scene/Scene.h"
+#include "Ham/Scene/Entity.h"
+#include "Ham/Scene/Component.h"
+
 //  stdlib
 #include <vector>
 #include <string>

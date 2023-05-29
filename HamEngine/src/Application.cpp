@@ -6,11 +6,15 @@
 #include "Ham/Util/TimeStep.h"
 #include "Ham/Util/GLFWExtra.h"
 
+#include "Ham/Scene/Scene.h"
+#include "Ham/Scene/Entity.h"
+#include "Ham/Scene/Component.h"
+
 namespace Ham
 {
     Application *Application::s_Instance = nullptr;
 
-    Application::Application(const ApplicationSpecification &spec) : m_Specification(spec)
+    Application::Application(const ApplicationSpecification &spec) : m_Specification(spec), m_Scene()
     {
         HAM_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
@@ -22,7 +26,20 @@ namespace Ham
     void Application::Init()
     {
         HAM_PROFILE_SCOPE("Application Init");
+        HAM_CORE_INFO("Ham Engine Version: 0.0.1");
         m_Window.Init(this);
+
+        auto cameraEntity = m_Scene.CreateEntity("camera");
+        cameraEntity.AddComponent<Component::Camera>(glm::radians(45.0f), GetWindow().GetAspectRatio(), 0.001f, 1000.0f);
+        cameraEntity.GetComponent<Component::Transform>().Value = glm::lookAt(glm::vec3(0.0f, 3.0f, 0.0f),
+                                                                              glm::vec3(0.0f, 0.0f, 0.0f),
+                                                                              glm::vec3(0.0f, 0.0f, 1.0f));
+
+        auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
+        auto &view = cameraEntity.GetComponent<Component::Transform>().Value;
+        HAM_CORE_WARN("Camera Aspect Ratio: {0}", GetWindow().GetAspectRatio());
+        HAM_CORE_WARN("Camera Transform (View): {0}", glm::to_string(view));
+        HAM_CORE_WARN("Camera Projection: {0}", glm::to_string(projection));
     }
 
     void Application::Shutdown()
@@ -85,7 +102,10 @@ namespace Ham
             }
 
             if (m_Window.ShouldClose())
+            {
                 m_Window.SetIsRunning(false);
+                break;
+            }
 
             if (glfwGetCurrentContext() != m_Window.GetWindowHandle())
                 m_Window.SetContextCurrent();
@@ -137,8 +157,7 @@ namespace Ham
 
     int Application::Run()
     {
-        // HAM_PROFILE_THREAD("Main Thread");
-        HAM_CORE_INFO("Ham Engine Version: 0.0.1");
+        HAM_PROFILE_THREAD("Main Thread");
 
         glfwMakeContextCurrent(nullptr);
         m_RenderThread = std::thread(&Application::RenderThread, this);
@@ -158,7 +177,10 @@ namespace Ham
             }
 
             if (m_Window.ShouldClose())
+            {
                 m_Window.SetIsRunning(false);
+                break;
+            }
         }
 
         if (m_RenderThread.joinable())

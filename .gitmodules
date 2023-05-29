@@ -17,3 +17,6 @@
 [submodule "HamEngine/lib/optick/optick"]
 	path = HamEngine/lib/optick
 	url = https://github.com/bombomby/optick
+[submodule "HamEngine/lib/entt"]
+	path = HamEngine/lib/entt
+	url = https://github.com/skypjack/entt
