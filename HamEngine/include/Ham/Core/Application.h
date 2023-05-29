@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Ham/Core/Layer.h"
+#include "Ham/Core/Base.h"
 #include "Ham/Core/Window.h"
-#include "Ham/ImGui/ImGuiImpl.h"
-#include "Ham/Core/Assert.h"
+#include "Ham/Core/Layer.h"
 #include "Ham/Core/LayerStack.h"
+#include "Ham/ImGui/ImGuiImpl.h"
 #include "Ham/Scene/Scene.h"
 
 #include <thread>

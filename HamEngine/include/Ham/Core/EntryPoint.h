@@ -10,6 +10,7 @@ int main(int argc, char **argv)
 	HAM_PROFILE_BEGIN_SESSION();
 	HAM_PROFILE_APP("Ham Engine");
 	Ham::Log::Init();
+	Ham::UUIDGenerator::Init();
 	auto app = Ham::CreateApplication({argc, argv});
 	app->Init();
 	if (app->Run())

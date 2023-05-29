@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Ham/Util/UUID.h"
+
 #include <entt/entt.hpp>
 
 namespace Ham
@@ -13,7 +15,7 @@ namespace Ham
 
         Entity CreateEntity(std::string name);
         void DestroyEntity(Entity entity);
-        Entity GetEntityByID(uint64_t id);
+        Entity GetEntityByID(UUID id);
         Entity GetActiveCamera();
         std::vector<Entity> GetEntitiesByTag(std::string name);
         entt::registry *GetRegistry();

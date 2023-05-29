@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Ham/Util/UUID.h>
+
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext.hpp>
@@ -18,14 +20,7 @@ namespace Ham::Component
         operator const char *() const { return Name.c_str(); }
     };
 
-    inline static uint64_t s_IDCounter = 0;
-    struct ID
-    {
-        uint64_t Value;
-        ID() : Value(s_IDCounter++) {}
-        ID(const ID &other) : Value(other.Value) {}
-        operator uint64_t() const { return Value; }
-    };
+    using UUID = Ham::UUID;
 
     struct Camera
     {

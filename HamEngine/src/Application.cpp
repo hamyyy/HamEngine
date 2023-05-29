@@ -5,6 +5,7 @@
 #include "Ham/Core/Log.h"
 #include "Ham/Util/TimeStep.h"
 #include "Ham/Util/GLFWExtra.h"
+#include "Ham/Util/UUID.h"
 
 #include "Ham/Scene/Scene.h"
 #include "Ham/Scene/Entity.h"
@@ -40,6 +41,8 @@ namespace Ham
         HAM_CORE_WARN("Camera Aspect Ratio: {0}", GetWindow().GetAspectRatio());
         HAM_CORE_WARN("Camera Transform (View): {0}", glm::to_string(view));
         HAM_CORE_WARN("Camera Projection: {0}", glm::to_string(projection));
+
+        HAM_CORE_INFO("Here are some random UUIDs:\n\t{0}\n\t{1}\n\t{2}", UUIDGenerator::Create(), UUIDGenerator::Create(), UUIDGenerator::Create());
     }
 
     void Application::Shutdown()

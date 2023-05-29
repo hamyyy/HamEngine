@@ -1,18 +1,32 @@
 #pragma once
 
-#define UUID_SYSTEM_GENERATOR
+#include "Ham/Core/Base.h"
+
 #include <uuid.h>
+
+#include <random>
+#include <string>
 
 namespace Ham
 {
-    class UUID
+    typedef std::string UUID;
+    class UUIDGenerator
     {
     public:
-        UUID() : m_UUID(uuid::uuid_system_generator{}) {}
+        static void Init()
+        {
+            std::random_device rd;
+            auto seed_data = std::array<int, std::mt19937::state_size>{};
+            std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
+            std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
+            std::mt19937 generator(seq);
+            s_Generator = std::make_shared<uuids::uuid_random_generator>(generator);
+        }
 
-        std::string ToString() const { return m_UUID.to_string(); }
+        static std::shared_ptr<uuids::uuid_random_generator> GetGenerator() { return s_Generator; }
+        static UUID Create() { return (UUID)uuids::to_string((*s_Generator)()); }
 
     private:
-        uuid m_UUID;
+        static std::shared_ptr<uuids::uuid_random_generator> s_Generator;
     };
 } // namespace Ham

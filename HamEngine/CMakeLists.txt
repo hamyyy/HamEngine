@@ -19,6 +19,7 @@ add_library(${PROJECT_NAME} STATIC ${HAM_SOURCES} ${HAM_HEADERS})
 target_include_directories(${PROJECT_NAME} PUBLIC
     include
     src
+    lib/stduuid/include
 )
 
 target_link_libraries(${PROJECT_NAME}

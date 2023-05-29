@@ -12,7 +12,7 @@ namespace Ham
     Entity Scene::CreateEntity(std::string name)
     {
         Entity entity = {m_Registry.create(), this};
-        entity.AddComponent<Component::ID>();
+        entity.AddComponent<Component::UUID>(UUIDGenerator::Create());
         entity.AddComponent<Component::Tag>(name);
         entity.AddComponent<Component::Transform>();
         return entity;
@@ -23,13 +23,13 @@ namespace Ham
         entity.Destroy();
     }
 
-    Entity Scene::GetEntityByID(uint64_t id)
+    Entity Scene::GetEntityByID(UUID id)
     {
-        const auto &view = m_Registry.view<Component::ID>();
+        const auto &view = m_Registry.view<Component::UUID>();
 
         for (auto entity : view)
         {
-            if (view.get<Component::ID>(entity).Value == id)
+            if (view.get<Component::UUID>(entity) == id)
             {
                 return {entity, this};
             }
