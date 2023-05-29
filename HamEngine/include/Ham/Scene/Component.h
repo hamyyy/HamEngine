@@ -10,6 +10,8 @@
 
 namespace Ham::Component
 {
+    using UUID = Ham::UUID;
+
     struct Tag
     {
         std::string Name;
@@ -19,8 +21,6 @@ namespace Ham::Component
         operator std::string() const { return Name; }
         operator const char *() const { return Name.c_str(); }
     };
-
-    using UUID = Ham::UUID;
 
     struct Camera
     {

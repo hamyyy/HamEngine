@@ -10,6 +10,7 @@
 #include "Ham/Util/GlmExtra.h"
 
 //  Ham Engine Core
+#include "Ham/Core/Macros.h"
 #include "Ham/Core/Base.h"
 #include "Ham/Core/Log.h"
 #include "Ham/Core/Assert.h"
@@ -24,6 +25,7 @@
 
 #include "Ham/Util/TimeStep.h"
 #include "Ham/Util/UUID.h"
+#include "Ham/Util/File.h"
 
 #include "Ham/Input/Input.h"
 #include "Ham/Input/KeyCodes.h"

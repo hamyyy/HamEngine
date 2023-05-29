@@ -4,16 +4,32 @@
 
 #include <glm/glm.hpp>
 
+#include <map>
+
 namespace Ham
 {
-
 	class Input
 	{
 	public:
 		static bool IsKeyDown(KeyCode keycode);
+		static bool IsKeyDownThisFrame(KeyCode keycode);
+		static bool IsKeyUp(KeyCode keycode);
+		static bool IsKeyUpThisFrame(KeyCode keycode);
+
 		static bool IsMouseButtonDown(MouseButton button);
+		static bool IsMouseButtonDownThisFrame(MouseButton button);
+		static bool IsMouseButtonUp(MouseButton button);
+		static bool IsMouseButtonUpThisFrame(MouseButton button);
+
 		static glm::vec2 GetMousePosition();
 		static void SetCursorMode(CursorMode mode);
+
+		static void BeginFrame();
+		static void EndFrame();
+
+		static std::map<KeyCode, std::pair<bool, bool>> m_KeyStates;			 // <isDown, wasDown>
+		static std::map<MouseButton, std::pair<bool, bool>> m_MouseButtonStates; // <isDown, wasDown>
+	private:
 	};
 
 }

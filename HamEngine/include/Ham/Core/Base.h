@@ -47,6 +47,7 @@ namespace Hazel {
 #include <optick.config.h>
 #include <optick.h>
 
+#include "Ham/Core/Macros.h"
 #include "Ham/Core/Log.h"
 #include "Ham/Core/Assert.h"
 #include "Ham/Debug/Profiler.h"

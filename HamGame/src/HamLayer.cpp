@@ -61,18 +61,15 @@ namespace Ham
     }
 
     HamLayer::HamLayer(Application *app) : Layer("HamLayer"), m_App(app), m_Scene(m_App->GetScene()) {}
+
     HamLayer::~HamLayer() {}
 
     void HamLayer::OnAttach()
     {
         // opengl simple cube
 
-        // read from file using std::filesystem
-        std::string vertexShaderSource = File::Read("assets/shaders/cube.vert");
-        std::string fragmentShaderSource = File::Read("assets/shaders/cube.frag");
-
         //  create Shader
-        shader = std::make_unique<Shader>(vertexShaderSource, fragmentShaderSource);
+        shader = std::make_unique<Shader>(ASSETS_PATH + "shaders/cube.vert", ASSETS_PATH + "shaders/cube.frag");
 
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
@@ -189,6 +186,8 @@ namespace Ham
         glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
+
+        shader->Unbind();
     }
 
     void HamLayer::OnUIRender(TimeStep deltaTime)

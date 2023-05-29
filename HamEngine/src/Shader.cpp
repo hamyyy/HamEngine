@@ -1,24 +1,25 @@
 #include "Ham/Renderer/Shader.h"
 
 #include "Ham/Core/Base.h"
+#include "Ham/Util/Watcher.h"
 
 #include <glad/glad.h>
 
 namespace Ham
 {
-    Shader::Shader(const std::string &vertexSrc, const std::string &fragmentSrc)
+
+    void OnFileChanged(Shader *shader) { shader->Reload(); }
+
+    Shader::Shader(std::string vertexPath, std::string fragmentPath)
     {
-        m_RendererID = glCreateProgram();
-        unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexSrc);
-        unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentSrc);
+        m_VertexSourcePath = vertexPath;
+        m_FragmentSourcePath = fragmentPath;
 
-        glAttachShader(m_RendererID, vs);
-        glAttachShader(m_RendererID, fs);
-        glLinkProgram(m_RendererID);
-        glValidateProgram(m_RendererID);
+        m_RendererID = CreateShader(File::Read(m_VertexSourcePath), File::Read(m_FragmentSourcePath));
+        FileWatcher::Watch(m_FragmentSourcePath, std::bind(OnFileChanged, this));
 
-        glDeleteShader(vs);
-        glDeleteShader(fs);
+        if (m_RendererID == 0)
+            HAM_CORE_ERROR("Shader compilation failed");
     }
 
     Shader::~Shader()
@@ -34,6 +35,15 @@ namespace Ham
     void Shader::Unbind() const
     {
         glUseProgram(0);
+    }
+
+    void Shader::Reload()
+    {
+        m_UniformLocationCache.clear();
+        auto newProgram = CreateShader(File::Read(m_VertexSourcePath), File::Read(m_FragmentSourcePath));
+        glDeleteProgram(m_RendererID);
+        m_RendererID = newProgram;
+        HAM_CORE_INFO("Shader reloaded:\n\t{0}\n\t{1}", m_VertexSourcePath, m_FragmentSourcePath);
     }
 
     void Shader::SetUniform1i(const std::string &name, int value)
@@ -94,15 +104,26 @@ namespace Ham
         glCompileShader(id);
 
         // Error handling
-        int result;
+        int result = -1;
         glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-        if (result == GL_FALSE)
+        if (result != GL_TRUE)
         {
             int length;
             glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
             char *message = (char *)alloca(length * sizeof(char));
             glGetShaderInfoLog(id, length, &length, message);
-            HAM_CORE_ERROR("Failed to compile {0} shader!", (type == GL_VERTEX_SHADER ? "vertex" : "fragment"));
+
+            std::string shaderType;
+            switch (type)
+            {
+            // clang-format off
+                case GL_VERTEX_SHADER: shaderType = "vertex"; break; 
+                case GL_FRAGMENT_SHADER: shaderType = "fragment"; break;
+                default: shaderType = "unknown"; break;
+                // clang-format on
+            }
+
+            HAM_CORE_ERROR("Failed to compile {0} shader!", shaderType);
             HAM_CORE_ERROR("{0}", message);
             glDeleteShader(id);
             return 0;
@@ -113,9 +134,16 @@ namespace Ham
 
     unsigned int Shader::CreateShader(const std::string &vertexShader, const std::string &fragmentShader)
     {
-        unsigned int program = glCreateProgram();
+        auto program = glCreateProgram();
         unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
         unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+        if (vs == 0 || fs == 0)
+        {
+            glDeleteShader(vs);
+            glDeleteShader(fs);
+            return program;
+        }
 
         glAttachShader(program, vs);
         glAttachShader(program, fs);

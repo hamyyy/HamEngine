@@ -6,6 +6,7 @@
 #include "Ham/Util/TimeStep.h"
 #include "Ham/Util/GLFWExtra.h"
 #include "Ham/Util/UUID.h"
+#include "Ham/Input/Input.h"
 
 #include "Ham/Scene/Scene.h"
 #include "Ham/Scene/Entity.h"
@@ -49,6 +50,7 @@ namespace Ham
     {
         m_Window.Shutdown();
         s_Instance = nullptr;
+        // FileWatcher::Shutdown();
     }
 
     void Application::PushLayer(Layer *layer)
@@ -101,6 +103,7 @@ namespace Ham
 
             {
                 // HAM_PROFILE_SCOPE("Render Poll Events");
+                Input::BeginFrame();
                 m_Window.PollEvents();
             }
 
@@ -153,6 +156,8 @@ namespace Ham
                 // HAM_PROFILE_SCOPE("Present");
                 m_Window.Present();
             }
+
+            Input::EndFrame();
         }
 
         m_imgui.Shutdown();

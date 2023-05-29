@@ -34,5 +34,5 @@ void main()
     FragColor = vec4(result, 1.0);
 
     // color based on normal
-    FragColor = vec4(abs(LocalNormal * sin(uTime)) * uObjectColor + 0.0001 * result, 1.0);
+    FragColor = vec4(abs(LocalNormal) * (sin(uTime * 10.0)) * uObjectColor + 0.0001 * result, 1.0);
 }

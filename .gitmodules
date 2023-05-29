@@ -23,3 +23,6 @@
 [submodule "HamEngine/lib/stduuid"]
 	path = HamEngine/lib/stduuid
 	url = https://github.com/mariusbancila/stduuid
+[submodule "HamEngine/lib/filewatch"]
+	path = HamEngine/lib/filewatch
+	url = https://github.com/ThomasMonkman/filewatch

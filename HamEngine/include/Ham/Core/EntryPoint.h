@@ -1,8 +1,6 @@
 #pragma once
 #include "Ham/Core/Application.h"
 
-#include <iostream>
-
 extern Ham::Application *Ham::CreateApplication(Ham::ApplicationCommandLineArgs args);
 
 int main(int argc, char **argv)

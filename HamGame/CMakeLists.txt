@@ -10,3 +10,5 @@ target_link_libraries(${PROJECT_NAME} HamEngine)
 
 target_copy_assets(${PROJECT_NAME} assets)
 target_kill_executable(${PROJECT_NAME})
+
+add_compile_definitions(SOURCE_ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/assets/")
