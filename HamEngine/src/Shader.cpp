@@ -8,22 +8,33 @@
 namespace Ham
 {
 
-    void OnFileChanged(Shader *shader) { shader->Reload(); }
+    std::vector<std::shared_ptr<Shader>> Shader::s_Shaders;
 
     Shader::Shader(std::string vertexPath, std::string fragmentPath)
     {
         m_VertexSourcePath = vertexPath;
         m_FragmentSourcePath = fragmentPath;
+        m_LastReloadTime = std::chrono::system_clock::now();
+
+        auto onFileChanged = [this]()
+        {
+            Reload();
+        };
+        m_UnSubscribeFunctions.push_back(FileWatcher::Watch(m_VertexSourcePath, onFileChanged));
+        m_UnSubscribeFunctions.push_back(FileWatcher::Watch(m_FragmentSourcePath, onFileChanged));
 
         m_RendererID = CreateShader(File::Read(m_VertexSourcePath), File::Read(m_FragmentSourcePath));
-        FileWatcher::Watch(m_FragmentSourcePath, std::bind(OnFileChanged, this));
 
         if (m_RendererID == 0)
             HAM_CORE_ERROR("Shader compilation failed");
+        else
+            Shader::s_Shaders.push_back(std::shared_ptr<Shader>(this));
     }
 
     Shader::~Shader()
     {
+        for (auto &unSubscribeFunction : m_UnSubscribeFunctions)
+            unSubscribeFunction();
         glDeleteProgram(m_RendererID);
     }
 
@@ -39,11 +50,29 @@ namespace Ham
 
     void Shader::Reload()
     {
+        if (m_LastReloadTime + std::chrono::milliseconds(100) > std::chrono::system_clock::now())
+            return;
+        m_LastReloadTime = std::chrono::system_clock::now();
+
+        m_ShouldReload = true;
+    }
+
+    void Shader::PerformReload()
+    {
+        if (!m_ShouldReload)
+            return;
+        m_ShouldReload = false;
+
         m_UniformLocationCache.clear();
         auto newProgram = CreateShader(File::Read(m_VertexSourcePath), File::Read(m_FragmentSourcePath));
+        if (newProgram == 0)
+        {
+            HAM_CORE_ERROR("Shader recompilation failed:\n\t{0}\n\t{1}", m_VertexSourcePath, m_FragmentSourcePath);
+            return;
+        }
         glDeleteProgram(m_RendererID);
         m_RendererID = newProgram;
-        HAM_CORE_INFO("Shader reloaded:\n\t{0}\n\t{1}", m_VertexSourcePath, m_FragmentSourcePath);
+        // HAM_CORE_INFO("Reloaded shader:\n\t{0}\n\t{1}", m_VertexSourcePath, m_FragmentSourcePath);
     }
 
     void Shader::SetUniform1i(const std::string &name, int value)
@@ -110,7 +139,7 @@ namespace Ham
         {
             int length;
             glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-            char *message = (char *)alloca(length * sizeof(char));
+            char message[1024];
             glGetShaderInfoLog(id, length, &length, message);
 
             std::string shaderType;
@@ -124,7 +153,7 @@ namespace Ham
             }
 
             HAM_CORE_ERROR("Failed to compile {0} shader!", shaderType);
-            HAM_CORE_ERROR("{0}", message);
+            HAM_CORE_ERROR("OpenGL Error: {0}", message);
             glDeleteShader(id);
             return 0;
         }
@@ -149,6 +178,23 @@ namespace Ham
         glAttachShader(program, fs);
         glLinkProgram(program);
         glValidateProgram(program);
+
+        // Error handling
+        int result = -1;
+        glGetProgramiv(program, GL_LINK_STATUS, &result);
+        if (result != GL_TRUE)
+        {
+            int length;
+            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+            char *message = (char *)alloca(length * sizeof(char));
+            glGetProgramInfoLog(program, length, &length, message);
+
+            HAM_CORE_ERROR("Failed to link shader program!");
+            HAM_CORE_ERROR("{0}", message);
+            glDeleteShader(vs);
+            glDeleteShader(fs);
+            return 0;
+        }
 
         glDeleteShader(vs);
         glDeleteShader(fs);

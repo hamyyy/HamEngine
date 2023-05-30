@@ -9,6 +9,7 @@
 #include "Ham/Input/Input.h"
 
 #include "Ham/Scene/Scene.h"
+#include "Ham/Renderer/Shader.h"
 #include "Ham/Scene/Entity.h"
 #include "Ham/Scene/Component.h"
 
@@ -33,7 +34,7 @@ namespace Ham
 
         auto cameraEntity = m_Scene.CreateEntity("camera");
         cameraEntity.AddComponent<Component::Camera>(glm::radians(45.0f), GetWindow().GetAspectRatio(), 0.001f, 1000.0f);
-        cameraEntity.GetComponent<Component::Transform>().Value = glm::lookAt(glm::vec3(0.0f, 3.0f, 0.0f),
+        cameraEntity.GetComponent<Component::Transform>().Value = glm::lookAt(glm::vec3(3.0f, 3.0f, 3.0f),
                                                                               glm::vec3(0.0f, 0.0f, 0.0f),
                                                                               glm::vec3(0.0f, 0.0f, 1.0f));
 
@@ -158,6 +159,11 @@ namespace Ham
             }
 
             Input::EndFrame();
+
+            for (auto shader : Shader::s_Shaders)
+            {
+                shader->PerformReload();
+            }
         }
 
         m_imgui.Shutdown();

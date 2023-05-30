@@ -5,10 +5,13 @@
 #include <glm/glm.hpp>
 
 #include <string>
+#include <chrono>
+#include <atomic>
 #include <unordered_map>
 
 namespace Ham
 {
+    class Application;
     class Shader
     {
     public:
@@ -18,6 +21,7 @@ namespace Ham
         void Bind() const;
         void Unbind() const;
         void Reload();
+        void PerformReload();
 
         void SetUniform1i(const std::string &name, int value);
         void SetUniform2i(const std::string &name, glm::ivec2 value);
@@ -42,5 +46,14 @@ namespace Ham
 
         std::string m_VertexSourcePath;
         std::string m_FragmentSourcePath;
+
+        std::chrono::time_point<std::chrono::system_clock> m_LastReloadTime;
+        std::atomic_bool m_ShouldReload = false;
+
+        std::vector<std::function<void()>> m_UnSubscribeFunctions;
+
+        static std::vector<std::shared_ptr<Shader>> s_Shaders;
+
+        friend class Application;
     };
 } // namespace Ham

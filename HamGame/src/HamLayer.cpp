@@ -43,19 +43,84 @@ namespace Ham
         vertices.push_back({{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, -1.0f}});
         vertices.push_back({{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, -1.0f}});
 
+        vertices.clear();
+
+        vertices = {
+            // Front Face
+            {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
+            {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
+            {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
+            {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
+
+            // Right Face
+            {{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+
+            // Back Face
+            {{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+            {{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+            {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+            {{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+
+            // Left Face
+            {{-0.5f, -0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}},
+            {{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}},
+            {{-0.5f, 0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}},
+            {{-0.5f, 0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}},
+
+            // Top Face
+            {{-0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+            {{0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+            {{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+
+            // Bottom Face
+            {{-0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}},
+            {{0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}},
+            {{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}},
+            {{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}}};
+
         return vertices;
     }
 
     std::vector<unsigned int> getCubeIndices()
     {
-        std::vector<unsigned int> indices = {
-            0, 2, 1, 2, 0, 3,       // Top face
-            4, 5, 6, 6, 7, 4,       // Bottom face
-            8, 10, 9, 10, 8, 11,    // Right face
-            12, 13, 14, 14, 15, 12, // Left face
-            16, 17, 18, 18, 19, 16, // Front face
-            20, 22, 21, 22, 20, 23  // Back face
-        };
+        std::vector<unsigned int> indices =
+            // {
+            //     0, 2, 1, 2, 0, 3,       // Top face
+            //     4, 5, 6, 6, 7, 4,       // Bottom face
+            //     8, 10, 9, 10, 8, 11,    // Right face
+            //     12, 13, 14, 14, 15, 12, // Left face
+            //     16, 17, 18, 18, 19, 16, // Front face
+            //     20, 22, 21, 22, 20, 23  // Back face
+            // };
+
+            {
+                // Front Face
+                0, 1, 2,
+                2, 3, 0,
+
+                // Right Face
+                4, 5, 6,
+                6, 7, 4,
+
+                // Back Face
+                8, 9, 10,
+                10, 11, 8,
+
+                // Left Face
+                12, 13, 14,
+                14, 15, 12,
+
+                // Top Face
+                16, 17, 18,
+                18, 19, 16,
+
+                // Bottom Face
+                20, 21, 22,
+                22, 23, 20};
 
         return indices;
     }
@@ -167,8 +232,13 @@ namespace Ham
         shader->SetUniformMat4f("uView", view);
         shader->SetUniformMat4f("uProjection", projection);
 
-        shader->SetUniform3f("uLightPos", glm::vec3(1.0f, 0.0f, -1.0f));
-        shader->SetUniform3f("uLightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+        static auto lightPos = glm::vec3(1.0f, 0.0f, 0.0f);
+
+        // rotate light about z axis
+        lightPos = glm::rotate(lightPos, glm::radians(90.0f) * deltaTime, glm::vec3(0.0f, 0.0f, 1.0f));
+
+        shader->SetUniform3f("uLightPos", lightPos);
+        shader->SetUniform3f("uLightColor", glm::vec3(1.0f, 0.0f, 0.0f));
         shader->SetUniform1f("uTime", m_App->GetTime());
 
         // render the cube
@@ -284,7 +354,7 @@ namespace Ham
 
         static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
         static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::LOCAL);
-        static bool enableGizmo = true;
+        static bool enableGizmo = false;
         bool useSnap = false;
         float snapValue;
         if (Input::IsKeyDown(KeyCode::LEFT_CONTROL))
