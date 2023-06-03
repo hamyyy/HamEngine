@@ -17,7 +17,7 @@ namespace Ham
 
     void ImGuiImpl::Init(Window *window)
     {
-        HAM_ASSERT(window != nullptr, "Window is nullptr!");
+        HAM_CORE_ASSERT(window != nullptr, "Window is nullptr!");
         m_Window = window;
 
         // Setup Dear ImGui context

@@ -12,6 +12,8 @@
 #include "Ham/Renderer/Shader.h"
 #include "Ham/Scene/Entity.h"
 #include "Ham/Scene/Component.h"
+#include "Ham/Script/CameraController.h"
+#include "Ham/Scene/Systems.h"
 
 namespace Ham
 {
@@ -19,7 +21,7 @@ namespace Ham
 
     Application::Application(const ApplicationSpecification &spec) : m_Specification(spec), m_Scene()
     {
-        HAM_ASSERT(!s_Instance, "Application already exists!");
+        HAM_CORE_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
         m_Specification.DefaultWidth = m_Specification.Width;
         m_Specification.DefaultHeight = m_Specification.Height;
@@ -31,12 +33,14 @@ namespace Ham
         HAM_PROFILE_SCOPE("Application Init");
         HAM_CORE_INFO("Ham Engine Version: 0.0.1");
         m_Window.Init(this);
+        Input::Init();
 
         auto cameraEntity = m_Scene.CreateEntity("camera");
         cameraEntity.AddComponent<Component::Camera>(glm::radians(45.0f), GetWindow().GetAspectRatio(), 0.001f, 1000.0f);
-        cameraEntity.GetComponent<Component::Transform>().Value = glm::lookAt(glm::vec3(3.0f, 3.0f, 3.0f),
-                                                                              glm::vec3(0.0f, 0.0f, 0.0f),
-                                                                              glm::vec3(0.0f, 0.0f, 1.0f));
+        cameraEntity.GetComponent<Component::Transform>().Value = glm::inverse(glm::camera());
+
+        auto &scriptList = cameraEntity.AddComponent<Component::NativeScriptList>();
+        scriptList.AddScript<CameraController>("CameraController");
 
         auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
         auto &view = cameraEntity.GetComponent<Component::Transform>().Value;
@@ -45,10 +49,15 @@ namespace Ham
         HAM_CORE_WARN("Camera Projection: {0}", glm::to_string(projection));
 
         HAM_CORE_INFO("Here are some random UUIDs:\n\t{0}\n\t{1}\n\t{2}", UUIDGenerator::Create(), UUIDGenerator::Create(), UUIDGenerator::Create());
+
+        HAM_CORE_INFO("Up vector is: {0}", glm::to_string(glm::up()));
+        HAM_CORE_INFO("Right vector is: {0}", glm::to_string(glm::right()));
+        HAM_CORE_INFO("Forward vector is: {0}", glm::to_string(glm::forward()));
     }
 
     void Application::Shutdown()
     {
+        Systems::DetachNativeScripts(m_Scene);
         m_Window.Shutdown();
         s_Instance = nullptr;
         // FileWatcher::Shutdown();
@@ -93,10 +102,16 @@ namespace Ham
 
         m_imgui.Init(&m_Window);
 
-        for (Layer *layer : m_LayerStack)
-            layer->OnAttach();
+        {
+            // pre-loop
+            for (Layer *layer : m_LayerStack)
+                layer->OnAttach();
 
-        SetVSync(GetSpecification().VSync);
+            Systems::AttachNativeScripts(m_Scene);
+
+            SetVSync(GetSpecification().VSync);
+        }
+
         m_Window.SetIsRunning(true);
         while (m_Window.IsRunning())
         {
@@ -133,6 +148,7 @@ namespace Ham
 
             {
                 // HAM_PROFILE_SCOPE("LayerStack OnUpdate");
+                Systems::UpdateNativeScripts(m_Scene, timestep);
                 for (Layer *layer : m_LayerStack)
                     layer->OnUpdate(timestep);
             }
@@ -158,12 +174,12 @@ namespace Ham
                 m_Window.Present();
             }
 
-            Input::EndFrame();
-
             for (auto shader : Shader::s_Shaders)
             {
                 shader->PerformReload();
             }
+
+            Input::EndFrame();
         }
 
         m_imgui.Shutdown();

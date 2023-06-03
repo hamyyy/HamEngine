@@ -9,12 +9,35 @@ namespace Ham
 
 	std::map<KeyCode, std::pair<bool, bool>> Input::m_KeyStates;
 	std::map<MouseButton, std::pair<bool, bool>> Input::m_MouseButtonStates;
+	int Input::s_MouseWheelDelta = 0;
+	int Input::s_MouseWheelChanged = 0;
+
+	void Input::Init()
+	{
+		//  mouse wheel callback
+		auto &app = Application::Get();
+		GLFWwindow *windowHandle = app.GetWindowHandle();
+		glfwSetScrollCallback(windowHandle, [](GLFWwindow *window, double xOffset, double yOffset)
+							  {
+								  auto &app = Application::Get();
+								  if (app.GetImGui().WantsCaptureMouse())
+									  return;
+
+								  if (yOffset > 0)
+									  Input::s_MouseWheelChanged = 1;
+								  else if (yOffset < 0)
+									  Input::s_MouseWheelChanged = -1;
+								  else
+									  Input::s_MouseWheelChanged = 0;
+								  //
+							  });
+	}
 
 	bool Input::IsKeyDown(KeyCode keycode)
 	{
 		auto &app = Application::Get();
 
-		if (app.GetImGui().WantsCaptureKeyboard())
+		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
 
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
@@ -30,7 +53,7 @@ namespace Ham
 	{
 		auto &app = Application::Get();
 
-		if (app.GetImGui().WantsCaptureKeyboard())
+		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
 
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
@@ -46,7 +69,7 @@ namespace Ham
 	{
 		auto &app = Application::Get();
 
-		if (app.GetImGui().WantsCaptureKeyboard())
+		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
 
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
@@ -62,7 +85,7 @@ namespace Ham
 	{
 		auto &app = Application::Get();
 
-		if (app.GetImGui().WantsCaptureKeyboard())
+		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
 
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
@@ -138,6 +161,11 @@ namespace Ham
 		return !m_MouseButtonStates[button].first && m_MouseButtonStates[button].second;
 	}
 
+	int Input::GetMouseWheelDelta()
+	{
+		return s_MouseWheelDelta;
+	}
+
 	glm::vec2 Input::GetMousePosition()
 	{
 		GLFWwindow *windowHandle = Application::Get().GetWindowHandle();
@@ -155,6 +183,8 @@ namespace Ham
 
 	void Input::BeginFrame()
 	{
+		s_MouseWheelDelta = s_MouseWheelChanged;
+		s_MouseWheelChanged = 0;
 	}
 
 	void Input::EndFrame()
@@ -168,6 +198,8 @@ namespace Ham
 		{
 			button.second.second = button.second.first;
 		}
+
+		s_MouseWheelDelta = 0;
 	}
 
 }

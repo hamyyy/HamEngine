@@ -1,5 +1,10 @@
 #include "HamLayer.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
+
+#include "Ham/Script/CameraController.h"
+
 namespace Ham
 {
 
@@ -204,6 +209,22 @@ namespace Ham
         //     transform = glm::translate(transform, glm::left() * speed * deltaTime);
         // }
 
+        if (Input::IsKeyDownThisFrame(KeyCode::F))
+        {
+            auto cameraEntity = GetCamera();
+            auto &scriptList = cameraEntity.GetComponent<Component::NativeScriptList>();
+            auto script = scriptList.GetScript<CameraController>();
+            script->SetTarget(transform[3]);
+        }
+
+        if (Input::IsKeyDownThisFrame(KeyCode::TAB))
+        {
+            auto cameraEntity = GetCamera();
+            auto &scriptList = cameraEntity.GetComponent<Component::NativeScriptList>();
+            auto script = scriptList.GetScript<CameraController>();
+            script->SetTarget((glm::vec3(rand() % 1000, rand() % 1000, rand() % 1000) / 1000.0f - 0.5f) * 2.0f);
+        }
+
         glm::vec2 mouse = Input::GetMousePosition();
         static glm::vec2 prevMouse = mouse;
         static float sensitivity = 0.2f;
@@ -229,7 +250,7 @@ namespace Ham
         auto &view = cameraEntity.GetComponent<Component::Transform>().Value;
 
         shader->SetUniformMat4f("uModel", transform);
-        shader->SetUniformMat4f("uView", view);
+        shader->SetUniformMat4f("uView", glm::inverse(view));
         shader->SetUniformMat4f("uProjection", projection);
 
         static auto lightPos = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -390,6 +411,46 @@ namespace Ham
             enableGizmo = true;
             mCurrentGizmoMode = ImGuizmo::LOCAL;
         }
+
+        {
+            ImGui::Separator();
+            ImGui::DragFloat3("Cube Position", glm::value_ptr(transform[3]), 0.1f);
+
+            ImGui::Separator();
+            auto cameraEntity = GetCamera();
+            auto &cameraTransform = cameraEntity.GetComponent<Component::Transform>();
+            auto &cameraComponent = cameraEntity.GetComponent<Component::Camera>();
+            auto &projection = cameraComponent.Projection;
+            auto &tf = cameraTransform.Value;
+
+            glm::vec3 scale;
+            glm::quat rotation;
+            glm::vec3 translation;
+            glm::vec3 skew;
+            glm::vec4 perspective;
+            glm::decompose(cameraTransform.Value, scale, rotation, translation, skew, perspective);
+            auto cameraLookDir = glm::normalize(translation + rotation * glm::vec3(1.0f, 0.0f, 0.0f));
+
+            ImGui::DragFloat3("Camera Position", glm::value_ptr(cameraTransform.Value[3]), 0.1f);
+            ImGui::DragFloat3("Camera Look Dir", glm::value_ptr(cameraLookDir), 0.1f);
+        }
+
+        {
+            ImGui::Separator();
+
+            static std::string text = "Hello World";
+
+            ImGui::LabelText("##TextLabel", "%s", text.c_str());
+
+            static char textValue[256];
+            text.resize(IM_ARRAYSIZE(textValue));
+            std::strcpy(textValue, text.c_str());
+            if (ImGui::InputText("Name", textValue, IM_ARRAYSIZE(textValue)))
+            {
+                text = textValue;
+            }
+        }
+
         ImGui::End();
 
         ImGuizmo::SetOrthographic(false);
@@ -408,14 +469,15 @@ namespace Ham
                 break;
             }
         }
+        {
+            auto cameraEntity = GetCamera();
+            auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
+            auto view = glm::inverse(cameraEntity.GetComponent<Component::Transform>().Value);
 
-        auto cameraEntity = GetCamera();
-        auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
-        auto &view = cameraEntity.GetComponent<Component::Transform>().Value;
-
-        float snapValues[3] = {snapValue, snapValue, snapValue};
-        if (enableGizmo)
-            ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr);
+            float snapValues[3] = {snapValue, snapValue, snapValue};
+            if (enableGizmo)
+                ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr);
+        }
     }
 
     // void HamLayer::OnEvent(Event &event) {}

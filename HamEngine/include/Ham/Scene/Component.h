@@ -1,12 +1,37 @@
 #pragma once
 
-#include <Ham/Util/UUID.h>
+#include "Ham/Util/TimeStep.h"
+#include "Ham/Util/UUID.h"
 
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext.hpp>
 
 #include <string>
+
+namespace Ham
+{
+    class Entity;
+    class Scene;
+    struct NativeScript
+    {
+        std::string Name;
+        UUID ID;
+        Entity *GameObject;
+        Scene *World;
+        bool Active = false;
+
+        NativeScript(const std::string &name);
+        NativeScript(const NativeScript &other);
+
+        virtual ~NativeScript() {}
+        virtual void OnCreate() {}
+        virtual void OnDestroy() {}
+        virtual void OnUpdate(TimeStep deltaTime) {}
+
+        operator bool() const { return Active; }
+    };
+} // namespace Ham
 
 namespace Ham::Component
 {
@@ -15,9 +40,12 @@ namespace Ham::Component
     struct Tag
     {
         std::string Name;
+
         Tag() : Name("Unnamed") {}
         Tag(std::string name) : Name(name) {}
         Tag(const Tag &other) : Name(other.Name) {}
+
+        operator std::string() { return Name; }
         operator std::string() const { return Name; }
         operator const char *() const { return Name.c_str(); }
     };
@@ -55,7 +83,59 @@ namespace Ham::Component
         Transform(const Transform &other) : Value(other.Value) {}
         Transform(const glm::mat4 &value) : Value(value) {}
 
+        operator glm::mat4() { return Value; }
         operator glm::mat4() const { return Value; }
     };
 
-} // namespace Ham::Compone
+    struct NativeScriptList
+    {
+        std::vector<std::shared_ptr<NativeScript>> Scripts;
+        NativeScriptList() {}
+        NativeScriptList(const NativeScriptList &other) : Scripts(other.Scripts) {}
+
+        template <typename T, typename... Args>
+        T *AddScript(Args &&...args)
+        {
+            if (HasScript<T>())
+            {
+                HAM_CORE_ERROR("Script {0} already attached to this entity!", typeid(T).name());
+                return GetScript<T>();
+            }
+            else
+            {
+                Scripts.push_back(std::make_shared<T>(std::forward<Args>(args)...));
+                return &static_cast<T &>(*Scripts.back());
+            }
+        }
+
+        template <typename T>
+        T *GetScript()
+        {
+            for (auto &script : Scripts)
+            {
+                if (dynamic_cast<T *>(script.get()) != nullptr)
+                {
+                    return &static_cast<T &>(*script);
+                }
+            }
+
+            HAM_CORE_ERROR("Script {0} not found!", typeid(T).name());
+            return nullptr;
+        }
+
+        template <typename T>
+        bool HasScript()
+        {
+            for (auto &script : Scripts)
+            {
+                if (dynamic_cast<T *>(script.get()) != nullptr)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    };
+
+} // namespace Ham::Component

@@ -33,6 +33,9 @@
 #include "Ham/Scene/Scene.h"
 #include "Ham/Scene/Entity.h"
 #include "Ham/Scene/Component.h"
+#include "Ham/Scene/Systems.h"
+
+// #include "Ham/Script/NativeScript.h"
 
 //  stdlib
 #include <vector>
