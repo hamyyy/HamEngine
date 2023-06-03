@@ -119,8 +119,8 @@ namespace Ham
 
             {
                 // HAM_PROFILE_SCOPE("Render Poll Events");
-                Input::BeginFrame();
                 m_Window.PollEvents();
+                Input::BeginFrame();
             }
 
             if (m_Window.ShouldClose())
@@ -204,6 +204,7 @@ namespace Ham
             {
                 HAM_PROFILE_SCOPE("Main Poll Events");
                 m_Window.PollEvents();
+                Input::Update();
             }
 
             if (m_Window.ShouldClose())

@@ -28,6 +28,7 @@ namespace Ham
 		static glm::vec2 GetMousePosition();
 		static void SetCursorMode(CursorMode mode);
 
+		static void Update();
 		static void BeginFrame();
 		static void EndFrame();
 
@@ -36,6 +37,9 @@ namespace Ham
 	private:
 		static int s_MouseWheelDelta;
 		static int s_MouseWheelChanged;
+		
+		static CursorMode s_CurrentCursorMode;
+		static CursorMode s_DesiredCursorMode;
 	};
 
 }

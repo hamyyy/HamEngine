@@ -225,6 +225,16 @@ namespace Ham
             script->SetTarget((glm::vec3(rand() % 1000, rand() % 1000, rand() % 1000) / 1000.0f - 0.5f) * 2.0f);
         }
 
+        if (Input::IsMouseButtonDownThisFrame(MouseButton::LEFT))
+        {
+            Input::SetCursorMode(CursorMode::CAPTURED);
+        }
+
+        if (Input::IsKeyDownThisFrame(KeyCode::ESCAPE))
+        {
+            Input::SetCursorMode(CursorMode::NORMAL);
+        }
+
         glm::vec2 mouse = Input::GetMousePosition();
         static glm::vec2 prevMouse = mouse;
         static float sensitivity = 0.2f;
@@ -341,7 +351,20 @@ namespace Ham
             if (ImGui::ColorButton("Clear Color", {brown.r, brown.g, brown.b, brown.a}))
                 m_App->GetWindow().SetClearColor(brown);
             ImGui::PopID();
+            ImGui::PushID("5");
+            ImGui::SameLine();
+            if (ImGui::ColorButton("Clear Color", {0.0f, 0.0f, 0.0f, 1.0f}))
+                m_App->GetWindow().SetClearColor({0.0f, 0.0f, 0.0f, 1.0f});
+            ImGui::PopID();
             ImGui::Separator();
+
+            static bool transparent = false;
+            if (ImGui::Checkbox("Transparent Background", &transparent))
+            {
+                auto cc = m_App->GetWindow().GetClearColor();
+                cc.a = transparent ? 0.0f : 1.0f;
+                m_App->GetWindow().SetClearColor(cc);
+            }
 
             if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
                 counter++;

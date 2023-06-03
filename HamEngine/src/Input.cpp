@@ -11,6 +11,8 @@ namespace Ham
 	std::map<MouseButton, std::pair<bool, bool>> Input::m_MouseButtonStates;
 	int Input::s_MouseWheelDelta = 0;
 	int Input::s_MouseWheelChanged = 0;
+	CursorMode Input::s_CurrentCursorMode = CursorMode::NORMAL;
+	CursorMode Input::s_DesiredCursorMode = CursorMode::NORMAL;
 
 	void Input::Init()
 	{
@@ -31,6 +33,14 @@ namespace Ham
 									  Input::s_MouseWheelChanged = 0;
 								  //
 							  });
+
+		glfwSetWindowFocusCallback(windowHandle, [](GLFWwindow *window, int focused)
+								   {
+									   auto &app = Application::Get();
+									   if (!focused)
+										   Input::s_DesiredCursorMode = CursorMode::NORMAL;
+									   //
+								   });
 	}
 
 	bool Input::IsKeyDown(KeyCode keycode)
@@ -178,7 +188,17 @@ namespace Ham
 	void Input::SetCursorMode(CursorMode mode)
 	{
 		GLFWwindow *windowHandle = Application::Get().GetWindowHandle();
-		glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)mode);
+		s_DesiredCursorMode = mode;
+	}
+
+	void Input::Update()
+	{
+		GLFWwindow *windowHandle = Application::Get().GetWindowHandle();
+		if (s_DesiredCursorMode != s_CurrentCursorMode)
+		{
+			glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)s_DesiredCursorMode);
+			s_CurrentCursorMode = s_DesiredCursorMode;
+		}
 	}
 
 	void Input::BeginFrame()

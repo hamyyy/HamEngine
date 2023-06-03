@@ -57,10 +57,10 @@ namespace Ham
 		Y = 89,
 		Z = 90,
 
-		LEFT_BRACKET = 91,  /* [ */
-		BACKSLASH = 92,	   /* \ */
+		LEFT_BRACKET = 91,	/* [ */
+		BACKSLASH = 92,		/* \ */
 		RIGHT_BRACKET = 93, /* ] */
-		TILDE = 96,  /* ` */
+		TILDE = 96,			/* ` */
 
 		WORRLD_1 = 161, /* non-US #1 */
 		WORRLD_2 = 162, /* non-US #2 */
@@ -152,8 +152,8 @@ namespace Ham
 	enum class CursorMode
 	{
 		NORMAL = 0,
-		HIDDEN = 1,
-		LOCKED = 2
+		HIDDEN,
+		CAPTURED
 	};
 
 	typedef enum class MouseButton : uint16_t
