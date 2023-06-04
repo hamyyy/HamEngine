@@ -8,6 +8,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext.hpp>
 #include "Ham/Util/GlmExtra.h"
+#include "Ham/Util/ImGuiExtra.h"
 
 //  Ham Engine Core
 #include "Ham/Core/Macros.h"
@@ -22,6 +23,7 @@
 #include "Ham/Core/Assert.h"
 
 #include "Ham/Renderer/Shader.h"
+#include "Ham/Renderer/Buffer.h"
 
 #include "Ham/Util/TimeStep.h"
 #include "Ham/Util/UUID.h"

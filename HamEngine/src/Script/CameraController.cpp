@@ -24,6 +24,11 @@ namespace Ham
     {
         DoAnimation(deltaTime);
 
+        static auto pTarget = glm::inverse(glm::camera());
+        static auto pAlpha = 0.0f;
+        static auto pBeta = 0.0f;
+        static auto pDistance = 0.0f;
+
         static float speed = 5.0f;
         static auto pmousePos = Input::GetMousePosition();
         auto mousePos = Input::GetMousePosition();
@@ -34,9 +39,9 @@ namespace Ham
         glm::vec3 rightTarget = m_Target * glm::vec4(glm::right(), 0.0f);
         glm::vec3 upTarget = m_Target * glm::vec4(glm::up(), 0.0f);
 
-        glm::vec3 cameraForward = glm::inverse(m_Target) * transform.Value * glm::camera() * glm::vec4(glm::forward(), 0.0f);
-        glm::vec3 cameraRight = glm::inverse(m_Target) * transform.Value * glm::camera() * glm::vec4(glm::right(), 0.0f);
-        glm::vec3 cameraUp = glm::inverse(m_Target) * transform.Value * glm::camera() * glm::vec4(glm::up(), 0.0f);
+        glm::vec3 cameraForward = glm::inverse(m_Target) * transform.ToMatrix() * glm::camera() * glm::vec4(glm::forward(), 0.0f);
+        glm::vec3 cameraRight = glm::inverse(m_Target) * transform.ToMatrix() * glm::camera() * glm::vec4(glm::right(), 0.0f);
+        glm::vec3 cameraUp = glm::inverse(m_Target) * transform.ToMatrix() * glm::camera() * glm::vec4(glm::up(), 0.0f);
 
         glm::vec3 strightUp = glm::inverse(m_Target) * glm::vec4(glm::up(), 0.0f);
 
@@ -89,8 +94,8 @@ namespace Ham
         if (Input::IsMouseButtonDown(MouseButton::MIDDLE))
         {
             glm::vec2 mouseDelta = mousePos - pmousePos;
-            m_Target *= glm::translate(glm::mat4(1.0f), -cameraRight * mouseDelta.x * m_Distance * 0.05 * (float)deltaTime);
-            m_Target *= glm::translate(glm::mat4(1.0f), cameraUp * mouseDelta.y * m_Distance * 0.05 * (float)deltaTime);
+            m_Target *= glm::translate(glm::mat4(1.0f), -cameraRight * mouseDelta.x * m_Distance * 0.00083f);
+            m_Target *= glm::translate(glm::mat4(1.0f), cameraUp * mouseDelta.y * m_Distance * 0.00083f);
         }
 
         // rotate camera
@@ -111,9 +116,18 @@ namespace Ham
                                  * glm::rotate(glm::mat4(1.0f), m_Beta, rightTarget) //
                                  * glm::translate(glm::mat4(1.0f), flip * forwardTarget * (m_Distance));
 
+        // float x = m_Distance * glm::cos(m_Beta) * glm::sin(m_Alpha);
+        // float y = m_Distance * glm::sin(m_Beta);
+        // float z = m_Distance * glm::cos(m_Beta) * glm::cos(m_Alpha);
+        // m_Position = m_Target + glm::vec3(x, y, z);
+
         transform = newTransform;
 
         pmousePos = mousePos;
+        pTarget = m_Target;
+        pAlpha = m_Alpha;
+        pBeta = m_Beta;
+        pDistance = m_Distance;
     }
 
     void CameraController::DoAnimation(TimeStep deltaTime)
@@ -130,7 +144,7 @@ namespace Ham
 
         auto anim = m_Target;
         anim[3] = glm::vec4(m_AnimationTarget, anim[3].w);
-        m_Target = glm::mix(m_Target, anim, 0.3f);
+        m_Target = glm::mix(m_Target, anim, 30.0f * deltaTime);
     }
 
 } // namespace Ham

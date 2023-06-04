@@ -10,6 +10,7 @@ uniform vec3 uLightPos;
 uniform vec3 uLightColor;
 uniform vec3 uObjectColor;
 uniform float uTime;
+uniform float uResolution;
 
 void main()
 {

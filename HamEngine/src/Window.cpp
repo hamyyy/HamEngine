@@ -86,6 +86,13 @@ namespace Ham
     {
     }
 
+    glm::vec2 Window::GetSize() const
+    {
+        int width, height;
+        glfwGetWindowSize(GetWindowHandle(), &width, &height);
+        return {(float)width, (float)height};
+    }
+
     int Window::GetWidth() const
     {
         int width, height;

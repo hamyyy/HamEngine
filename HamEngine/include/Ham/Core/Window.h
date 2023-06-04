@@ -59,6 +59,7 @@ namespace Ham
 
         GLFWwindow *GetWindowHandle() const { return m_Window; }
         std::string GetGLSLVersion() const { return m_glsl_version; }
+        glm::vec2 GetSize() const;
         int GetWidth() const;
         int GetHeight() const;
         int GetXPos() const;

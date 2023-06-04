@@ -1,9 +1,10 @@
 #include "HamLayer.h"
 
+#include "Ham/Script/CameraController.h"
+#include "Ham/Util/ImGuiExtra.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
-
-#include "Ham/Script/CameraController.h"
 
 namespace Ham
 {
@@ -132,7 +133,10 @@ namespace Ham
 
     HamLayer::HamLayer(Application *app) : Layer("HamLayer"), m_App(app), m_Scene(m_App->GetScene()) {}
 
-    HamLayer::~HamLayer() {}
+    HamLayer::~HamLayer()
+    {
+        vb.Destroy();
+    }
 
     void HamLayer::OnAttach()
     {
@@ -150,36 +154,34 @@ namespace Ham
         //     glm::vec3 normal;
         // };
 
-        vertices = getCubeVertices();
-
-        indices = getCubeIndices();
+        auto vertices = getCubeVertices();
+        auto indices = getCubeIndices();
 
         // Generate and bind the Vertex Array Object (VAO)
         glGenVertexArrays(1, &cubeVAO);
         glBindVertexArray(cubeVAO);
 
         // Generate and bind the Vertex Buffer Object (VBO) for the vertex data
-        glGenBuffers(1, &cubeVBO);
-        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-        glBufferData(GL_ARRAY_BUFFER, (int)vertices.size() * sizeof(VertexData), vertices.data(), GL_STATIC_DRAW);
+        vb.Create();
+        vb.SetData(vertices);
 
         // Enable and specify the vertex attribute pointers
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, position));
-
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, normal));
+        vb.DefineAttribute3f(offsetof(VertexData, position));
+        vb.DefineAttribute3f(offsetof(VertexData, normal));
 
         // Generate and bind the Element Buffer Object (EBO) for the index data
-        unsigned int cubeEBO;
-        glGenBuffers(1, &cubeEBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (int)indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+        // unsigned int cubeEBO;
+        // glGenBuffers(1, &cubeEBO);
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
+        // glBufferData(GL_ELEMENT_ARRAY_BUFFER, (int)indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+        ib.Create();
+        ib.SetData(indices);
 
         // Unbind the VAO and buffers
         glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        vb.Unbind();
+        ib.Unbind();
 
         transform = glm::mat4(1.0f);
     }
@@ -225,10 +227,10 @@ namespace Ham
             script->SetTarget((glm::vec3(rand() % 1000, rand() % 1000, rand() % 1000) / 1000.0f - 0.5f) * 2.0f);
         }
 
-        if (Input::IsMouseButtonDownThisFrame(MouseButton::LEFT))
-        {
-            Input::SetCursorMode(CursorMode::CAPTURED);
-        }
+        // if (Input::IsMouseButtonDownThisFrame(MouseButton::LEFT))
+        // {
+        //     Input::SetCursorMode(CursorMode::CAPTURED);
+        // }
 
         if (Input::IsKeyDownThisFrame(KeyCode::ESCAPE))
         {
@@ -257,10 +259,10 @@ namespace Ham
         // Camera
         auto cameraEntity = GetCamera();
         auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
-        auto &view = cameraEntity.GetComponent<Component::Transform>().Value;
+        auto view = glm::inverse(cameraEntity.GetComponent<Component::Transform>().ToMatrix());
 
         shader->SetUniformMat4f("uModel", transform);
-        shader->SetUniformMat4f("uView", glm::inverse(view));
+        shader->SetUniformMat4f("uView", view);
         shader->SetUniformMat4f("uProjection", projection);
 
         static auto lightPos = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -271,21 +273,23 @@ namespace Ham
         shader->SetUniform3f("uLightPos", lightPos);
         shader->SetUniform3f("uLightColor", glm::vec3(1.0f, 0.0f, 0.0f));
         shader->SetUniform1f("uTime", m_App->GetTime());
+        shader->SetUniform2f("uResolution", m_App->GetWindow().GetSize());
 
         // render the cube
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
+
         glBindVertexArray(cubeVAO);
+        {
+            shader->SetUniform3f("uObjectColor", glm::vec3());
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glDrawElements(GL_TRIANGLES, (int)ib.GetData().size(), GL_UNSIGNED_INT, 0);
 
-        shader->SetUniform3f("uObjectColor", glm::vec3());
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, 0);
-
-        shader->SetUniform3f("uObjectColor", glm::vec3(1, 1, 1));
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, 0);
-
+            shader->SetUniform3f("uObjectColor", glm::vec3(1, 1, 1));
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glDrawElements(GL_TRIANGLES, (int)ib.GetData().size(), GL_UNSIGNED_INT, 0);
+        }
         glBindVertexArray(0);
 
         shader->Unbind();
@@ -398,7 +402,7 @@ namespace Ham
 
         static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
         static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::LOCAL);
-        static bool enableGizmo = false;
+        static bool enableGizmo = true;
         bool useSnap = false;
         float snapValue;
         if (Input::IsKeyDown(KeyCode::LEFT_CONTROL))
@@ -406,6 +410,9 @@ namespace Ham
 
         if (Input::IsKeyDown(KeyCode::Q))
             enableGizmo = false;
+
+        ImGui::Checkbox("Gizmos", &enableGizmo);
+
         if (ImGui::Button("Translate") || Input::IsKeyDown(KeyCode::W))
         {
             enableGizmo = true;
@@ -436,25 +443,58 @@ namespace Ham
         }
 
         {
+            ImGuizmo::SetOrthographic(false);
+            ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
+            ImGuizmo::SetRect((float)m_App->GetWindow().GetXPos(), (float)m_App->GetWindow().GetYPos(), (float)m_App->GetWindow().GetWidth(), (float)m_App->GetWindow().GetHeight());
+
+            if (useSnap)
+            {
+                switch (mCurrentGizmoOperation)
+                {
+                case ImGuizmo::OPERATION::ROTATE:
+                    snapValue = 45.0f * 0.5f;
+                    break;
+                default:
+                    snapValue = 0.25f;
+                    break;
+                }
+            }
+            {
+                auto cameraEntity = GetCamera();
+                auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
+                auto view = glm::inverse(cameraEntity.GetComponent<Component::Transform>().ToMatrix());
+
+                float snapValues[3] = {snapValue, snapValue, snapValue};
+
+                if (enableGizmo)
+                    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr);
+            }
+        }
+
+        {
+            auto cameraEntity = GetCamera();
+            auto &cameraTransform = cameraEntity.GetComponent<Component::Transform>();
+
+            ImGui::Separator();
+            ImGui::Transform("Cube", transform);
+            ImGui::Separator();
+            ImGui::Transform("Camera", cameraTransform);
+
             ImGui::Separator();
             ImGui::DragFloat3("Cube Position", glm::value_ptr(transform[3]), 0.1f);
 
-            ImGui::Separator();
-            auto cameraEntity = GetCamera();
-            auto &cameraTransform = cameraEntity.GetComponent<Component::Transform>();
             auto &cameraComponent = cameraEntity.GetComponent<Component::Camera>();
             auto &projection = cameraComponent.Projection;
-            auto &tf = cameraTransform.Value;
+            auto tf = cameraTransform.ToMatrix();
 
-            glm::vec3 scale;
-            glm::quat rotation;
-            glm::vec3 translation;
-            glm::vec3 skew;
-            glm::vec4 perspective;
-            glm::decompose(cameraTransform.Value, scale, rotation, translation, skew, perspective);
-            auto cameraLookDir = glm::normalize(translation + rotation * glm::vec3(1.0f, 0.0f, 0.0f));
+            auto cameraLookDir = cameraTransform.forward();
 
-            ImGui::DragFloat3("Camera Position", glm::value_ptr(cameraTransform.Value[3]), 0.1f);
+            ImGui::Separator();
+            ImGui::DragFloat3("Camera Position", glm::value_ptr(cameraTransform.Position), 0.1f);
+            ImGui::DragFloat3("Camera Rotation", glm::value_ptr(cameraTransform.Rotation), 0.1f);
+            ImGui::DragFloat3("Camera Scale", glm::value_ptr(cameraTransform.Scale), 0.1f);
+            ImGui::Separator();
+
             ImGui::DragFloat3("Camera Look Dir", glm::value_ptr(cameraLookDir), 0.1f);
         }
 
@@ -475,32 +515,6 @@ namespace Ham
         }
 
         ImGui::End();
-
-        ImGuizmo::SetOrthographic(false);
-        ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
-        ImGuizmo::SetRect((float)m_App->GetWindow().GetXPos(), (float)m_App->GetWindow().GetYPos(), (float)m_App->GetWindow().GetWidth(), (float)m_App->GetWindow().GetHeight());
-
-        if (useSnap)
-        {
-            switch (mCurrentGizmoOperation)
-            {
-            case ImGuizmo::OPERATION::ROTATE:
-                snapValue = 45.0f * 0.5f;
-                break;
-            default:
-                snapValue = 0.25f;
-                break;
-            }
-        }
-        {
-            auto cameraEntity = GetCamera();
-            auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
-            auto view = glm::inverse(cameraEntity.GetComponent<Component::Transform>().Value);
-
-            float snapValues[3] = {snapValue, snapValue, snapValue};
-            if (enableGizmo)
-                ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr);
-        }
     }
 
     // void HamLayer::OnEvent(Event &event) {}

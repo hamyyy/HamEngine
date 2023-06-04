@@ -6,6 +6,8 @@
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include "Ham/Util/GlmExtra.h"
 
 #include <string>
 
@@ -77,14 +79,62 @@ namespace Ham::Component
 
     struct Transform
     {
-        glm::mat4 Value;
+        glm::vec3 Position = {0.0f, 0.0f, 0.0f};
+        glm::vec3 Rotation = {0.0f, 0.0f, 0.0f};
+        glm::vec3 Scale = {1.0f, 1.0f, 1.0f};
 
-        Transform() : Value(glm::mat4(1.0f)) {}
-        Transform(const Transform &other) : Value(other.Value) {}
-        Transform(const glm::mat4 &value) : Value(value) {}
+        Transform() = default;
+        Transform(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) : Position(pos), Rotation(rot), Scale(scale) {}
+        Transform(const Transform &other) : Position(other.Position), Rotation(other.Rotation), Scale(other.Scale) {}
+        Transform(const glm::mat4 &value)
+        {
+            auto t = Transform::FromMatrix(value);
+            Position = t.Position;
+            Rotation = t.Rotation;
+            Scale = t.Scale;
+        }
 
-        operator glm::mat4() { return Value; }
-        operator glm::mat4() const { return Value; }
+        operator glm::mat4() { return ToMatrix(); }
+        glm::mat4 ToMatrix()
+        {
+            glm::mat4 translation = glm::translate(glm::mat4(1.0f), Position);
+            glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
+            glm::mat4 scale = glm::scale(glm::mat4(1.0f), Scale);
+
+            return translation * rotation * scale;
+        }
+
+        static Transform FromMatrix(glm::mat4 mat)
+        {
+            glm::vec3 scale;
+            glm::quat rotation;
+            glm::vec3 position;
+            glm::vec3 skew;
+            glm::vec4 perspective;
+            glm::decompose(mat, scale, rotation, position, skew, perspective);
+            return {position, glm::eulerAngles(rotation), scale};
+        }
+
+        glm::vec3 up()
+        {
+            return glm::normalize(glm::vec3(ToMatrix() * glm::vec4(glm::up(), 1.0f)));
+        }
+
+        glm::vec3 down() { return -up(); }
+
+        glm::vec3 right()
+        {
+            return glm::normalize(glm::vec3(ToMatrix() * glm::vec4(glm::right(), 1.0f)));
+        }
+
+        glm::vec3 left() { return -right(); }
+
+        glm::vec3 forward()
+        {
+            return glm::normalize(glm::vec3(ToMatrix() * glm::vec4(glm::forward(), 1.0f)));
+        }
+
+        glm::vec3 backward() { return -forward(); }
     };
 
     struct NativeScriptList
@@ -136,6 +186,10 @@ namespace Ham::Component
 
             return false;
         }
+    };
+
+    struct Mesh
+    {
     };
 
 } // namespace Ham::Component

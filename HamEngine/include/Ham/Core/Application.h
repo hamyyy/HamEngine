@@ -97,6 +97,7 @@ namespace Ham
         std::thread m_RenderThread;
 
         std::atomic_bool m_FramebufferResized = false;
+        
 
         friend ::Ham::Window;
     };

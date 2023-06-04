@@ -30,20 +30,20 @@ namespace Ham
 
     void Application::Init()
     {
-        HAM_PROFILE_SCOPE("Application Init");
+        // HAM_PROFILE_SCOPE("Application Init");
         HAM_CORE_INFO("Ham Engine Version: 0.0.1");
         m_Window.Init(this);
         Input::Init();
 
         auto cameraEntity = m_Scene.CreateEntity("camera");
         cameraEntity.AddComponent<Component::Camera>(glm::radians(45.0f), GetWindow().GetAspectRatio(), 0.001f, 1000.0f);
-        cameraEntity.GetComponent<Component::Transform>().Value = glm::inverse(glm::camera());
+        cameraEntity.GetComponent<Component::Transform>() = Component::Transform(glm::inverse(glm::lookAt(glm::vec3(3, 3, 3), glm::zero<glm::vec3>(), glm::up()))); //glm::inverse(glm::camera()) * glm::translate(glm::mat4(1.0f), glm::forward() * 10.0f)
 
         auto &scriptList = cameraEntity.AddComponent<Component::NativeScriptList>();
         scriptList.AddScript<CameraController>("CameraController");
 
         auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
-        auto &view = cameraEntity.GetComponent<Component::Transform>().Value;
+        auto view = glm::inverse(cameraEntity.GetComponent<Component::Transform>().ToMatrix());
         HAM_CORE_WARN("Camera Aspect Ratio: {0}", GetWindow().GetAspectRatio());
         HAM_CORE_WARN("Camera Transform (View): {0}", glm::to_string(view));
         HAM_CORE_WARN("Camera Projection: {0}", glm::to_string(projection));
@@ -138,6 +138,7 @@ namespace Ham
                 auto display = m_Window.GetFramebufferSize();
                 glViewport(0, 0, display.x, display.y);
                 m_FramebufferResized = false;
+                m_Scene.GetActiveCamera().GetComponent<Component::Camera>().Update((float)display.x, (float)display.y);
             }
 
             float time = GetTime();
@@ -164,6 +165,7 @@ namespace Ham
                 // HAM_PROFILE_SCOPE("ImGui Render");
                 m_imgui.Render();
             }
+
             {
                 // HAM_PROFILE_SCOPE("ImGui Update Windows");
                 m_imgui.UpdateWindows();
@@ -199,10 +201,10 @@ namespace Ham
         // Main loop
         while (m_Window.IsRunning())
         {
-            HAM_PROFILE_FRAME("Main Frame");
+            // HAM_PROFILE_FRAME("Main Frame");
 
             {
-                HAM_PROFILE_SCOPE("Main Poll Events");
+                // HAM_PROFILE_SCOPE("Main Poll Events");
                 m_Window.PollEvents();
                 Input::Update();
             }
