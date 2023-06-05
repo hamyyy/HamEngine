@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Ham/Input/KeyCodes.h"
+
 #include <imgui_internal.h>
 #include <ImGuizmo.h>
 
@@ -19,7 +21,19 @@ namespace Ham
         void Shutdown();
 
         bool WantsCaptureMouse() { return ImGui::GetIO().WantCaptureMouse || ImGuizmo::IsUsingAny(); }
-        bool WantsCaptureKeyboard() { return ImGui::GetIO().WantCaptureKeyboard; }
+        bool WantsCaptureKeyboard() { return ImGui::GetIO().WantTextInput; }
+
+        bool WantsCaptureKey(KeyCode key)
+        {
+            if (key >= KeyCode::A && key <= KeyCode::Z)
+            {
+                return ImGui::GetIO().WantTextInput;
+            }
+            else
+            {
+                return ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantTextInput;
+            }
+        }
 
     private:
         Window *m_Window;

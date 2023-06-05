@@ -35,6 +35,7 @@ namespace Ham
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         // glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); // Debug
+        // glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
 
         // Create window with graphics context
         m_Window = glfwCreateWindow(GetSpecification().Width, GetSpecification().Height, GetSpecification().Name.c_str(), nullptr, nullptr);
@@ -83,6 +84,13 @@ namespace Ham
 
     void Window::SetIcon(const std::string &path)
     {
+    }
+
+    glm::vec2 Window::GetSize() const
+    {
+        int width, height;
+        glfwGetWindowSize(GetWindowHandle(), &width, &height);
+        return {(float)width, (float)height};
     }
 
     int Window::GetWidth() const

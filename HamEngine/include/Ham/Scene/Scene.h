@@ -7,11 +7,13 @@
 namespace Ham
 {
     class Entity;
+    class Systems;
     class Scene
     {
     public:
         Scene();
         ~Scene();
+        Scene &operator=(const Scene &other) { return *this; }
 
         Entity CreateEntity(std::string name);
         void DestroyEntity(Entity entity);
@@ -23,5 +25,6 @@ namespace Ham
     private:
         entt::registry m_Registry;
         friend class Entity;
+        friend class Systems;
     };
 } // namespace Ham

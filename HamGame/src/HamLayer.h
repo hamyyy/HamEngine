@@ -29,9 +29,10 @@ namespace Ham
         Application *m_App;
         Scene &m_Scene;
         std::unique_ptr<Shader> shader;
-        std::vector<VertexData> vertices;
-        std::vector<uint32_t> indices;
-        unsigned int cubeVBO, cubeVAO;
+
+        unsigned int cubeVAO;
+        VertexBuffer<VertexData> vb;
+        IndexBuffer ib;
 
         glm::mat4 transform;
     };

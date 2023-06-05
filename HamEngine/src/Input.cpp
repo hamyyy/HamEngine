@@ -9,12 +9,45 @@ namespace Ham
 
 	std::map<KeyCode, std::pair<bool, bool>> Input::m_KeyStates;
 	std::map<MouseButton, std::pair<bool, bool>> Input::m_MouseButtonStates;
+	int Input::s_MouseWheelDelta = 0;
+	int Input::s_MouseWheelChanged = 0;
+	CursorMode Input::s_CurrentCursorMode = CursorMode::NORMAL;
+	CursorMode Input::s_DesiredCursorMode = CursorMode::NORMAL;
+
+	void Input::Init()
+	{
+		//  mouse wheel callback
+		auto &app = Application::Get();
+		GLFWwindow *windowHandle = app.GetWindowHandle();
+		glfwSetScrollCallback(windowHandle, [](GLFWwindow *window, double xOffset, double yOffset)
+							  {
+								  auto &app = Application::Get();
+								  if (app.GetImGui().WantsCaptureMouse())
+									  return;
+
+								  if (yOffset > 0)
+									  Input::s_MouseWheelChanged = 1;
+								  else if (yOffset < 0)
+									  Input::s_MouseWheelChanged = -1;
+								  else
+									  Input::s_MouseWheelChanged = 0;
+								  //
+							  });
+
+		glfwSetWindowFocusCallback(windowHandle, [](GLFWwindow *window, int focused)
+								   {
+									   auto &app = Application::Get();
+									   if (!focused)
+										   Input::s_DesiredCursorMode = CursorMode::NORMAL;
+									   //
+								   });
+	}
 
 	bool Input::IsKeyDown(KeyCode keycode)
 	{
 		auto &app = Application::Get();
 
-		if (app.GetImGui().WantsCaptureKeyboard())
+		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
 
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
@@ -30,7 +63,7 @@ namespace Ham
 	{
 		auto &app = Application::Get();
 
-		if (app.GetImGui().WantsCaptureKeyboard())
+		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
 
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
@@ -46,7 +79,7 @@ namespace Ham
 	{
 		auto &app = Application::Get();
 
-		if (app.GetImGui().WantsCaptureKeyboard())
+		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
 
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
@@ -62,7 +95,7 @@ namespace Ham
 	{
 		auto &app = Application::Get();
 
-		if (app.GetImGui().WantsCaptureKeyboard())
+		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
 
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
@@ -138,6 +171,11 @@ namespace Ham
 		return !m_MouseButtonStates[button].first && m_MouseButtonStates[button].second;
 	}
 
+	int Input::GetMouseWheelDelta()
+	{
+		return s_MouseWheelDelta;
+	}
+
 	glm::vec2 Input::GetMousePosition()
 	{
 		GLFWwindow *windowHandle = Application::Get().GetWindowHandle();
@@ -150,11 +188,23 @@ namespace Ham
 	void Input::SetCursorMode(CursorMode mode)
 	{
 		GLFWwindow *windowHandle = Application::Get().GetWindowHandle();
-		glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)mode);
+		s_DesiredCursorMode = mode;
+	}
+
+	void Input::Update()
+	{
+		GLFWwindow *windowHandle = Application::Get().GetWindowHandle();
+		if (s_DesiredCursorMode != s_CurrentCursorMode)
+		{
+			glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)s_DesiredCursorMode);
+			s_CurrentCursorMode = s_DesiredCursorMode;
+		}
 	}
 
 	void Input::BeginFrame()
 	{
+		s_MouseWheelDelta = s_MouseWheelChanged;
+		s_MouseWheelChanged = 0;
 	}
 
 	void Input::EndFrame()
@@ -168,6 +218,8 @@ namespace Ham
 		{
 			button.second.second = button.second.first;
 		}
+
+		s_MouseWheelDelta = 0;
 	}
 
 }

@@ -9,7 +9,6 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <ImGuizmo.h>
 
-
 namespace Ham
 {
     ImGuiImpl::ImGuiImpl() {}
@@ -17,7 +16,7 @@ namespace Ham
 
     void ImGuiImpl::Init(Window *window)
     {
-        HAM_ASSERT(window != nullptr, "Window is nullptr!");
+        HAM_CORE_ASSERT(window != nullptr, "Window is nullptr!");
         m_Window = window;
 
         // Setup Dear ImGui context
@@ -42,16 +41,22 @@ namespace Ham
         // io.ConfigViewportsNoAutoMerge = true;
         // io.ConfigViewportsNoTaskBarIcon = true;
 
-        // Setup Dear ImGui style
-        ImGui::StyleColorsDark();
-        // ImGui::StyleColorsLight();
+        {
+            ImGuiStyle *style = &ImGui::GetStyle();
+            ImVec4 *colors = style->Colors;
+            // Setup Dear ImGui style
+            ImGui::StyleColorsDark();
+            // ImGui::StyleColorsLight();
+
+            colors[ImGuiCol_WindowBg].w = 200.0f / 255.0f;
+        }
 
         // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
         ImGuiStyle &style = ImGui::GetStyle();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
             style.WindowRounding = 0.0f;
-            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+            // style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
         // Setup Platform/Renderer backends
@@ -83,10 +88,10 @@ namespace Ham
         auto &io = ImGui::GetIO();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
-            GLFWwindow *backup_current_context = glfwGetCurrentContext();
+            // GLFWwindow *backup_current_context = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
-            glfwMakeContextCurrent(backup_current_context);
+            // glfwMakeContextCurrent(backup_current_context);
         }
     }
 
