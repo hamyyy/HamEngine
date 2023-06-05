@@ -26,3 +26,6 @@
 [submodule "HamEngine/lib/filewatch"]
 	path = HamEngine/lib/filewatch
 	url = https://github.com/ThomasMonkman/filewatch
+[submodule "HamEngine/lib/fmt"]
+	path = HamEngine/lib/fmt
+	url = https://github.com/fmtlib/fmt

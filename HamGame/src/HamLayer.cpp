@@ -394,7 +394,12 @@ namespace Ham
 
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
-        ImGuizmo::SetRect((float)m_App->GetWindow().GetXPos(), (float)m_App->GetWindow().GetYPos(), (float)m_App->GetWindow().GetWidth(), (float)m_App->GetWindow().GetHeight());
+
+        auto x = ImGui::GetWindowViewport()->Pos.x;
+        auto y = ImGui::GetWindowViewport()->Pos.y;
+        auto width = ImGui::GetWindowViewport()->Size.x;
+        auto height = ImGui::GetWindowViewport()->Size.y;
+        ImGuizmo::SetRect(x, y, width, height);
 
         if (useSnap)
         {
