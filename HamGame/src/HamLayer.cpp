@@ -442,6 +442,16 @@ namespace Ham
             mCurrentGizmoMode = ImGuizmo::LOCAL;
         }
 
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
+
+        auto x = ImGui::GetWindowViewport()->Pos.x;
+        auto y = ImGui::GetWindowViewport()->Pos.y;
+        auto width = ImGui::GetWindowViewport()->Size.x;
+        auto height = ImGui::GetWindowViewport()->Size.y;
+        ImGuizmo::SetRect(x, y, width, height);
+
+        if (useSnap)
         {
             ImGuizmo::SetOrthographic(false);
             ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());

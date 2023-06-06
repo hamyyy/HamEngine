@@ -6,6 +6,7 @@ add_subdirectory(lib/glfw)
 add_subdirectory(lib/glm)
 add_subdirectory(lib/imgui)
 add_subdirectory(lib/ImGuizmo)
+add_subdirectory(lib/fmt)
 add_subdirectory(lib/spdlog)
 add_subdirectory(lib/optick)
 add_subdirectory(lib/entt)
@@ -30,6 +31,7 @@ target_link_libraries(${PROJECT_NAME}
     glm
     imgui
     ImGuizmo
+    fmt
     spdlog
     optick
     EnTT
