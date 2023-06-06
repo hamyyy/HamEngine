@@ -76,7 +76,7 @@ namespace ImGui
 
     static void SceneTree(Ham::Scene &scene)
     {
-        auto &entities = scene.GetTopLevelEntities();
+        auto entities = scene.GetTopLevelEntities();
         ImGui::EntityNodeRecurse(entities);
     }
 

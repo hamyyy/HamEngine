@@ -445,40 +445,33 @@ namespace Ham
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
 
-        auto x = ImGui::GetWindowViewport()->Pos.x;
-        auto y = ImGui::GetWindowViewport()->Pos.y;
-        auto width = ImGui::GetWindowViewport()->Size.x;
-        auto height = ImGui::GetWindowViewport()->Size.y;
-        ImGuizmo::SetRect(x, y, width, height);
+        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+            ImGuizmo::SetRect((float)m_App->GetWindow().GetXPos(), (float)m_App->GetWindow().GetYPos(), (float)m_App->GetWindow().GetWidth(), (float)m_App->GetWindow().GetHeight());
+        else
+            ImGuizmo::SetRect(0.0f, 0.0f, (float)m_App->GetWindow().GetWidth(), (float)m_App->GetWindow().GetHeight());
 
         if (useSnap)
         {
-            ImGuizmo::SetOrthographic(false);
-            ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
-            ImGuizmo::SetRect((float)m_App->GetWindow().GetXPos(), (float)m_App->GetWindow().GetYPos(), (float)m_App->GetWindow().GetWidth(), (float)m_App->GetWindow().GetHeight());
-
-            if (useSnap)
+            switch (mCurrentGizmoOperation)
             {
-                switch (mCurrentGizmoOperation)
-                {
-                case ImGuizmo::OPERATION::ROTATE:
-                    snapValue = 45.0f * 0.5f;
-                    break;
-                default:
-                    snapValue = 0.25f;
-                    break;
-                }
+            case ImGuizmo::OPERATION::ROTATE:
+                snapValue = 45.0f * 0.5f;
+                break;
+            default:
+                snapValue = 0.25f;
+                break;
             }
-            {
-                auto cameraEntity = GetCamera();
-                auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
-                auto view = glm::inverse(cameraEntity.GetComponent<Component::Transform>().ToMatrix());
+        }
+        
+        {
+            auto cameraEntity = GetCamera();
+            auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
+            auto view = glm::inverse(cameraEntity.GetComponent<Component::Transform>().ToMatrix());
 
-                float snapValues[3] = {snapValue, snapValue, snapValue};
+            float snapValues[3] = {snapValue, snapValue, snapValue};
 
-                if (enableGizmo)
-                    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr);
-            }
+            if (enableGizmo)
+                ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr);
         }
 
         {

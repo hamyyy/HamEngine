@@ -2,4 +2,4 @@ build/
 .vscode/
 
 *.log
-*.ini
+settings.ini
