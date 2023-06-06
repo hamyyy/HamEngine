@@ -515,6 +515,10 @@ namespace Ham
         }
 
         ImGui::End();
+
+        ImGui::Begin("Scene Tree");
+        ImGui::SceneTree(m_Scene);
+        ImGui::End();
     }
 
     // void HamLayer::OnEvent(Event &event) {}

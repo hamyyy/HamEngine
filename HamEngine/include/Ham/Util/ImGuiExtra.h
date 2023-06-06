@@ -1,11 +1,15 @@
 #pragma once
 
+#include "Ham/Scene/Entity.h"
+#include "Ham/Scene/Scene.h"
 #include "Ham/Scene/Component.h"
 
 #include <glm/glm.hpp>
 
 #include <imgui.h>
 #include <ImGuizmo.h>
+
+#include <string>
 
 namespace ImGui
 {
@@ -49,6 +53,31 @@ namespace ImGui
         }
 
         return result;
+    }
+
+    static void EntityNodeRecurse(std::vector<Ham::Entity> &entities)
+    {
+        for (auto &entity : entities)
+        {
+            auto id = std::string("##") + entity.GetUUID();
+            auto children = entity.GetChildren();
+
+            uint32_t flags = ImGuiTreeNodeFlags_DefaultOpen;
+            if (children.empty())
+                flags |= ImGuiTreeNodeFlags_Leaf;
+
+            if (ImGui::TreeNodeEx(id.c_str(), flags, entity.GetName().c_str()))
+            {
+                ImGui::EntityNodeRecurse(children);
+                ImGui::TreePop();
+            }
+        }
+    }
+
+    static void SceneTree(Ham::Scene &scene)
+    {
+        auto &entities = scene.GetTopLevelEntities();
+        ImGui::EntityNodeRecurse(entities);
     }
 
 } // namespace ImGui

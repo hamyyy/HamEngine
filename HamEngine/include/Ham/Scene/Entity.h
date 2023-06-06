@@ -13,6 +13,7 @@ namespace Ham
     public:
         Entity();
         Entity(entt::entity handle, Scene *scene);
+        Entity(entt::entity handle, entt::registry *registry);
         Entity(const Entity &other) = default;
 
         template <typename T, typename... Args>
@@ -54,6 +55,63 @@ namespace Ham
         {
             HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
             m_Registry->destroy(m_EntityHandle);
+        }
+
+        UUID GetUUID()
+        {
+            HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
+            return GetComponent<Component::UUID>();
+        }
+
+        std::string GetName()
+        {
+            HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
+            return GetComponent<Component::Tag>().Name;
+        }
+
+        bool HasParent()
+        {
+            HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
+            return HasComponent<Component::Parent>();
+        }
+
+        Entity GetParent()
+        {
+            HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
+            if (HasParent())
+                return GetComponent<Component::Parent>();
+
+            return {};
+        }
+
+        void SetParent(Entity parent)
+        {
+            HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
+            
+            if (!parent)
+                return;
+
+            parent.GetComponent<Component::EntityList>().Add({m_EntityHandle, m_Registry});
+            if (HasParent())
+                RemoveComponent<Component::Parent>();
+            AddComponent<Component::Parent>(parent);
+        }
+
+        void RemoveParent()
+        {
+            HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
+            if (HasParent())
+            {
+                Entity parent = GetParent();
+                parent.GetComponent<Component::EntityList>().Remove(*this);
+                RemoveComponent<Component::Parent>();
+            }
+        }
+
+        std::vector<Entity> GetChildren()
+        {
+            HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
+            return GetComponent<Component::EntityList>().Entities;
         }
 
         operator bool() const { return m_EntityHandle != entt::null && m_Registry != nullptr; }

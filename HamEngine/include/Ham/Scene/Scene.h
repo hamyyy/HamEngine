@@ -21,6 +21,8 @@ namespace Ham
         Entity GetActiveCamera();
         std::vector<Entity> GetEntitiesByTag(std::string name);
         entt::registry *GetRegistry();
+        std::vector<Entity> GetEntities();
+        std::vector<Entity> GetTopLevelEntities();
 
     private:
         entt::registry m_Registry;

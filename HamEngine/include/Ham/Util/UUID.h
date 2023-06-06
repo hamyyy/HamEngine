@@ -25,7 +25,7 @@ namespace Ham
 
         static std::shared_ptr<uuids::uuid_random_generator> GetGenerator() { return s_Generator; }
         static UUID Create() { return (UUID)uuids::to_string((*s_Generator)()); }
-
+        
     private:
         static std::shared_ptr<uuids::uuid_random_generator> s_Generator;
     };

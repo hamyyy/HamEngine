@@ -15,6 +15,7 @@ namespace Ham
         entity.AddComponent<Component::UUID>(UUIDGenerator::Create());
         entity.AddComponent<Component::Tag>(name);
         entity.AddComponent<Component::Transform>();
+        entity.AddComponent<Component::EntityList>();
         return entity;
     }
 
@@ -67,5 +68,33 @@ namespace Ham
         }
 
         return {};
+    }
+
+    std::vector<Entity> Scene::GetEntities()
+    {
+        std::vector<Entity> entities;
+        const auto &view = m_Registry.view<Component::UUID>();
+
+        for (auto entity : view)
+        {
+            entities.push_back({entity, this});
+        }
+
+        return entities;
+    }
+
+    std::vector<Entity> Scene::GetTopLevelEntities()
+    {
+        std::vector<Entity> entities;
+        const auto &view = m_Registry.view<Component::UUID>();
+
+        for (auto entity : view)
+        {
+            Entity e = {entity, this};
+            if (!e.HasComponent<Component::Parent>())
+                entities.push_back(e);
+        }
+
+        return entities;
     }
 } // namespace Ham

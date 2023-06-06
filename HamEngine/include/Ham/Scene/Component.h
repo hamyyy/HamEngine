@@ -38,6 +38,7 @@ namespace Ham
 namespace Ham::Component
 {
     using UUID = Ham::UUID;
+    using Parent = Ham::Entity;
 
     struct Tag
     {
@@ -186,6 +187,17 @@ namespace Ham::Component
 
             return false;
         }
+    };
+
+    struct EntityList
+    {
+        std::vector<Entity> Entities;
+        EntityList() {}
+        EntityList(const EntityList &other) : Entities(other.Entities) {}
+
+        void Add(Entity entity);
+        void Remove(Entity entity);
+        bool Contains(Entity entity);
     };
 
     struct Mesh

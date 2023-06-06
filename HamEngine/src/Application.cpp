@@ -37,7 +37,7 @@ namespace Ham
 
         auto cameraEntity = m_Scene.CreateEntity("camera");
         cameraEntity.AddComponent<Component::Camera>(glm::radians(45.0f), GetWindow().GetAspectRatio(), 0.001f, 1000.0f);
-        cameraEntity.GetComponent<Component::Transform>() = Component::Transform(glm::inverse(glm::lookAt(glm::vec3(3, 3, 3), glm::zero<glm::vec3>(), glm::up()))); //glm::inverse(glm::camera()) * glm::translate(glm::mat4(1.0f), glm::forward() * 10.0f)
+        cameraEntity.GetComponent<Component::Transform>() = Component::Transform(glm::inverse(glm::lookAt(glm::vec3(3, 3, 3), glm::zero<glm::vec3>(), glm::up()))); // glm::inverse(glm::camera()) * glm::translate(glm::mat4(1.0f), glm::forward() * 10.0f)
 
         auto &scriptList = cameraEntity.AddComponent<Component::NativeScriptList>();
         scriptList.AddScript<CameraController>("CameraController");
@@ -53,6 +53,21 @@ namespace Ham
         HAM_CORE_INFO("Up vector is: {0}", glm::to_string(glm::up()));
         HAM_CORE_INFO("Right vector is: {0}", glm::to_string(glm::right()));
         HAM_CORE_INFO("Forward vector is: {0}", glm::to_string(glm::forward()));
+
+        {
+            //  add dummy entities
+
+            auto cube = m_Scene.CreateEntity("Cube");
+            auto monkey = m_Scene.CreateEntity("Monkey");
+            auto sphere = m_Scene.CreateEntity("Sphere");
+            auto plane = m_Scene.CreateEntity("Plane");
+
+
+            plane.SetParent(cube);
+            sphere.SetParent(cube);
+
+            monkey.SetParent(plane);
+        }
     }
 
     void Application::Shutdown()
