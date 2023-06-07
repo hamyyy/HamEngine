@@ -8,6 +8,7 @@ namespace Ham
 
 	typedef enum class KeyCode : uint16_t
 	{
+		ANY = 999,
 		// From glfw3.h
 		SPACE = 32,
 		APOSTROPHE = 39, /* ' */
@@ -158,6 +159,7 @@ namespace Ham
 
 	typedef enum class MouseButton : uint16_t
 	{
+		ANY = 999,
 		BUTTON_0 = 0,
 		BUTTON_1 = 1,
 		BUTTON_2 = 2,

@@ -50,6 +50,16 @@ namespace Ham
 		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
 
+		if (keycode == KeyCode::ANY)
+		{
+			for (auto &key : m_KeyStates)
+			{
+				if (key.second.first)
+					return true;
+			}
+			return false;
+		}
+
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
 			m_KeyStates[keycode] = {false, false};
 
@@ -65,6 +75,16 @@ namespace Ham
 
 		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
+
+		if (keycode == KeyCode::ANY)
+		{
+			for (auto &key : m_KeyStates)
+			{
+				if (key.second.first && !key.second.second)
+					return true;
+			}
+			return false;
+		}
 
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
 			m_KeyStates[keycode] = {false, false};
@@ -82,6 +102,16 @@ namespace Ham
 		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
 
+		if (keycode == KeyCode::ANY)
+		{
+			for (auto &key : m_KeyStates)
+			{
+				if (!key.second.first)
+					return true;
+			}
+			return false;
+		}
+
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
 			m_KeyStates[keycode] = {false, false};
 
@@ -97,6 +127,16 @@ namespace Ham
 
 		if (app.GetImGui().WantsCaptureKey(keycode))
 			return false;
+
+		if (keycode == KeyCode::ANY)
+		{
+			for (auto &key : m_KeyStates)
+			{
+				if (!key.second.first && key.second.second)
+					return true;
+			}
+			return false;
+		}
 
 		if (m_KeyStates.find(keycode) == m_KeyStates.end())
 			m_KeyStates[keycode] = {false, false};
@@ -114,6 +154,16 @@ namespace Ham
 		if (app.GetImGui().WantsCaptureMouse())
 			return false;
 
+		if (button == MouseButton::ANY)
+		{
+			for (auto &button : m_MouseButtonStates)
+			{
+				if (button.second.first)
+					return true;
+			}
+			return false;
+		}
+
 		if (m_MouseButtonStates.find(button) == m_MouseButtonStates.end())
 			m_MouseButtonStates[button] = {false, false};
 
@@ -129,6 +179,16 @@ namespace Ham
 
 		if (app.GetImGui().WantsCaptureMouse())
 			return false;
+
+		if (button == MouseButton::ANY)
+		{
+			for (auto &button : m_MouseButtonStates)
+			{
+				if (button.second.first && !button.second.second)
+					return true;
+			}
+			return false;
+		}
 
 		if (m_MouseButtonStates.find(button) == m_MouseButtonStates.end())
 			m_MouseButtonStates[button] = {false, false};
@@ -146,6 +206,16 @@ namespace Ham
 		if (app.GetImGui().WantsCaptureMouse())
 			return false;
 
+		if (button == MouseButton::ANY)
+		{
+			for (auto &button : m_MouseButtonStates)
+			{
+				if (!button.second.first)
+					return true;
+			}
+			return false;
+		}
+
 		if (m_MouseButtonStates.find(button) == m_MouseButtonStates.end())
 			m_MouseButtonStates[button] = {false, false};
 
@@ -161,6 +231,16 @@ namespace Ham
 
 		if (app.GetImGui().WantsCaptureMouse())
 			return false;
+
+		if (button == MouseButton::ANY)
+		{
+			for (auto &button : m_MouseButtonStates)
+			{
+				if (!button.second.first && button.second.second)
+					return true;
+			}
+			return false;
+		}
 
 		if (m_MouseButtonStates.find(button) == m_MouseButtonStates.end())
 			m_MouseButtonStates[button] = {false, false};
