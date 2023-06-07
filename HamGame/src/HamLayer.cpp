@@ -403,8 +403,9 @@ namespace Ham
         static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
         static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::LOCAL);
         static bool enableGizmo = true;
+        static bool mouseInUse = false;
         bool useSnap = false;
-        float snapValue;
+        float snapValue = 0.25f;
         if (Input::IsKeyDown(KeyCode::LEFT_CONTROL))
             useSnap = true;
 
@@ -462,7 +463,17 @@ namespace Ham
                 break;
             }
         }
-        
+
+        if (Input::IsMouseButtonDownThisFrame(MouseButton::ANY) && (!ImGuizmo::IsOver() || !ImGuizmo::IsUsing()))
+        {
+            mouseInUse = true;
+        }
+
+        if (Input::IsMouseButtonUpThisFrame(MouseButton::ANY))
+        {
+            mouseInUse = false;
+        }
+
         {
             auto cameraEntity = GetCamera();
             auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
@@ -470,7 +481,7 @@ namespace Ham
 
             float snapValues[3] = {snapValue, snapValue, snapValue};
 
-            if (enableGizmo)
+            if (enableGizmo && !mouseInUse)
                 ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr);
         }
 

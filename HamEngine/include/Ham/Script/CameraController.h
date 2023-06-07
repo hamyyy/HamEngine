@@ -4,6 +4,12 @@
 
 namespace Ham
 {
+    enum class CameraMode
+    {
+        FPS,
+        ORBIT
+    };
+
     class CameraController : public NativeScript
     {
         using NativeScript::NativeScript;
@@ -34,5 +40,7 @@ namespace Ham
         glm::mat4 m_Target = glm::mat4(1.0f);
         glm::vec3 m_AnimationTarget = glm::vec3(0.0f);
         bool m_Animate = false;
+        
+        CameraMode m_CameraMode = CameraMode::ORBIT;
     };
 }

@@ -28,6 +28,8 @@ namespace Ham
         static auto pAlpha = 0.0f;
         static auto pBeta = 0.0f;
         static auto pDistance = 0.0f;
+        static auto pCameraMode = m_CameraMode;
+        static auto offset = glm::mat4(1.0f);
 
         static float speed = 5.0f;
         static auto pmousePos = Input::GetMousePosition();
@@ -51,76 +53,115 @@ namespace Ham
         float flip = glm::forward().y;
 #endif
 
-        if (Input::IsKeyDown(KeyCode::W))
-        {
-            m_Target *= glm::translate(glm::mat4(1.0f), cameraForward * speed * (float)deltaTime);
-        }
-
-        if (Input::IsKeyDown(KeyCode::S))
-        {
-            m_Target *= glm::translate(glm::mat4(1.0f), -cameraForward * speed * (float)deltaTime);
-        }
-
-        if (Input::IsKeyDown(KeyCode::D))
-        {
-            m_Target *= glm::translate(glm::mat4(1.0f), cameraRight * speed * (float)deltaTime);
-        }
-
-        if (Input::IsKeyDown(KeyCode::A))
-        {
-            m_Target *= glm::translate(glm::mat4(1.0f), -cameraRight * speed * (float)deltaTime);
-        }
-
-        if (Input::IsKeyDown(KeyCode::SPACE))
-        {
-            m_Target *= glm::translate(glm::mat4(1.0f), strightUp * speed * (float)deltaTime);
-        }
-
-        if (Input::IsKeyDown(KeyCode::LEFT_CONTROL))
-        {
-            m_Target *= glm::translate(glm::mat4(1.0f), -strightUp * speed * (float)deltaTime);
-        }
-
-        // zoom camera
-        auto wheelDelta = Input::GetMouseWheelDelta();
-        if (wheelDelta != 0)
-        {
-            m_Distance += wheelDelta * (m_Distance * 0.1f);
-            m_Distance = glm::max(m_Distance, 0.1f);
-            m_Distance = glm::min(m_Distance, 1000.0f);
-        }
-
-        // translate camera
-        if (Input::IsMouseButtonDown(MouseButton::MIDDLE))
-        {
-            glm::vec2 mouseDelta = mousePos - pmousePos;
-            m_Target *= glm::translate(glm::mat4(1.0f), -cameraRight * mouseDelta.x * m_Distance * 0.00083f);
-            m_Target *= glm::translate(glm::mat4(1.0f), cameraUp * mouseDelta.y * m_Distance * 0.00083f);
-        }
-
-        // rotate camera
         if (Input::IsMouseButtonDown(MouseButton::RIGHT))
-        {
-            glm::vec2 mouseDelta = mousePos - pmousePos;
+            m_CameraMode = CameraMode::FPS;
+        else
+            m_CameraMode = CameraMode::ORBIT;
 
-            m_Alpha += mouseDelta.x * flip * glm::radians(0.1f);
-            m_Beta -= mouseDelta.y * glm::radians(0.1f);
+        if (m_CameraMode != pCameraMode && m_CameraMode == CameraMode::FPS)
+        {
+            offset = glm::inverse(m_Target) * transform.ToMatrix();
+            m_Target = transform;
+            m_Alpha = 0.0f;
+            m_Beta = 0.0f;
+
+            HAM_CORE_INFO("FPS");
+        }
+        else if (m_CameraMode != pCameraMode && m_CameraMode == CameraMode::ORBIT)
+        {
+            // m_Target *= glm::inverse(glm::translate(glm::mat4(1.0f), glm::vec3(offset[3])));
+
+            m_Target = transform.ToMatrix()                                                    //
+                       * glm::translate(glm::mat4(1.0f), -flip * forwardTarget * (m_Distance)) //
+                       * glm::rotate(glm::mat4(1.0f), -m_Beta, rightTarget)                    //
+                       * glm::rotate(glm::mat4(1.0f), -m_Alpha, upTarget);                     //
+
+            HAM_CORE_INFO("ORBIT");
         }
 
-        // clamp beta
-        m_Beta = glm::clamp(m_Beta, glm::radians(-89.0f), glm::radians(89.0f));
+        glm::mat4 newTransform;
+        if (m_CameraMode == CameraMode::FPS)
+        {
+            if (Input::IsKeyDown(KeyCode::W))
+            {
+                m_Target *= glm::translate(glm::mat4(1.0f), cameraForward * speed * (float)deltaTime);
+            }
 
-        // calculate new transform
-        glm::mat4 newTransform = m_Target                                            //
-                                 * glm::rotate(glm::mat4(1.0f), m_Alpha, upTarget)   //
-                                 * glm::rotate(glm::mat4(1.0f), m_Beta, rightTarget) //
-                                 * glm::translate(glm::mat4(1.0f), flip * forwardTarget * (m_Distance));
+            if (Input::IsKeyDown(KeyCode::S))
+            {
+                m_Target *= glm::translate(glm::mat4(1.0f), -cameraForward * speed * (float)deltaTime);
+            }
 
-        // float x = m_Distance * glm::cos(m_Beta) * glm::sin(m_Alpha);
-        // float y = m_Distance * glm::sin(m_Beta);
-        // float z = m_Distance * glm::cos(m_Beta) * glm::cos(m_Alpha);
-        // m_Position = m_Target + glm::vec3(x, y, z);
+            if (Input::IsKeyDown(KeyCode::D))
+            {
+                m_Target *= glm::translate(glm::mat4(1.0f), cameraRight * speed * (float)deltaTime);
+            }
 
+            if (Input::IsKeyDown(KeyCode::A))
+            {
+                m_Target *= glm::translate(glm::mat4(1.0f), -cameraRight * speed * (float)deltaTime);
+            }
+
+            if (Input::IsKeyDown(KeyCode::SPACE))
+            {
+                m_Target *= glm::translate(glm::mat4(1.0f), strightUp * speed * (float)deltaTime);
+            }
+
+            if (Input::IsKeyDown(KeyCode::LEFT_CONTROL))
+            {
+                m_Target *= glm::translate(glm::mat4(1.0f), -strightUp * speed * (float)deltaTime);
+            }
+
+            {
+                glm::vec2 mouseDelta = mousePos - pmousePos;
+
+                m_Alpha += mouseDelta.x * flip * glm::radians(0.1f);
+                m_Beta -= mouseDelta.y * glm::radians(0.1f);
+            }
+
+            newTransform = m_Target                                             //
+                           * glm::rotate(glm::mat4(1.0f), m_Alpha, upTarget)    //
+                           * glm::rotate(glm::mat4(1.0f), m_Beta, rightTarget); //
+                                                                                //    * glm::translate(glm::mat4(1.0f), flip * forwardTarget * (m_Distance))
+        }
+        else if (m_CameraMode == CameraMode::ORBIT)
+        {
+
+            // zoom camera
+            auto wheelDelta = Input::GetMouseWheelDelta();
+            if (wheelDelta != 0)
+            {
+                m_Distance += wheelDelta * (m_Distance * 0.1f);
+                m_Distance = glm::max(m_Distance, 0.1f);
+                m_Distance = glm::min(m_Distance, 1000.0f);
+            }
+
+            // translate camera
+            if (Input::IsMouseButtonDown(MouseButton::MIDDLE) && Input::IsKeyDown(KeyCode::LEFT_SHIFT))
+            {
+                glm::vec2 mouseDelta = mousePos - pmousePos;
+                m_Target *= glm::translate(glm::mat4(1.0f), -cameraRight * mouseDelta.x * m_Distance * 0.00083f);
+                m_Target *= glm::translate(glm::mat4(1.0f), cameraUp * mouseDelta.y * m_Distance * 0.00083f);
+            }
+            else if (Input::IsMouseButtonDown(MouseButton::MIDDLE))
+            {
+                // rotate camera
+                glm::vec2 mouseDelta = mousePos - pmousePos;
+
+                m_Alpha += mouseDelta.x * flip * glm::radians(0.1f);
+                m_Beta -= mouseDelta.y * glm::radians(0.1f);
+            }
+
+            // clamp beta
+            m_Beta = glm::clamp(m_Beta, glm::radians(-89.0f), glm::radians(89.0f));
+
+            newTransform = m_Target                                            //
+                           * glm::rotate(glm::mat4(1.0f), m_Alpha, upTarget)   //
+                           * glm::rotate(glm::mat4(1.0f), m_Beta, rightTarget) //
+                           * glm::translate(glm::mat4(1.0f), flip * forwardTarget * (m_Distance));
+        }
+
+        // update transform
         transform = newTransform;
 
         pmousePos = mousePos;
@@ -128,6 +169,7 @@ namespace Ham
         pAlpha = m_Alpha;
         pBeta = m_Beta;
         pDistance = m_Distance;
+        pCameraMode = m_CameraMode;
     }
 
     void CameraController::DoAnimation(TimeStep deltaTime)

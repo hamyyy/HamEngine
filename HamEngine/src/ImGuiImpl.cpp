@@ -41,6 +41,8 @@ namespace Ham
         // io.ConfigViewportsNoAutoMerge = true;
         // io.ConfigViewportsNoTaskBarIcon = true;
 
+        io.ConfigWindowsMoveFromTitleBarOnly = true;
+
         {
             ImGuiStyle *style = &ImGui::GetStyle();
             ImVec4 *colors = style->Colors;
