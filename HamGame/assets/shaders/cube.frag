@@ -34,5 +34,6 @@ void main()
     // Calculate final color
     vec3 result = (ambient + diffuse + specular) * uObjectColor;
 
-    FragColor = vec4(LocalNormal, 1.0);
+    FragColor = vec4(result, 1.0);
+    // FragColor = vec4(LocalNormal, 1.0);
 }
