@@ -62,7 +62,6 @@ namespace Ham
             auto sphere = m_Scene.CreateEntity("Sphere");
             auto plane = m_Scene.CreateEntity("Plane");
 
-
             plane.SetParent(cube);
             sphere.SetParent(cube);
 
@@ -172,8 +171,13 @@ namespace Ham
             m_imgui.NewFrame();
             {
                 // HAM_PROFILE_SCOPE("LayerStack OnUIRender");
+                m_imgui.SetupPreRender();
+                Systems::UpdateNativeScriptsUI(m_Scene, timestep);
                 for (Layer *layer : m_LayerStack)
+                {
+                    m_imgui.SetupPreRender();
                     layer->OnUIRender(timestep);
+                }
             }
 
             {
@@ -200,6 +204,7 @@ namespace Ham
         }
 
         m_imgui.Shutdown();
+        m_Scene.Shutdown();
     }
 
     int Application::Run()

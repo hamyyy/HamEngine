@@ -67,4 +67,24 @@ namespace Ham
             }
         }
     }
+
+    void Systems::UpdateNativeScriptsUI(Scene &scene, TimeStep &deltaTime)
+    {
+        auto view = scene.m_Registry.view<Component::NativeScriptList>();
+        for (auto entity : view)
+        {
+            auto &list = view.get<Component::NativeScriptList>(entity);
+            for (auto &script : list.Scripts)
+            {
+                if (script->Active)
+                {
+                    if (script->World == nullptr)
+                        script->World = &scene;
+                    if (script->GameObject == nullptr || entity != entt::null)
+                        script->GameObject = new Entity(entity, &scene);
+                    script->OnUIUpdate(deltaTime);
+                }
+            }
+        }
+    }
 } // namespace Ham

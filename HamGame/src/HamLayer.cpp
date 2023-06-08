@@ -443,14 +443,6 @@ namespace Ham
             mCurrentGizmoMode = ImGuizmo::LOCAL;
         }
 
-        ImGuizmo::SetOrthographic(false);
-        ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
-
-        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-            ImGuizmo::SetRect((float)m_App->GetWindow().GetXPos(), (float)m_App->GetWindow().GetYPos(), (float)m_App->GetWindow().GetWidth(), (float)m_App->GetWindow().GetHeight());
-        else
-            ImGuizmo::SetRect(0.0f, 0.0f, (float)m_App->GetWindow().GetWidth(), (float)m_App->GetWindow().GetHeight());
-
         if (useSnap)
         {
             switch (mCurrentGizmoOperation)
@@ -465,15 +457,13 @@ namespace Ham
         }
 
         if (Input::IsMouseButtonDownThisFrame(MouseButton::ANY) && (!ImGuizmo::IsOver() || !ImGuizmo::IsUsing()))
-        {
             mouseInUse = true;
-        }
 
         if (Input::IsMouseButtonUpThisFrame(MouseButton::ANY))
-        {
             mouseInUse = false;
-        }
 
+        mouseInUse = false;
+        
         {
             auto cameraEntity = GetCamera();
             auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;

@@ -13,6 +13,10 @@ namespace Ham
     public:
         Scene();
         ~Scene();
+
+        void Init();
+        void Shutdown();
+
         Scene &operator=(const Scene &other) { return *this; }
 
         Entity CreateEntity(std::string name);

@@ -30,6 +30,7 @@ namespace Ham
         virtual void OnCreate() {}
         virtual void OnDestroy() {}
         virtual void OnUpdate(TimeStep deltaTime) {}
+        virtual void OnUIUpdate(TimeStep deltaTime) {}
 
         operator bool() const { return Active; }
     };

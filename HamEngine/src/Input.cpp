@@ -203,7 +203,7 @@ namespace Ham
 	{
 		auto &app = Application::Get();
 
-		if (app.GetImGui().WantsCaptureMouse())
+		if (app.GetImGui().WantsCaptureMouse() && button != MouseButton::ANY)
 			return false;
 
 		if (button == MouseButton::ANY)
@@ -229,7 +229,7 @@ namespace Ham
 	{
 		auto &app = Application::Get();
 
-		if (app.GetImGui().WantsCaptureMouse())
+		if (app.GetImGui().WantsCaptureMouse() && button != MouseButton::ANY)
 			return false;
 
 		if (button == MouseButton::ANY)

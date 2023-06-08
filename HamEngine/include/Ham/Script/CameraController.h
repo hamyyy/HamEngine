@@ -18,6 +18,7 @@ namespace Ham
         void OnCreate();
         void OnDestroy();
         void OnUpdate(TimeStep deltaTime);
+        void OnUIUpdate(TimeStep deltaTime);
 
         void SetTarget(const glm::vec3 &target, bool animate = true)
         {

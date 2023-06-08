@@ -75,6 +75,17 @@ namespace Ham
         ImGuizmo::BeginFrame();
     }
 
+    void ImGuiImpl::SetupPreRender()
+    {
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
+
+        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+            ImGuizmo::SetRect((float)m_Window->GetXPos(), (float)m_Window->GetYPos(), (float)m_Window->GetWidth(), (float)m_Window->GetHeight());
+        else
+            ImGuizmo::SetRect(0.0f, 0.0f, (float)m_Window->GetWidth(), (float)m_Window->GetHeight());
+    }
+
     void ImGuiImpl::Render()
     {
         // Rendering

@@ -19,6 +19,7 @@ namespace Ham
         void Render();
         void UpdateWindows();
         void Shutdown();
+        void SetupPreRender();
 
         bool WantsCaptureMouse() { return ImGui::GetIO().WantCaptureMouse || ImGuizmo::IsUsingAny(); }
         bool WantsCaptureKeyboard() { return ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantTextInput; }

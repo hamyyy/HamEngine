@@ -7,7 +7,14 @@ namespace Ham
 {
     Scene::Scene() : m_Registry() {}
 
-    Scene::~Scene() {}
+    Scene::~Scene() { Shutdown(); }
+
+    void Scene::Init() {}
+
+    void Scene::Shutdown()
+    {
+        m_Registry.clear();
+    }
 
     Entity Scene::CreateEntity(std::string name)
     {
