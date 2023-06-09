@@ -36,7 +36,7 @@ namespace Ham
         Input::Init();
 
         auto cameraEntity = m_Scene.CreateEntity("camera");
-        cameraEntity.AddComponent<Component::Camera>(glm::radians(45.0f), GetWindow().GetAspectRatio(), 0.001f, 1000.0f);
+        cameraEntity.AddComponent<Component::Camera>();
         cameraEntity.GetComponent<Component::Transform>() = Component::Transform(glm::inverse(glm::lookAt(glm::vec3(3, 3, 3), glm::zero<glm::vec3>(), glm::up()))); // glm::inverse(glm::camera()) * glm::translate(glm::mat4(1.0f), glm::forward() * 10.0f)
 
         auto &scriptList = cameraEntity.AddComponent<Component::NativeScriptList>();

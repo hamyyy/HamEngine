@@ -64,7 +64,7 @@ namespace Ham
         float flip = glm::forward().y;
 #endif
 
-        if (Input::IsMouseButtonDown(MouseButton::RIGHT))
+        if (Input::IsMouseButtonDown(MouseButton::MIDDLE))
             m_CameraMode = CameraMode::FPS;
         else
             m_CameraMode = CameraMode::ORBIT;
@@ -143,13 +143,13 @@ namespace Ham
         }
 
         // translate camera
-        if (Input::IsMouseButtonDown(MouseButton::MIDDLE) && Input::IsKeyDown(KeyCode::LEFT_SHIFT) && m_CameraMode == CameraMode::ORBIT)
+        if (Input::IsMouseButtonDown(MouseButton::RIGHT) && Input::IsKeyDown(KeyCode::LEFT_SHIFT) && m_CameraMode == CameraMode::ORBIT)
         {
             glm::vec2 mouseDelta = mousePos - pmousePos;
             m_Target *= glm::translate(glm::mat4(1.0f), -cameraRight * mouseDelta.x * m_Distance * 0.00083f);
             m_Target *= glm::translate(glm::mat4(1.0f), cameraUp * mouseDelta.y * m_Distance * 0.00083f);
         }
-        else if (Input::IsMouseButtonDown(MouseButton::MIDDLE) || m_CameraMode == CameraMode::FPS)
+        else if (Input::IsMouseButtonDown(MouseButton::RIGHT) || m_CameraMode == CameraMode::FPS)
         {
             // rotate camera
             glm::vec2 mouseDelta = mousePos - pmousePos;

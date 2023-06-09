@@ -59,12 +59,12 @@ namespace Ham::Component
         glm::mat4 Projection;
         float FOV = glm::radians(45.0f);
         float AspectRatio = 1.0f;
-        float Near = 0.01f;
-        float Far = 100.0f;
+        float Near = 0.001f;
+        float Far = 2000.0f;
         bool Active = true;
 
         Camera(float fov, float aspectRatio, float near, float far) : FOV(fov), AspectRatio(aspectRatio), Near(near), Far(far), Projection(glm::perspective(fov, aspectRatio, near, far)) {}
-        Camera() : Projection(glm::perspective(glm::radians(45.0f), 1.0f, 0.001f, 1000.0f)) {}
+        Camera() : Projection(glm::perspective(FOV, AspectRatio, Near, Far)) {}
         Camera(const Camera &other) : Projection(other.Projection) {}
 
         void Update()
