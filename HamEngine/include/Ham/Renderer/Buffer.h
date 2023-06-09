@@ -85,4 +85,19 @@ namespace Ham
     using VertexBuffer = Buffer<T, GL_ARRAY_BUFFER>;
     using IndexBuffer = Buffer<uint32_t, GL_ELEMENT_ARRAY_BUFFER>;
 
+    class VertexArray
+    {
+        VertexArray() {}
+        ~VertexArray() { Destroy(); }
+
+        void Create() { glGenVertexArrays(1, &m_VertexArrayID); }
+        void Destroy() { glDeleteVertexArrays(1, &m_VertexArrayID); }
+
+        void Bind() { glBindVertexArray(m_VertexArrayID); }
+        void Unbind() { glBindVertexArray(0); }
+
+    private:
+        uint32_t m_VertexArrayID;
+    };
+
 } // namespace Ham

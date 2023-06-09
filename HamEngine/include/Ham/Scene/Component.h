@@ -2,6 +2,7 @@
 
 #include "Ham/Util/TimeStep.h"
 #include "Ham/Util/UUID.h"
+#include "Ham/Renderer/Buffer.h"
 
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -201,8 +202,12 @@ namespace Ham::Component
         bool Contains(Entity entity);
     };
 
+    
     struct Mesh
     {
+        VertexBuffer VertexBuffer;
+        IndexBuffer IndexBuffer;
+        VertexArray VertexArray;
     };
 
 } // namespace Ham::Component
