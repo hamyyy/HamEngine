@@ -41,6 +41,10 @@ namespace Ham
         // io.ConfigViewportsNoAutoMerge = true;
         // io.ConfigViewportsNoTaskBarIcon = true;
 
+#if defined(HAM_PLATFORM_LINUX) || defined(HAM_PLATFORM_MACOS)
+        io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable; // FIXME: Viewports are not currently working on Linux/MacOS
+#endif
+
         io.ConfigWindowsMoveFromTitleBarOnly = true;
 
         {

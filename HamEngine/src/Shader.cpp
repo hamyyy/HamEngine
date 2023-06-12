@@ -8,7 +8,7 @@
 namespace Ham
 {
 
-    std::vector<std::shared_ptr<Shader>> Shader::s_Shaders;
+    std::vector<Shader *> Shader::s_Shaders;
 
     Shader::Shader(std::string vertexPath, std::string fragmentPath)
     {
@@ -28,13 +28,15 @@ namespace Ham
         if (m_RendererID == 0)
             HAM_CORE_ERROR("Shader compilation failed");
         else
-            Shader::s_Shaders.push_back(std::shared_ptr<Shader>(this));
+            Shader::s_Shaders.push_back(this);
     }
 
     Shader::~Shader()
     {
         for (auto &unSubscribeFunction : m_UnSubscribeFunctions)
             unSubscribeFunction();
+
+        Shader::s_Shaders.erase(std::find(Shader::s_Shaders.begin(), Shader::s_Shaders.end(), this));
         glDeleteProgram(m_RendererID);
     }
 

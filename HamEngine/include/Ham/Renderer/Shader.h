@@ -37,7 +37,7 @@ namespace Ham
         void SetUniformMat4f(const std::string &name, const glm::mat4 &matrix);
 
     private:
-        unsigned int m_RendererID = -1;
+        unsigned int m_RendererID = 0;
         std::unordered_map<std::string, int> m_UniformLocationCache;
 
         unsigned int CompileShader(unsigned int type, const std::string &source);
@@ -52,7 +52,7 @@ namespace Ham
 
         std::vector<std::function<void()>> m_UnSubscribeFunctions;
 
-        static std::vector<std::shared_ptr<Shader>> s_Shaders;
+        static std::vector<Shader*> s_Shaders;
 
         friend class Application;
     };
