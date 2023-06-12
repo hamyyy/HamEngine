@@ -15,17 +15,20 @@ namespace Ham
     public:
         static void Init()
         {
-            std::random_device rd;
-            auto seed_data = std::array<int, std::mt19937::state_size>{};
+            static std::random_device rd;
+            static auto seed_data = std::array<int, std::mt19937::state_size>{};
             std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
-            std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
-            std::mt19937 generator(seq);
+            static std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
+            static std::mt19937 generator(seq);
             s_Generator = std::make_shared<uuids::uuid_random_generator>(generator);
+
+            HAM_CORE_WARN("UUIDGenerator initialized!");
+            HAM_CORE_WARN("UUIDGenerator seed: {0}", (*GetGenerator())());
         }
 
         static std::shared_ptr<uuids::uuid_random_generator> GetGenerator() { return s_Generator; }
-        static UUID Create() { return (UUID)uuids::to_string((*s_Generator)()); }
-        
+        static UUID Create() { return (UUID)uuids::to_string((*GetGenerator())()); }
+
     private:
         static std::shared_ptr<uuids::uuid_random_generator> s_Generator;
     };
