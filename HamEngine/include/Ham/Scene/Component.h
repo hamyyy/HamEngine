@@ -3,6 +3,7 @@
 #include "Ham/Util/TimeStep.h"
 #include "Ham/Util/UUID.h"
 #include "Ham/Renderer/Buffer.h"
+#include "Ham/Renderer/Shader.h"
 
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -41,6 +42,7 @@ namespace Ham::Component
 {
     using UUID = Ham::UUID;
     using Parent = Ham::Entity;
+    using Shader = Ham::Shader;
 
     struct Tag
     {
@@ -58,7 +60,7 @@ namespace Ham::Component
     struct Camera
     {
         glm::mat4 Projection;
-        float FOV = glm::radians(45.0f);
+        float FOV = glm::radians(90.0f);
         float AspectRatio = 1.0f;
         float Near = 0.001f;
         float Far = 2000.0f;
@@ -202,12 +204,41 @@ namespace Ham::Component
         bool Contains(Entity entity);
     };
 
-    
+    struct VertexData
+    {
+        glm::vec3 Position;
+        glm::vec3 Normal;
+        // glm::vec2 TexCoord;
+    };
+
     struct Mesh
     {
-        VertexBuffer VertexBuffer;
-        IndexBuffer IndexBuffer;
-        VertexArray VertexArray;
+        VertexBuffer<VertexData> Verticies;
+        IndexBuffer Indicies;
+        VertexArray VAO;
+
+        bool ShowWireframe = false;
+        bool ShowFill = true;
+
+        Mesh() {}
+        Mesh(const Mesh &other) : Verticies(other.Verticies), Indicies(other.Indicies) {} // VBO(other.VBO)
+        Mesh(const std::vector<VertexData> &verticies, const std::vector<uint32_t> &indicies)
+        {
+            VAO.Create();
+            VAO.Bind();
+
+            Indicies.Create();
+            Indicies.Bind();
+            Indicies.SetData(indicies);
+
+            Verticies.Create();
+            Verticies.Bind();
+            Verticies.SetData(verticies);
+
+            // VBO.Unbind();
+            // Verticies.Unbind();
+            // Indicies.Unbind();
+        }
     };
 
 } // namespace Ham::Component

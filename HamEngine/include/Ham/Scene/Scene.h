@@ -22,7 +22,13 @@ namespace Ham
         Entity CreateEntity(std::string name);
         void DestroyEntity(Entity entity);
         Entity GetEntityByID(UUID id);
+
         Entity GetActiveCamera();
+
+        Entity& GetSelectedEntity(); // TODO: Move entity selection to editor
+        void SetSelectedEntity(Entity entity);
+        void ClearSelectedEntity();
+
         std::vector<Entity> GetEntitiesByTag(std::string name);
         entt::registry *GetRegistry();
         std::vector<Entity> GetEntities();
@@ -30,6 +36,7 @@ namespace Ham
 
     private:
         entt::registry m_Registry;
+
         friend class Entity;
         friend class Systems;
     };

@@ -25,7 +25,10 @@ namespace Ham
         void Create() { glGenBuffers(1, &m_BufferID); }
         void Destroy() { glDeleteBuffers(1, &m_BufferID); }
 
-        void Bind() { glBindBuffer(BufferType, m_BufferID); }
+        void Bind()
+        {
+            glBindBuffer(BufferType, m_BufferID);
+        }
         void Unbind() { glBindBuffer(BufferType, 0); }
 
         void SetData(std::vector<T> data)
@@ -40,10 +43,9 @@ namespace Ham
         template <typename U>
         void DefineAttribute(size_t offset, uint32_t length, uint32_t type, bool normalized = false)
         {
-            static uint32_t index = 0;
-            glEnableVertexAttribArray(index);
-            glVertexAttribPointer(index, length, type, normalized ? GL_TRUE : GL_FALSE, sizeof(T), (void *)offset);
-            index++;
+            glEnableVertexAttribArray(m_AttributeIndex);
+            glVertexAttribPointer(m_AttributeIndex, length, type, normalized ? GL_TRUE : GL_FALSE, sizeof(T), (void *)offset);
+            m_AttributeIndex++;
         }
 
         void SetDrawMode(uint32_t mode) { m_DrawMode = mode; }
@@ -87,6 +89,7 @@ namespace Ham
 
     class VertexArray
     {
+    public:
         VertexArray() {}
         ~VertexArray() { Destroy(); }
 

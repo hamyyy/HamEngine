@@ -2,6 +2,7 @@
 
 #include "Ham/Script/CameraController.h"
 #include "Ham/Util/ImGuiExtra.h"
+#include "Ham/Parser/STLParser.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
@@ -9,49 +10,9 @@
 namespace Ham
 {
 
-    std::vector<VertexData> getCubeVertices()
+    std::vector<Component::VertexData> getCubeVertices()
     {
-        std::vector<VertexData> vertices;
-
-        // Top face
-        vertices.push_back({{-0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}});
-        vertices.push_back({{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}});
-        vertices.push_back({{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}});
-        vertices.push_back({{-0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}});
-
-        // Back face
-        vertices.push_back({{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}});
-        vertices.push_back({{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}});
-        vertices.push_back({{0.5f, 0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}});
-        vertices.push_back({{-0.5f, 0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}});
-
-        // Left face
-        vertices.push_back({{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}});
-        vertices.push_back({{-0.5f, -0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}});
-        vertices.push_back({{-0.5f, 0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}});
-        vertices.push_back({{-0.5f, 0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}});
-
-        // Right face
-        vertices.push_back({{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}});
-        vertices.push_back({{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}});
-        vertices.push_back({{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}});
-        vertices.push_back({{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}});
-
-        // Top face
-        vertices.push_back({{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}});
-        vertices.push_back({{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}});
-        vertices.push_back({{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}});
-        vertices.push_back({{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}});
-
-        // Bottom face
-        vertices.push_back({{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}});
-        vertices.push_back({{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}});
-        vertices.push_back({{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, -1.0f}});
-        vertices.push_back({{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, -1.0f}});
-
-        vertices.clear();
-
-        vertices = {
+        std::vector<Component::VertexData> vertices = {
             // Front Face
             {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
             {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
@@ -94,96 +55,181 @@ namespace Ham
     std::vector<unsigned int> getCubeIndices()
     {
         std::vector<unsigned int> indices =
-            // {
-            //     0, 2, 1, 2, 0, 3,       // Top face
-            //     4, 5, 6, 6, 7, 4,       // Bottom face
-            //     8, 10, 9, 10, 8, 11,    // Right face
-            //     12, 13, 14, 14, 15, 12, // Left face
-            //     16, 17, 18, 18, 19, 16, // Front face
-            //     20, 22, 21, 22, 20, 23  // Back face
-            // };
-
             {
-                // Front Face
-                0, 1, 2,
-                2, 3, 0,
-
-                // Right Face
-                4, 5, 6,
-                6, 7, 4,
-
-                // Back Face
-                8, 9, 10,
-                10, 11, 8,
-
-                // Left Face
-                12, 13, 14,
-                14, 15, 12,
-
-                // Top Face
-                16, 17, 18,
-                18, 19, 16,
-
-                // Bottom Face
-                20, 21, 22,
-                22, 23, 20};
+                0, 2, 1, 2, 0, 3,       // Front Face
+                4, 6, 5, 6, 4, 7,       // Right Face
+                8, 10, 9, 10, 8, 11,    // Back Face
+                12, 14, 13, 14, 12, 15, // Left Face
+                16, 18, 17, 18, 16, 19, // Top Face
+                20, 22, 21, 22, 20, 23  // Bottom Face
+            };
 
         return indices;
     }
 
+    std::vector<Component::VertexData> GetSphereVertices(float radius, int h_segments, int v_segments)
+    {
+        std::vector<Component::VertexData> vertices;
+
+        float sectorStep = 2 * glm::pi<float>() / h_segments;
+        float stackStep = glm::pi<float>() / v_segments;
+
+        for (int i = 0; i <= v_segments; ++i)
+        {
+            float stackAngle = glm::pi<float>() / 2 - i * stackStep;
+            float xy = radius * cosf(stackAngle);
+            float z = radius * sinf(stackAngle);
+
+            for (int j = 0; j <= h_segments; ++j)
+            {
+                float sectorAngle = j * sectorStep;
+
+                float x = xy * cosf(sectorAngle);
+                float y = xy * sinf(sectorAngle);
+
+                glm::vec3 position(x, y, z);
+                glm::vec3 normal(glm::normalize(position));
+
+                vertices.push_back({position, normal});
+            }
+        }
+
+        return vertices;
+    }
+
+    std::vector<unsigned int> GetSphereIndices(int h_segments, int v_segments)
+    {
+        std::vector<unsigned int> indices;
+
+        int numStacks = v_segments + 1;
+        int numSectors = h_segments + 1;
+
+        for (int i = 0; i < numStacks; ++i)
+        {
+            int k1 = i * numSectors;       // current stack
+            int k2 = (i + 1) * numSectors; // next stack
+
+            for (int j = 0; j < numSectors; ++j)
+            {
+                if (i != 0)
+                {
+                    indices.push_back(k1 + j);
+                    indices.push_back(k2 + j);
+                    indices.push_back(k1 + j + 1);
+                }
+
+                if (i != numStacks - 1)
+                {
+                    indices.push_back(k1 + j + 1);
+                    indices.push_back(k2 + j);
+                    indices.push_back(k2 + j + 1);
+                }
+            }
+        }
+
+        return indices;
+    }
+
+    void CalculateNormals(std::vector<Component::VertexData> &vertices, const std::vector<unsigned int> &indices)
+    {
+        // Initialize normals of all vertices to zero vectors
+        for (auto &vertex : vertices)
+        {
+            vertex.Normal = glm::vec3(0.0f);
+        }
+
+        // Calculate face normals and accumulate to vertex normals
+        for (size_t i = 0; i < indices.size(); i += 3)
+        {
+            unsigned int index1 = indices[i];
+            unsigned int index2 = indices[i + 1];
+            unsigned int index3 = indices[i + 2];
+
+            auto &vertex1 = vertices[index1];
+            auto &vertex2 = vertices[index2];
+            auto &vertex3 = vertices[index3];
+
+            const glm::vec3 &v1 = vertex1.Position;
+            const glm::vec3 &v2 = vertex2.Position;
+            const glm::vec3 &v3 = vertex3.Position;
+
+            glm::vec3 faceNormal = glm::normalize(glm::cross(v2 - v1, v3 - v1));
+
+            vertex1.Normal += faceNormal;
+            vertex2.Normal += faceNormal;
+            vertex3.Normal += faceNormal;
+        }
+
+        // Normalize the vertex normals
+        for (auto &vertex : vertices)
+        {
+            vertex.Normal = glm::normalize(vertex.Normal);
+        }
+    }
+
     HamLayer::HamLayer(Application *app) : Layer("HamLayer"), m_App(app), m_Scene(m_App->GetScene()) {}
 
-    HamLayer::~HamLayer()
-    {
-        vb.Destroy();
-    }
+    HamLayer::~HamLayer() {}
 
     void HamLayer::OnAttach()
     {
-        // opengl simple cube
+        {
+            auto entity = m_Scene.CreateEntity("Cube");
+            entity.GetComponent<Component::Transform>().Position = glm::vec3(-2.0f, 0.0f, 0.0f);
+            auto &shader = entity.AddComponent<Component::Shader>(ASSETS_PATH + "shaders/basic.vert", ASSETS_PATH + "shaders/cube.frag");
+            auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
 
-        //  create Shader
-        shader = std::make_unique<Shader>(ASSETS_PATH + "shaders/cube.vert", ASSETS_PATH + "shaders/cube.frag");
+            // mesh.Indicies.Bind();
+            // mesh.Verticies.Bind();
 
-        // set up vertex data (and buffer(s)) and configure vertex attributes
-        // ------------------------------------------------------------------
+            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Position));
+            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
-        // struct VertexData
-        // {
-        //     glm::vec3 position;
-        //     glm::vec3 normal;
-        // };
+            // mesh.VAO.Unbind();
+            // mesh.Verticies.Unbind();
+            // mesh.Indicies.Unbind();
 
-        auto vertices = getCubeVertices();
-        auto indices = getCubeIndices();
+            m_Scene.SetSelectedEntity(entity);
+        }
+        {
+            auto entity = m_Scene.CreateEntity("Sphere");
+            entity.GetComponent<Component::Transform>().Position = glm::vec3(2.0f, 0.0f, 0.0f);
+            auto &shader = entity.AddComponent<Component::Shader>(ASSETS_PATH + "shaders/basic.vert", ASSETS_PATH + "shaders/normals.frag");
+            auto &mesh = entity.AddComponent<Component::Mesh>(GetSphereVertices(0.5, 32, 32), GetSphereIndices(32, 32));
 
-        // Generate and bind the Vertex Array Object (VAO)
-        glGenVertexArrays(1, &cubeVAO);
-        glBindVertexArray(cubeVAO);
+            // mesh.Indicies.Bind();
+            // mesh.Verticies.Bind();
 
-        // Generate and bind the Vertex Buffer Object (VBO) for the vertex data
-        vb.Create();
-        vb.SetData(vertices);
+            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Position));
+            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
-        // Enable and specify the vertex attribute pointers
-        vb.DefineAttribute3f(offsetof(VertexData, position));
-        vb.DefineAttribute3f(offsetof(VertexData, normal));
+            mesh.ShowWireframe = true;
 
-        // Generate and bind the Element Buffer Object (EBO) for the index data
-        // unsigned int cubeEBO;
-        // glGenBuffers(1, &cubeEBO);
-        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
-        // glBufferData(GL_ELEMENT_ARRAY_BUFFER, (int)indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+            // mesh.VAO.Unbind();
+            // mesh.Verticies.Unbind();
+            // mesh.Indicies.Unbind();
+        }
+        {
+            auto entity = m_Scene.CreateEntity("Monkey");
+            auto &shader = entity.AddComponent<Component::Shader>(ASSETS_PATH + "shaders/basic.vert", ASSETS_PATH + "shaders/funk.frag");
 
-        ib.Create();
-        ib.SetData(indices);
+            std::vector<Ham::Component::VertexData> vertices;
+            std::vector<unsigned int> indices;
+            CalculateNormals(vertices, indices);
+            ReadOBJFile(ASSETS_PATH + "models/monkey.obj", vertices, indices);
 
-        // Unbind the VAO and buffers
-        glBindVertexArray(0);
-        vb.Unbind();
-        ib.Unbind();
+            auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
 
-        transform = glm::mat4(1.0f);
+            // mesh.Indicies.Bind();
+            // mesh.Verticies.Bind();
+
+            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Position));
+            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+
+            // mesh.VAO.Unbind();
+            // mesh.Verticies.Unbind();
+            // mesh.Indicies.Unbind();
+        }
     }
 
     void HamLayer::OnDetach() {}
@@ -213,15 +259,19 @@ namespace Ham
 
         if (Input::IsKeyDownThisFrame(KeyCode::F))
         {
-            auto cameraEntity = GetCamera();
+            auto cameraEntity = GetActiveCamera();
             auto &scriptList = cameraEntity.GetComponent<Component::NativeScriptList>();
             auto script = scriptList.GetScript<CameraController>();
-            script->SetTarget(transform[3]);
+
+            auto transform = m_Scene.GetSelectedEntity().GetComponent<Component::Transform>().ToMatrix();
+
+            if (cameraEntity != m_Scene.GetSelectedEntity())
+                script->SetTarget(transform[3]);
         }
 
         if (Input::IsKeyDownThisFrame(KeyCode::TAB))
         {
-            auto cameraEntity = GetCamera();
+            auto cameraEntity = GetActiveCamera();
             auto &scriptList = cameraEntity.GetComponent<Component::NativeScriptList>();
             auto script = scriptList.GetScript<CameraController>();
             script->SetTarget((glm::vec3(rand() % 1000, rand() % 1000, rand() % 1000) / 1000.0f - 0.5f) * 2.0f);
@@ -253,46 +303,7 @@ namespace Ham
             // transform = glm::rotate(transform, glm::radians(mouseDelta.x * sensitivity), glm::vec3(0.0f, 0.0f, 1.0f));
         }
 
-        shader->Bind();
-
-        // transform = glm::rotate(transform, glm::quarter_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-        // Camera
-        auto cameraEntity = GetCamera();
-        auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
-        auto view = glm::inverse(cameraEntity.GetComponent<Component::Transform>().ToMatrix());
-
-        shader->SetUniformMat4f("uModel", transform);
-        shader->SetUniformMat4f("uView", view);
-        shader->SetUniformMat4f("uProjection", projection);
-
-        static auto lightPos = glm::vec3(1.0f, 0.0f, 0.0f);
-
-        // rotate light about z axis
-        lightPos = glm::rotate(lightPos, glm::radians(90.0f) * deltaTime, glm::vec3(0.0f, 0.0f, 1.0f));
-
-        shader->SetUniform3f("uLightPos", lightPos);
-        shader->SetUniform3f("uLightColor", glm::vec3(1.0f, 0.0f, 0.0f));
-        shader->SetUniform1f("uTime", m_App->GetTime());
-        shader->SetUniform2f("uResolution", m_App->GetWindow().GetSize());
-
-        // render the cube
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-
-        glBindVertexArray(cubeVAO);
-        {
-            shader->SetUniform3f("uObjectColor", glm::vec3());
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            glDrawElements(GL_TRIANGLES, (int)ib.GetData().size(), GL_UNSIGNED_INT, 0);
-
-            shader->SetUniform3f("uObjectColor", glm::vec3(1, 1, 1));
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glDrawElements(GL_TRIANGLES, (int)ib.GetData().size(), GL_UNSIGNED_INT, 0);
-        }
-        glBindVertexArray(0);
-
-        shader->Unbind();
+        Systems::RenderScene(*m_App, m_Scene, deltaTime);
     }
 
     void HamLayer::OnUIRender(TimeStep deltaTime)
@@ -463,43 +474,73 @@ namespace Ham
             mouseInUse = false;
 
         mouseInUse = false;
-        
+
+        auto selectedEntity = m_Scene.GetSelectedEntity();
+
+        if (selectedEntity)
         {
-            auto cameraEntity = GetCamera();
-            auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
-            auto view = glm::inverse(cameraEntity.GetComponent<Component::Transform>().ToMatrix());
+            auto &transformComponent = selectedEntity.GetComponent<Component::Transform>();
+            auto transform = transformComponent.ToMatrix();
 
-            float snapValues[3] = {snapValue, snapValue, snapValue};
+            {
+                auto cameraEntity = GetActiveCamera();
+                auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
+                auto view = glm::inverse(cameraEntity.GetComponent<Component::Transform>().ToMatrix());
 
-            if (enableGizmo && !mouseInUse)
-                ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr);
+                float snapValues[3] = {snapValue, snapValue, snapValue};
+
+                if (enableGizmo && !mouseInUse)
+                {
+                    if (ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr))
+                    {
+                        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), glm::value_ptr(transformComponent.Position), glm::value_ptr(transformComponent.Rotation), glm::value_ptr(transformComponent.Scale));
+                        transformComponent.Rotation = glm::radians(transformComponent.Rotation);
+                    }
+                }
+            }
         }
 
         {
-            auto cameraEntity = GetCamera();
+            auto cameraEntity = GetActiveCamera();
             auto &cameraTransform = cameraEntity.GetComponent<Component::Transform>();
 
-            ImGui::Separator();
-            ImGui::Transform("Cube", transform);
-            ImGui::Separator();
-            ImGui::Transform("Camera", cameraTransform);
+            auto entity = m_Scene.GetSelectedEntity();
 
-            ImGui::Separator();
-            ImGui::DragFloat3("Cube Position", glm::value_ptr(transform[3]), 0.1f);
+            if (entity)
+            {
+                auto &transformComponent = entity.GetComponent<Component::Transform>();
+                auto &tagComponent = entity.GetComponent<Component::Tag>();
+                auto name = tagComponent.Name.c_str();
 
-            auto &cameraComponent = cameraEntity.GetComponent<Component::Camera>();
-            auto &projection = cameraComponent.Projection;
-            auto tf = cameraTransform.ToMatrix();
+                ImGui::Separator();
+                ImGui::Transform(name, transformComponent);
+                if (entity.HasComponent<Component::Mesh>())
+                {
+                    auto &meshComponent = entity.GetComponent<Component::Mesh>();
+                    ImGui::Checkbox("Show Wireframe", &meshComponent.ShowWireframe);
+                }
 
-            auto cameraLookDir = cameraTransform.forward();
+                if (entity.HasComponent<Component::Camera>())
+                {
+                    auto &cameraComponent = entity.GetComponent<Component::Camera>();
+                    bool update = false;
+                    if (ImGui::DragFloat("Aspect Ratio", &cameraComponent.AspectRatio, 0.1f, 0.1f, 10.0f))
+                        update = true;
 
-            ImGui::Separator();
-            ImGui::DragFloat3("Camera Position", glm::value_ptr(cameraTransform.Position), 0.1f);
-            ImGui::DragFloat3("Camera Rotation", glm::value_ptr(cameraTransform.Rotation), 0.1f);
-            ImGui::DragFloat3("Camera Scale", glm::value_ptr(cameraTransform.Scale), 0.1f);
-            ImGui::Separator();
+                    cameraComponent.FOV = glm::degrees(cameraComponent.FOV);
+                    if (ImGui::DragFloat("FOV", &cameraComponent.FOV, 0.1f, 0.1f, 180.0f))
+                        update = true;
+                    cameraComponent.FOV = glm::radians(cameraComponent.FOV);
 
-            ImGui::DragFloat3("Camera Look Dir", glm::value_ptr(cameraLookDir), 0.1f);
+                    if (ImGui::DragFloat("Near", &cameraComponent.Near, 0.1f, 0.1f, cameraComponent.Far))
+                        update = true;
+                    if (ImGui::DragFloat("Far", &cameraComponent.Far, 0.1f, cameraComponent.Near, 2000.0f))
+                        update = true;
+
+                    if (update)
+                        cameraComponent.Update();
+                }
+            }
         }
 
         {

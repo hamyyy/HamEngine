@@ -12,5 +12,6 @@ namespace Ham
         static void DetachNativeScripts(Scene &scene);
         static void UpdateNativeScripts(Scene &scene, TimeStep &deltaTime);
         static void UpdateNativeScriptsUI(Scene &scene, TimeStep &deltaTime);
+        static void RenderScene(Application &app, Scene &scene, TimeStep &deltaTime);
     };
 } // namespace Ham

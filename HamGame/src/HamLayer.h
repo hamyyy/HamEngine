@@ -4,13 +4,6 @@
 
 namespace Ham
 {
-    struct VertexData
-    {
-        glm::vec3 position;
-        glm::vec3 normal;
-        // glm::vec2 texCoords;
-    };
-
     class HamLayer : public Layer
     {
     public:
@@ -23,18 +16,12 @@ namespace Ham
         virtual void OnUIRender(TimeStep deltaTime) override;
         // virtual void OnEvent(Event &event) override;
 
-        Entity GetCamera() { return m_Scene.GetActiveCamera(); }
+        Entity GetActiveCamera() { return m_Scene.GetActiveCamera(); }
 
     private:
         Application *m_App;
         Scene &m_Scene;
         std::unique_ptr<Shader> shader;
-
-        unsigned int cubeVAO;
-        VertexBuffer<VertexData> vb;
-        IndexBuffer ib;
-
-        glm::mat4 transform;
     };
 
 }

@@ -77,6 +77,22 @@ namespace Ham
         return {};
     }
 
+    Entity &Scene::GetSelectedEntity()
+    {
+        static Entity selectedEntity = {};
+        return selectedEntity;
+    }
+
+    void Scene::SetSelectedEntity(Entity entity)
+    {
+        GetSelectedEntity() = entity;
+    }
+
+    void Scene::ClearSelectedEntity()
+    {
+        GetSelectedEntity() = {};
+    }
+
     std::vector<Entity> Scene::GetEntities()
     {
         std::vector<Entity> entities;

@@ -18,6 +18,8 @@ namespace Ham
     void CameraController::OnCreate()
     {
         m_Target = glm::inverse(glm::camera());
+        m_Alpha = glm::radians(-45.0f);
+        m_Beta = glm::radians(-30.0f);
     }
 
     void CameraController::OnDestroy()

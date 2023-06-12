@@ -32,7 +32,7 @@ namespace Ham
         T &GetComponent()
         {
             HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
-            HAM_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+            HAM_CORE_ASSERT(HasComponent<T>(), std::string("Entity does not have \"") + typeid(T).name() + "\"");
             return m_Registry->get<T>(m_EntityHandle);
         }
 
@@ -47,7 +47,7 @@ namespace Ham
         void RemoveComponent()
         {
             HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
-            HAM_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+            HAM_CORE_ASSERT(HasComponent<T>(), std::string("Entity does not have \"") + typeid(T).name() + "\"");
             m_Registry->remove<T>(m_EntityHandle);
         }
 

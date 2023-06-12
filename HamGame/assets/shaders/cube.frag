@@ -1,6 +1,7 @@
 #version 460 core
 
 in vec3 FragPos;
+in vec3 LocalFragPos;
 in vec3 Normal;
 in vec3 LocalNormal;
 
@@ -9,11 +10,19 @@ out vec4 FragColor;
 uniform vec3 uLightPos;
 uniform vec3 uLightColor;
 uniform vec3 uObjectColor;
+uniform vec3 uWireframeColor;
 uniform float uTime;
 uniform float uResolution;
+uniform int uIsWireframe;
 
 void main()
 {
+    if (uIsWireframe == 1)
+    {
+        FragColor = vec4(uWireframeColor, 1.0);
+        return;
+    }
+
     // Ambient lighting
     float ambientStrength = 0.3;
     vec3 ambient = ambientStrength * uLightColor;
@@ -32,8 +41,9 @@ void main()
     vec3 specular = specularStrength * spec * uLightColor;
 
     // Calculate final color
-    vec3 result = (ambient + diffuse + specular) * uObjectColor;
+    vec3 result = (ambient + diffuse + specular);
 
-    FragColor = vec4(result, 1.0);
+    // FragColor = vec4(result, 1.0);
     // FragColor = vec4(LocalNormal, 1.0);
+    FragColor = vec4(result * LocalNormal * uObjectColor, 1.0);
 }

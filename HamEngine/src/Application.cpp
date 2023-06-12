@@ -35,7 +35,7 @@ namespace Ham
         m_Window.Init(this);
         Input::Init();
 
-        auto cameraEntity = m_Scene.CreateEntity("camera");
+        auto cameraEntity = m_Scene.CreateEntity("Camera");
         cameraEntity.AddComponent<Component::Camera>();
         cameraEntity.GetComponent<Component::Transform>() = Component::Transform(glm::inverse(glm::lookAt(glm::vec3(3, 3, 3), glm::zero<glm::vec3>(), glm::up()))); // glm::inverse(glm::camera()) * glm::translate(glm::mat4(1.0f), glm::forward() * 10.0f)
 
@@ -57,15 +57,15 @@ namespace Ham
         {
             //  add dummy entities
 
-            auto cube = m_Scene.CreateEntity("Cube");
-            auto monkey = m_Scene.CreateEntity("Monkey");
-            auto sphere = m_Scene.CreateEntity("Sphere");
-            auto plane = m_Scene.CreateEntity("Plane");
+            // auto cube = m_Scene.CreateEntity("Cube");
+            // auto monkey = m_Scene.CreateEntity("Monkey");
+            // auto sphere = m_Scene.CreateEntity("Sphere");
+            // auto plane = m_Scene.CreateEntity("Plane");
 
-            plane.SetParent(cube);
-            sphere.SetParent(cube);
+            // plane.SetParent(cube);
+            // sphere.SetParent(cube);
 
-            monkey.SetParent(plane);
+            // monkey.SetParent(plane);
         }
     }
 
@@ -127,6 +127,8 @@ namespace Ham
         }
 
         m_Window.SetIsRunning(true);
+        m_FramebufferResized = true;
+
         while (m_Window.IsRunning())
         {
             // HAM_PROFILE_FRAME("Render Frame");

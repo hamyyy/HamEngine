@@ -55,20 +55,28 @@ namespace ImGui
         return result;
     }
 
-    static void EntityNodeRecurse(std::vector<Ham::Entity> &entities)
+    static void EntityNodeRecurse(std::vector<Ham::Entity> &entities, Ham::Scene &scene)
     {
         for (auto &entity : entities)
         {
             auto id = std::string("##") + entity.GetUUID();
             auto children = entity.GetChildren();
 
-            uint32_t flags = ImGuiTreeNodeFlags_DefaultOpen;
+            uint32_t flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
             if (children.empty())
                 flags |= ImGuiTreeNodeFlags_Leaf;
 
-            if (ImGui::TreeNodeEx(id.c_str(), flags, entity.GetName().c_str()))
+            if (entity == scene.GetSelectedEntity())
+                flags |= ImGuiTreeNodeFlags_Selected;
+
+            bool node_open = ImGui::TreeNodeEx(id.c_str(), flags, entity.GetName().c_str());
+            
+            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+                scene.SetSelectedEntity(entity);
+
+            if (node_open)
             {
-                ImGui::EntityNodeRecurse(children);
+                ImGui::EntityNodeRecurse(children, scene);
                 ImGui::TreePop();
             }
         }
@@ -77,7 +85,7 @@ namespace ImGui
     static void SceneTree(Ham::Scene &scene)
     {
         auto entities = scene.GetTopLevelEntities();
-        ImGui::EntityNodeRecurse(entities);
+        ImGui::EntityNodeRecurse(entities, scene);
     }
 
 } // namespace ImGui
