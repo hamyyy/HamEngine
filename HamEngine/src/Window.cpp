@@ -7,6 +7,12 @@
 #include "Ham/Core/Application.h"
 #include "Ham/Util/GLFWExtra.h"
 
+#ifdef _MSC_VER
+#define SSCANF sscanf_s
+#else
+#define SSCANF sscanf
+#endif
+
 namespace Ham
 {
 
@@ -178,29 +184,29 @@ namespace Ham
         auto &spec = app->m_Specification;
 
         int x, y;
-        if (sscanf_s(line, "WindowSize=%i,%i", &x, &y) == 2)
+        if (SSCANF(line, "WindowSize=%i,%i", &x, &y) == 2)
         {
             spec.Width = x;
             spec.Height = y;
         }
-        else if (sscanf_s(line, "Maximized=%i", &x) == 1)
+        else if (SSCANF(line, "Maximized=%i", &x) == 1)
         {
             spec.Maximized = (bool)x;
         }
-        else if (sscanf_s(line, "WindowPos=%i,%i", &x, &y) == 2)
+        else if (SSCANF(line, "WindowPos=%i,%i", &x, &y) == 2)
         {
             spec.XPos = x;
             spec.YPos = y;
         }
-        else if (sscanf_s(line, "Display=%i", &x) == 1)
+        else if (SSCANF(line, "Display=%i", &x) == 1)
         {
             spec.Display = x;
         }
-        else if (sscanf_s(line, "Fullscreen=%i", &x) == 1)
+        else if (SSCANF(line, "Fullscreen=%i", &x) == 1)
         {
             spec.Fullscreen = (FullscreenMode)x;
         }
-        else if (sscanf_s(line, "VSync=%i", &x) == 1)
+        else if (SSCANF(line, "VSync=%i", &x) == 1)
         {
             spec.VSync = (bool)x;
         }
