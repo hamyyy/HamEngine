@@ -161,12 +161,23 @@ namespace Ham
                     std::getline(faceIss, vertexIndexStr, '/');
 
                     unsigned int vertexIndex = std::stoi(vertexIndexStr) - 1;
-
-                    T vertex;
-                    vertex.Position = positions[vertexIndex];
-                    vertex.Normal = normals[vertexIndex];
-                    vertices.push_back(vertex);
-                    indices.push_back(indices.size());
+                    try
+                    {
+                        T vertex;
+                        vertex.Position = positions.at(vertexIndex);
+                        vertex.Normal = normals.at(vertexIndex);
+                        vertices.push_back(vertex);
+                        indices.push_back(indices.size());
+                    }
+                    catch (std::exception &e)
+                    {
+                        HAM_CORE_ERROR("Error: {0}", e.what());
+                        HAM_CORE_ERROR("Unable to parse face data: {0}", faceData);
+                        file.close();
+                        vertices.clear();
+                        indices.clear();
+                        return;
+                    }
                 }
             }
         }

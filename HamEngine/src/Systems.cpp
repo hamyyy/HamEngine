@@ -140,27 +140,40 @@ namespace Ham
             }
 
             {
-                if (mesh.ShowFill)
+                glEnable(GL_DEPTH_TEST);
+
+                if (mesh.BackfaceCulling)
                 {
-                    glEnable(GL_DEPTH_TEST);
                     glEnable(GL_CULL_FACE);
                     glCullFace(GL_BACK);
-                    // alpha blending
+                }
+                else
+                {
+                    glDisable(GL_CULL_FACE);
+                }
+
+                if (mesh.AlphaBlending)
+                {
                     glEnable(GL_BLEND);
                     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                }
+                else
+                {
+                    glDisable(GL_BLEND);
+                }
 
+                if (mesh.ShowFill)
+                {
                     shader.SetUniform1i("uIsWireframe", 0);
                     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                    glDrawElements(GL_TRIANGLES, (GLushort)mesh.Indicies.GetData().size(), GL_UNSIGNED_INT, 0);
+                    glDrawElements(GL_TRIANGLES, (GLushort)mesh.Indices.GetData().size(), GL_UNSIGNED_INT, 0);
                 }
 
                 if (mesh.ShowWireframe)
                 {
-                    glDisable(GL_BLEND);
-
                     shader.SetUniform1i("uIsWireframe", 1);
                     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                    glDrawElements(GL_TRIANGLES, (GLushort)mesh.Indicies.GetData().size(), GL_UNSIGNED_INT, 0);
+                    glDrawElements(GL_TRIANGLES, (GLushort)mesh.Indices.GetData().size(), GL_UNSIGNED_INT, 0);
                 }
             }
 

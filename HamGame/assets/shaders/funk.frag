@@ -104,5 +104,5 @@ void main()
     }
 
     float n = snoise(LocalFragPos * 2.0) * 0.5 + 0.5;
-    FragColor = vec4(n * uObjectColor, 1.0);
+    FragColor = vec4(n * uObjectColor, n);
 }

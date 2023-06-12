@@ -38,6 +38,8 @@ namespace Ham
             glBufferData(BufferType, (int)m_Data.size() * sizeof(T), m_Data.data(), m_DrawMode);
         }
 
+        size_t Size() { return m_Data.size(); }
+
         std::vector<T> &GetData() { return m_Data; }
 
         template <typename U>

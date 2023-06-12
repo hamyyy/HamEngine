@@ -60,7 +60,7 @@ namespace Ham::Component
     struct Camera
     {
         glm::mat4 Projection;
-        float FOV = glm::radians(90.0f);
+        float FOV = glm::radians(45.0f);
         float AspectRatio = 1.0f;
         float Near = 0.001f;
         float Far = 2000.0f;
@@ -213,27 +213,29 @@ namespace Ham::Component
 
     struct Mesh
     {
-        VertexBuffer<VertexData> Verticies;
-        IndexBuffer Indicies;
+        VertexBuffer<VertexData> Vertices;
+        IndexBuffer Indices;
         VertexArray VAO;
 
         bool ShowWireframe = false;
         bool ShowFill = true;
+        bool AlphaBlending = false;
+        bool BackfaceCulling = true;
 
         Mesh() {}
-        Mesh(const Mesh &other) : Verticies(other.Verticies), Indicies(other.Indicies) {} // VBO(other.VBO)
+        Mesh(const Mesh &other) : Vertices(other.Vertices), Indices(other.Indices) {} // VBO(other.VBO)
         Mesh(const std::vector<VertexData> &verticies, const std::vector<uint32_t> &indicies)
         {
             VAO.Create();
             VAO.Bind();
 
-            Indicies.Create();
-            Indicies.Bind();
-            Indicies.SetData(indicies);
+            Indices.Create();
+            Indices.Bind();
+            Indices.SetData(indicies);
 
-            Verticies.Create();
-            Verticies.Bind();
-            Verticies.SetData(verticies);
+            Vertices.Create();
+            Vertices.Bind();
+            Vertices.SetData(verticies);
 
             // VBO.Unbind();
             // Verticies.Unbind();

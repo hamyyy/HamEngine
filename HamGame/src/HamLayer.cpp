@@ -182,8 +182,8 @@ namespace Ham
             // mesh.Indicies.Bind();
             // mesh.Verticies.Bind();
 
-            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Position));
-            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
             // mesh.VAO.Unbind();
             // mesh.Verticies.Unbind();
@@ -200,8 +200,8 @@ namespace Ham
             // mesh.Indicies.Bind();
             // mesh.Verticies.Bind();
 
-            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Position));
-            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
             mesh.ShowWireframe = true;
 
@@ -223,8 +223,30 @@ namespace Ham
             // mesh.Indicies.Bind();
             // mesh.Verticies.Bind();
 
-            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Position));
-            mesh.Verticies.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+
+            // mesh.VAO.Unbind();
+            // mesh.Verticies.Unbind();
+            // mesh.Indicies.Unbind();
+        }
+
+        {
+            auto entity = m_Scene.CreateEntity("Living Room");
+            auto &shader = entity.AddComponent<Component::Shader>(ASSETS_PATH + "shaders/basic.vert", ASSETS_PATH + "shaders/funk.frag");
+
+            std::vector<Ham::Component::VertexData> vertices;
+            std::vector<unsigned int> indices;
+            CalculateNormals(vertices, indices);
+            ReadOBJFile(ASSETS_PATH + "models/InteriorTest.obj", vertices, indices);
+
+            auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
+
+            // mesh.Indicies.Bind();
+            // mesh.Verticies.Bind();
+
+            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
             // mesh.VAO.Unbind();
             // mesh.Verticies.Unbind();
@@ -517,11 +539,20 @@ namespace Ham
                 if (entity.HasComponent<Component::Mesh>())
                 {
                     auto &meshComponent = entity.GetComponent<Component::Mesh>();
+                    ImGui::Separator();
+                    ImGui::LabelText("##Mesh", "%s", "Mesh");
+                    ImGui::LabelText("##VertCount", "Vertex Count: %i", meshComponent.Vertices.Size());
+                    ImGui::LabelText("##IndexCount", "Index Count: %i", meshComponent.Indices.Size());
                     ImGui::Checkbox("Show Wireframe", &meshComponent.ShowWireframe);
+                    ImGui::Checkbox("Show Fill", &meshComponent.ShowFill);
+                    ImGui::Checkbox("Enable Alpha Blending", &meshComponent.AlphaBlending);
+                    ImGui::Checkbox("Enable Backface Culling", &meshComponent.BackfaceCulling);
                 }
 
                 if (entity.HasComponent<Component::Camera>())
                 {
+                    ImGui::Separator();
+                    ImGui::LabelText("##Camera", "%s", "Camera");
                     auto &cameraComponent = entity.GetComponent<Component::Camera>();
                     bool update = false;
                     if (ImGui::DragFloat("Aspect Ratio", &cameraComponent.AspectRatio, 0.1f, 0.1f, 10.0f))
