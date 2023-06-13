@@ -27,5 +27,5 @@
 	path = HamEngine/lib/fmt
 	url = https://github.com/fmtlib/fmt
 [submodule "HamEngine/lib/ImGuizmo"]
-	path = HamEngine/lib/ImGuizmo
+	path = HamEngine/lib/ImGuizmo/ImGuizmo
 	url = https://github.com/hamyyy/ImGuizmo
