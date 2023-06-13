@@ -3,7 +3,7 @@
 #include "Ham/Core/Base.h"
 #include "Ham/Util/Watcher.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Ham
 {

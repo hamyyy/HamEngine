@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.6)
 project(HamEngine)
 
-add_subdirectory(lib/glad)
+# add_subdirectory(lib/glad)
+add_subdirectory(lib/glad2)
 add_subdirectory(lib/glfw)
 add_subdirectory(lib/glm)
 add_subdirectory(lib/imgui)
@@ -26,7 +27,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 target_link_libraries(${PROJECT_NAME}
-    glad
+    # glad
+    glad2-GL
+    # glad2-VK
     glfw
     glm
     imgui

@@ -47,7 +47,7 @@ namespace Ham
         m_Window = glfwCreateWindow(GetSpecification().Width, GetSpecification().Height, GetSpecification().Name.c_str(), nullptr, nullptr);
         HAM_CORE_ASSERT(m_Window != nullptr, "Could not create GLFW window!");
         glfwMakeContextCurrent(m_Window);
-        gladLoadGL(); // Initialize OpenGL loader
+        gladLoadGL(glfwGetProcAddress); // Initialize OpenGL loader
 
         // glEnable(GL_DEBUG_OUTPUT);                              // Debug
         glDebugMessageCallback(opengl_error_callback, nullptr);

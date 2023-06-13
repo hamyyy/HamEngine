@@ -38,8 +38,8 @@ namespace Ham
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
-        // io.ConfigViewportsNoAutoMerge = true;
-        // io.ConfigViewportsNoTaskBarIcon = true;
+                                                              // io.ConfigViewportsNoAutoMerge = true;
+                                                              // io.ConfigViewportsNoTaskBarIcon = true;
 
 #if defined(HAM_PLATFORM_LINUX) || defined(HAM_PLATFORM_MACOS)
         io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable; // FIXME: Viewports are not currently working on Linux/MacOS
@@ -68,6 +68,23 @@ namespace Ham
         // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForOpenGL(m_Window->GetWindowHandle(), true);
         ImGui_ImplOpenGL3_Init(m_Window->GetGLSLVersion().c_str());
+
+        ImGuizmo::AllowAxisFlip(true);
+        auto &gizmoStyle = ImGuizmo::GetStyle();
+        gizmoStyle.TranslationLineArrowSize = 8.0f;
+        gizmoStyle.ScaleLineCircleSize = 8.0f;
+
+        gizmoStyle.TranslationLineThickness = 4.0f;
+        gizmoStyle.RotationLineThickness = 3.0f;
+        gizmoStyle.RotationOuterLineThickness = 3.0f;
+        gizmoStyle.ScaleLineThickness = 4.0f;
+
+        gizmoStyle.HatchedAxisLineThickness = 4.0f;
+
+        // gizmoStyle.CenterCircleSize = 10.0f;
+
+        gizmoStyle.Colors[ImGuizmo::COLOR::SELECTION].w = 1.0f;
+        gizmoStyle.Colors[ImGuizmo::COLOR::HATCHED_AXIS_LINES].w = 0.5f;
     }
 
     void ImGuiImpl::NewFrame()

@@ -3,7 +3,7 @@
 // libraries
 #include <imgui.h>
 #include <ImGuizmo.h>
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext.hpp>

@@ -11,7 +11,7 @@
 #endif
 
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
-#include <glad/glad.h>  // Initialize with gladLoadGL()
+#include <glad/gl.h>  // Initialize with gladLoadGL()
 #include <imgui_internal.h>
 #include <glm/glm.hpp>
 
