@@ -15,7 +15,7 @@ namespace Ham
     class Shader
     {
     public:
-        Shader(std::string vertexPath, std::string fragmentPath);
+        Shader(std::string vertexPath, std::string fragmentPath, std::string geometryPath = "");
         ~Shader();
 
         void Bind() const;
@@ -41,11 +41,12 @@ namespace Ham
         std::unordered_map<std::string, int> m_UniformLocationCache;
 
         unsigned int CompileShader(unsigned int type, const std::string &source);
-        unsigned int CreateShader(const std::string &vertexShader, const std::string &fragmentShader);
+        unsigned int CreateShader(const std::string &vertexShader, const std::string &fragmentShader, const std::string &geometryShader = "");
         int GetUniformLocation(const std::string &name);
 
         std::string m_VertexSourcePath;
         std::string m_FragmentSourcePath;
+        std::string m_GeometrySourcePath;
 
         std::chrono::time_point<std::chrono::system_clock> m_LastReloadTime;
         std::atomic_bool m_ShouldReload = false;

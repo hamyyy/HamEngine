@@ -4,6 +4,7 @@
 #include "Ham/Util/UUID.h"
 #include "Ham/Renderer/Buffer.h"
 #include "Ham/Renderer/Shader.h"
+#include "Ham/Renderer/ShaderLibrary.h"
 
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -12,6 +13,7 @@
 #include "Ham/Util/GlmExtra.h"
 
 #include <string>
+#include <vector>
 
 namespace Ham
 {
@@ -42,11 +44,11 @@ namespace Ham::Component
 {
     using UUID = Ham::UUID;
     using Parent = Ham::Entity;
-    using Shader = Ham::Shader;
 
     struct Tag
     {
         std::string Name;
+        uint32_t Order = 0;
 
         Tag() : Name("Unnamed") {}
         Tag(std::string name) : Name(name) {}
@@ -140,6 +142,38 @@ namespace Ham::Component
         }
 
         glm::vec3 backward() { return -forward(); }
+    };
+
+    struct ShaderList
+    {
+        std::vector<std::string> Names;
+
+        ShaderList() {}
+        ShaderList(const ShaderList &other) : Names(other.Names) {}
+
+        void Add(std::string name)
+        {
+            HAM_CORE_ASSERT(!Has(name), fmt::format("Shader {0} already added!", name));
+            HAM_CORE_ASSERT(::Ham::ShaderLibrary::Get(name) != nullptr, fmt::format("Shader {0} not found!", name));
+            Names.push_back(name);
+        }
+
+        void Remove(std::string name)
+        {
+            HAM_CORE_ASSERT(Has(name), fmt::format("Shader {0} not added!", name));
+            Names.erase(std::remove(Names.begin(), Names.end(), name), Names.end());
+        }
+
+        std::shared_ptr<::Ham::Shader> Get(std::string name)
+        {
+            HAM_CORE_ASSERT(Has(name), fmt::format("Shader {0} not added!", name));
+            return ::Ham::ShaderLibrary::Get(name);
+        }
+
+        bool Has(std::string name)
+        {
+            return std::find(Names.begin(), Names.end(), name) != Names.end();
+        }
     };
 
     struct NativeScriptList

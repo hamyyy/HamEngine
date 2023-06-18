@@ -10,6 +10,9 @@ namespace Ham::File
 {
     static std::string Read(const std::string &filePath)
     {
+        if (filePath.empty())
+            return "";
+
         std::ifstream file(filePath);
         if (!file)
         {

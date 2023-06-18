@@ -1,9 +1,13 @@
 #version 460 core
 
-in vec3 FragPos;
-in vec3 LocalFragPos;
-in vec3 Normal;
-in vec3 LocalNormal;
+in DATA
+{
+    vec3 Position;
+    vec3 Normal;
+    vec3 LocalPosition;
+    vec3 LocalNormal;
+}
+data_in;
 
 out vec4 FragColor;
 
@@ -103,6 +107,6 @@ void main()
         return;
     }
 
-    float n = snoise(LocalFragPos * 10.0) * 0.5 + 0.5;
+    float n = snoise(data_in.Position * 3.0) * 0.5 + 0.5;
     FragColor = vec4(n * uObjectColor, n);
 }

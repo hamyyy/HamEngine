@@ -25,9 +25,13 @@ namespace Ham
 
         Entity GetActiveCamera();
 
-        Entity& GetSelectedEntity(); // TODO: Move entity selection to editor
+        Entity &GetSelectedEntity(); // TODO: Move entity selection to editor
         void SetSelectedEntity(Entity entity);
         void ClearSelectedEntity();
+
+        Entity &GetHoveredEntity();
+        void SetHoveredEntity(Entity entity);
+        void ClearHoveredEntity();
 
         std::vector<Entity> GetEntitiesByTag(std::string name);
         entt::registry *GetRegistry();
@@ -39,5 +43,6 @@ namespace Ham
 
         friend class Entity;
         friend class Systems;
+        friend class Application;
     };
 } // namespace Ham

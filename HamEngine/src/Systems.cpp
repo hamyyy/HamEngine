@@ -108,7 +108,7 @@ namespace Ham
         auto &cameraTransform = cameraEntity.GetComponent<Component::Transform>();
         auto cameraView = glm::inverse(cameraTransform.ToMatrix());
 
-        auto view = scene.m_Registry.view<Component::Mesh, Component::Transform, Component::Shader>();
+        auto view = scene.m_Registry.view<Component::Mesh, Component::Transform, Component::ShaderList>();
 
         int index = 0;
         for (auto &ent : view)
@@ -117,63 +117,72 @@ namespace Ham
 
             auto &mesh = entity.GetComponent<Component::Mesh>();
             auto &transform = entity.GetComponent<Component::Transform>();
-            auto &shader = entity.GetComponent<Component::Shader>();
+            auto &shaderList = entity.GetComponent<Component::ShaderList>();
             auto &tag = entity.GetComponent<Component::Tag>();
 
-            shader.Bind();
-            mesh.VAO.Bind();
-
+            for (auto &shaderName : shaderList.Names)
             {
-                shader.SetUniformMat4f("uModel", transform.ToMatrix());
-                shader.SetUniformMat4f("uView", cameraView);
-                shader.SetUniformMat4f("uProjection", cameraProjection);
+                auto shader = ShaderLibrary::Get(shaderName);
 
-                shader.SetUniform3f("uLightPos", lightPos);
-                shader.SetUniform3f("uLightColor", lightColor);
-                shader.SetUniform1f("uTime", app.GetTime());
-                shader.SetUniform2f("uResolution", app.GetWindow().GetSize());
+                if (shader == nullptr) // TODO: Use default shader instead
+                    continue;
 
-                shader.SetUniform3f("uObjectColor", glm::vec3(1, 1, 1));
-                shader.SetUniform3f("uWireframeColor", glm::vec3());
+                mesh.VAO.Bind();
+                shader->Bind();
 
-                shader.SetUniform1i("uID", index);
-            }
-
-            {
-                glEnable(GL_DEPTH_TEST);
-
-                if (mesh.BackfaceCulling)
                 {
-                    glEnable(GL_CULL_FACE);
-                    glCullFace(GL_BACK);
-                }
-                else
-                {
-                    glDisable(GL_CULL_FACE);
+                    shader->SetUniformMat4f("uModel", transform.ToMatrix());
+                    shader->SetUniformMat4f("uView", cameraView);
+                    shader->SetUniformMat4f("uProjection", cameraProjection);
+
+                    shader->SetUniform3f("uLightPos", lightPos);
+                    shader->SetUniform3f("uLightColor", lightColor);
+                    shader->SetUniform1f("uTime", app.GetTime());
+                    shader->SetUniform2f("uResolution", app.GetWindow().GetSize());
+
+                    shader->SetUniform3f("uObjectColor", glm::vec3(1, 1, 1));
+                    shader->SetUniform3f("uWireframeColor", glm::vec3());
+
+                    shader->SetUniform1i("uID", index);
                 }
 
-                if (mesh.AlphaBlending)
                 {
-                    glEnable(GL_BLEND);
-                    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                }
-                else
-                {
-                    glDisable(GL_BLEND);
-                }
+                    glEnable(GL_DEPTH_TEST);
 
-                if (mesh.ShowFill)
-                {
-                    shader.SetUniform1i("uIsWireframe", 0);
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                    glDrawElements(GL_TRIANGLES, (GLushort)mesh.Indices.GetData().size(), GL_UNSIGNED_INT, 0);
-                }
+                    if (mesh.BackfaceCulling)
+                    {
+                        glEnable(GL_CULL_FACE);
+                        glCullFace(GL_BACK);
+                    }
+                    else
+                    {
+                        glDisable(GL_CULL_FACE);
+                    }
 
-                if (mesh.ShowWireframe)
-                {
-                    shader.SetUniform1i("uIsWireframe", 1);
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                    glDrawElements(GL_TRIANGLES, (GLushort)mesh.Indices.GetData().size(), GL_UNSIGNED_INT, 0);
+                    if (mesh.AlphaBlending)
+                    {
+                        glEnable(GL_BLEND);
+                        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                        glBlendEquation(GL_FUNC_ADD);
+                    }
+                    else
+                    {
+                        glDisable(GL_BLEND);
+                    }
+
+                    if (mesh.ShowFill || shaderName == "vertex-normal")
+                    {
+                        shader->SetUniform1i("uIsWireframe", 0);
+                        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                        glDrawElements(GL_TRIANGLES, (GLushort)mesh.Indices.GetData().size(), GL_UNSIGNED_INT, 0);
+                    }
+
+                    if (mesh.ShowWireframe)
+                    {
+                        shader->SetUniform1i("uIsWireframe", 1);
+                        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                        glDrawElements(GL_TRIANGLES, (GLushort)mesh.Indices.GetData().size(), GL_UNSIGNED_INT, 0);
+                    }
                 }
             }
 
@@ -182,5 +191,59 @@ namespace Ham
 
         // rotate light about z axis
         lightPos = glm::rotate(lightPos, glm::radians(90.0f) * deltaTime, glm::vec3(0.0f, 0.0f, 1.0f));
+    }
+
+    void Systems::RenderObjectPickerFrame(Application &app, Scene &scene, TimeStep &deltaTime)
+    {
+        auto camview = scene.m_Registry.view<Component::Camera>();
+        if (camview.size() == 0)
+        {
+            HAM_ERROR("No camera in scene!");
+            return;
+        }
+
+        auto cameraEntity = scene.GetActiveCamera();
+        auto &cameraProjection = cameraEntity.GetComponent<Component::Camera>().Projection;
+        auto &cameraTransform = cameraEntity.GetComponent<Component::Transform>();
+        auto cameraView = glm::inverse(cameraTransform.ToMatrix());
+
+        auto view = scene.m_Registry.view<Component::Mesh>();
+
+        int index = 0;
+        for (auto &ent : view)
+        {
+            Entity entity = {ent, &scene};
+
+            auto &mesh = entity.GetComponent<Component::Mesh>();
+            auto &transform = entity.GetComponent<Component::Transform>();
+            auto &shaderList = entity.GetComponent<Component::ShaderList>();
+            auto &tag = entity.GetComponent<Component::Tag>();
+            auto shader = ShaderLibrary::Get("object-picker");
+
+            mesh.VAO.Bind();
+            shader->Bind();
+
+            {
+                shader->SetUniformMat4f("uModel", transform.ToMatrix());
+                shader->SetUniformMat4f("uView", cameraView);
+                shader->SetUniformMat4f("uProjection", cameraProjection);
+
+                shader->SetUniform1f("uTime", app.GetTime());
+                shader->SetUniform2f("uResolution", app.GetWindow().GetSize());
+
+                shader->SetUniform3f("uObjectColor", glm::vec3(1, 1, 1));
+                shader->SetUniform3f("uWireframeColor", glm::vec3());
+                shader->SetUniform1i("uID", index);
+                shader->SetUniform1i("uTotalObjects", (int)view.size());
+            }
+
+            glEnable(GL_DEPTH_TEST);
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glDrawElements(GL_TRIANGLES, (GLushort)mesh.Indices.GetData().size(), GL_UNSIGNED_INT, 0);
+
+            index++;
+        }
     }
 } // namespace Ham

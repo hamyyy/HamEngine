@@ -74,12 +74,12 @@ namespace Ham
         gizmoStyle.TranslationLineArrowSize = 8.0f;
         gizmoStyle.ScaleLineCircleSize = 8.0f;
 
-        gizmoStyle.TranslationLineThickness = 4.0f;
-        gizmoStyle.RotationLineThickness = 3.0f;
-        gizmoStyle.RotationOuterLineThickness = 3.0f;
-        gizmoStyle.ScaleLineThickness = 4.0f;
+        gizmoStyle.RotationLineThickness = 4.0f;
+        gizmoStyle.RotationOuterLineThickness = 4.0f;
 
-        gizmoStyle.HatchedAxisLineThickness = 4.0f;
+        gizmoStyle.TranslationLineThickness = 5.0f;
+        gizmoStyle.ScaleLineThickness = 5.0f;
+        gizmoStyle.HatchedAxisLineThickness = 5.0f;
 
         // gizmoStyle.CenterCircleSize = 10.0f;
 

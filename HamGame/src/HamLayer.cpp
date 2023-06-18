@@ -1,6 +1,7 @@
 #include "HamLayer.h"
 
 #include "Ham/Script/CameraController.h"
+#include "Ham/Script/Oscillate.h"
 #include "Ham/Util/ImGuiExtra.h"
 #include "Ham/Parser/STLParser.h"
 
@@ -173,28 +174,12 @@ namespace Ham
 
     void HamLayer::OnAttach()
     {
-        {
-            auto entity = m_Scene.CreateEntity("Cube");
-            entity.GetComponent<Component::Transform>().Position = glm::vec3(-2.0f, 0.0f, 0.0f);
-            auto &shader = entity.AddComponent<Component::Shader>(ASSETS_PATH + "shaders/basic.vert", ASSETS_PATH + "shaders/cube.frag");
-            auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
 
-            // mesh.Indicies.Bind();
-            // mesh.Verticies.Bind();
-
-            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
-            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
-
-            // mesh.VAO.Unbind();
-            // mesh.Verticies.Unbind();
-            // mesh.Indicies.Unbind();
-
-            m_Scene.SetSelectedEntity(entity);
-        }
         {
             auto entity = m_Scene.CreateEntity("Sphere");
             entity.GetComponent<Component::Transform>().Position = glm::vec3(2.0f, 0.0f, 0.0f);
-            auto &shader = entity.AddComponent<Component::Shader>(ASSETS_PATH + "shaders/basic.vert", ASSETS_PATH + "shaders/normals.frag");
+            auto &shaders = entity.GetComponent<Component::ShaderList>();
+            shaders.Add("face-normal");
             auto &mesh = entity.AddComponent<Component::Mesh>(GetSphereVertices(0.5, 32, 32), GetSphereIndices(32, 32));
 
             // mesh.Indicies.Bind();
@@ -209,36 +194,15 @@ namespace Ham
             // mesh.Verticies.Unbind();
             // mesh.Indicies.Unbind();
         }
+
         {
             auto entity = m_Scene.CreateEntity("Monkey");
-            auto &shader = entity.AddComponent<Component::Shader>(ASSETS_PATH + "shaders/basic.vert", ASSETS_PATH + "shaders/funk.frag");
-
+            auto &shaders = entity.GetComponent<Component::ShaderList>();
+            shaders.Add("funk");
             std::vector<Ham::Component::VertexData> vertices;
             std::vector<unsigned int> indices;
-            CalculateNormals(vertices, indices);
             ReadOBJFile(ASSETS_PATH + "models/monkey.obj", vertices, indices);
-
-            auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
-
-            // mesh.Indicies.Bind();
-            // mesh.Verticies.Bind();
-
-            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
-            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
-
-            // mesh.VAO.Unbind();
-            // mesh.Verticies.Unbind();
-            // mesh.Indicies.Unbind();
-        }
-
-        {
-            auto entity = m_Scene.CreateEntity("Living Room");
-            auto &shader = entity.AddComponent<Component::Shader>(ASSETS_PATH + "shaders/basic.vert", ASSETS_PATH + "shaders/funk.frag");
-
-            std::vector<Ham::Component::VertexData> vertices;
-            std::vector<unsigned int> indices;
             CalculateNormals(vertices, indices);
-            ReadOBJFile(ASSETS_PATH + "models/InteriorTest.obj", vertices, indices);
 
             auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
 
@@ -251,7 +215,68 @@ namespace Ham
             // mesh.VAO.Unbind();
             // mesh.Verticies.Unbind();
             // mesh.Indicies.Unbind();
+
+            m_Scene.SetSelectedEntity(entity);
         }
+
+        auto cubesParent = m_Scene.CreateEntity("Cubes");
+
+        int width = 50;
+        int height = 50;
+        for (int y = -height / 2; y < height / 2; y++)
+            for (int x = -width / 2; x < width / 2; x++)
+            {
+                auto entity = m_Scene.CreateEntity("Cube-" + std::to_string(x) + "-" + std::to_string(y));
+                // entity.GetComponent<Component::Transform>().Position = glm::vec3(-2.0f, 0.0f, 0.0f);
+
+                // z as a function of x and y
+                float z = 10.0f * sin(0.15f * x) * cos(0.15f * y);
+
+                entity.GetComponent<Component::Transform>().Position = glm::vec3(x, y, z);
+                auto &shaders = entity.GetComponent<Component::ShaderList>();
+                shaders.Add("face-normal");
+                shaders.Add("vertex-normal");
+
+                auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
+
+                // mesh.Indicies.Bind();
+                // mesh.Verticies.Bind();
+
+                mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+                mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+
+                // mesh.VAO.Unbind();
+                // mesh.Verticies.Unbind();
+                // mesh.Indicies.Unbind();
+
+                auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
+                scriptList.AddScript<Oscillate>("Oscillate");
+
+                entity.SetParent(cubesParent);
+            }
+
+        // {
+        //     auto entity = m_Scene.CreateEntity("Living Room");
+        //     auto &shaders = entity.GetComponent<Component::ShaderList>();
+        //     shaders.Add("face-normal");
+        //     shaders.Add("vertex-normal");
+        //     std::vector<Ham::Component::VertexData> vertices;
+        //     std::vector<unsigned int> indices;
+        //     CalculateNormals(vertices, indices);
+        //     ReadOBJFile(ASSETS_PATH + "models/InteriorTest.obj", vertices, indices);
+
+        //     auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
+
+        //     // mesh.Indicies.Bind();
+        //     // mesh.Verticies.Bind();
+
+        //     mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+        //     mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+
+        //     // mesh.VAO.Unbind();
+        //     // mesh.Verticies.Unbind();
+        //     // mesh.Indicies.Unbind();
+        // }
     }
 
     void HamLayer::OnDetach() {}
@@ -324,8 +349,6 @@ namespace Ham
             // transform = glm::rotate(transform, glm::radians(-mouseDelta.y * sensitivity), glm::vec3(1.0f, 0.0f, 0.0f));
             // transform = glm::rotate(transform, glm::radians(mouseDelta.x * sensitivity), glm::vec3(0.0f, 0.0f, 1.0f));
         }
-
-        Systems::RenderScene(*m_App, m_Scene, deltaTime);
     }
 
     void HamLayer::OnUIRender(TimeStep deltaTime)
@@ -435,44 +458,33 @@ namespace Ham
 
         static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
         static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::LOCAL);
-        static bool enableGizmo = true;
         static bool mouseInUse = false;
         bool useSnap = false;
         float snapValue = 0.25f;
         if (Input::IsKeyDown(KeyCode::LEFT_CONTROL))
             useSnap = true;
 
-        if (Input::IsKeyDown(KeyCode::Q))
-            enableGizmo = false;
-
-        ImGui::Checkbox("Gizmos", &enableGizmo);
-
         if (ImGui::Button("Translate") || Input::IsKeyDown(KeyCode::W))
         {
-            enableGizmo = true;
             mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
         }
         ImGui::SameLine();
         if (ImGui::Button("Rotate") || Input::IsKeyDown(KeyCode::E))
         {
-            enableGizmo = true;
             mCurrentGizmoOperation = ImGuizmo::ROTATE;
         }
         ImGui::SameLine();
         if (ImGui::Button("Scale") || Input::IsKeyDown(KeyCode::R))
         {
-            enableGizmo = true;
             mCurrentGizmoOperation = ImGuizmo::SCALE;
         }
         if (ImGui::Button("World"))
         {
-            enableGizmo = true;
             mCurrentGizmoMode = ImGuizmo::WORLD;
         }
         ImGui::SameLine();
         if (ImGui::Button("Local"))
         {
-            enableGizmo = true;
             mCurrentGizmoMode = ImGuizmo::LOCAL;
         }
 
@@ -511,7 +523,7 @@ namespace Ham
 
                 float snapValues[3] = {snapValue, snapValue, snapValue};
 
-                if (enableGizmo && !mouseInUse)
+                if (!mouseInUse)
                 {
                     if (ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr))
                     {
@@ -539,10 +551,19 @@ namespace Ham
                 if (entity.HasComponent<Component::Mesh>())
                 {
                     auto &meshComponent = entity.GetComponent<Component::Mesh>();
+                    auto &shaderList = entity.GetComponent<Component::ShaderList>();
+                    bool showNormals = shaderList.Has("vertex-normal");
                     ImGui::Separator();
                     ImGui::LabelText("##Mesh", "%s", "Mesh");
                     ImGui::LabelText("##VertCount", "Vertex Count: %i", meshComponent.Vertices.Size());
                     ImGui::LabelText("##IndexCount", "Index Count: %i", meshComponent.Indices.Size());
+                    if (ImGui::Checkbox("Show Normals", &showNormals))
+                    {
+                        if (showNormals)
+                            shaderList.Add("vertex-normal");
+                        else
+                            shaderList.Remove("vertex-normal");
+                    }
                     ImGui::Checkbox("Show Wireframe", &meshComponent.ShowWireframe);
                     ImGui::Checkbox("Show Fill", &meshComponent.ShowFill);
                     ImGui::Checkbox("Enable Alpha Blending", &meshComponent.AlphaBlending);

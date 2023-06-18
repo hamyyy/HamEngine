@@ -62,7 +62,7 @@ namespace ImGui
             auto id = std::string("##") + entity.GetUUID();
             auto children = entity.GetChildren();
 
-            uint32_t flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+            uint32_t flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
             if (children.empty())
                 flags |= ImGuiTreeNodeFlags_Leaf;
 
@@ -82,9 +82,17 @@ namespace ImGui
         }
     }
 
+    static void SortEntityList(std::vector<Ham::Entity> &entityList)
+    {
+        std::sort(entityList.begin(), entityList.end(), [](Ham::Entity &a, Ham::Entity &b) {
+            return a.GetComponent<Ham::Component::Tag>().Order < b.GetComponent<Ham::Component::Tag>().Order;
+        });
+    }
+
     static void SceneTree(Ham::Scene &scene)
     {
         auto entities = scene.GetTopLevelEntities();
+        ImGui::SortEntityList(entities); // TODO: Perform sort only when necessary
         ImGui::EntityNodeRecurse(entities, scene);
     }
 

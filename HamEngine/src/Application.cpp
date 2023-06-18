@@ -7,9 +7,12 @@
 #include "Ham/Util/GLFWExtra.h"
 #include "Ham/Util/UUID.h"
 #include "Ham/Input/Input.h"
+#include "Ham/Util/Random.h"
 
 #include "Ham/Scene/Scene.h"
+#include "Ham/Renderer/ShaderLibrary.h"
 #include "Ham/Renderer/Shader.h"
+#include "Ham/Renderer/FrameBuffer.h"
 #include "Ham/Scene/Entity.h"
 #include "Ham/Scene/Component.h"
 #include "Ham/Script/CameraController.h"
@@ -33,6 +36,8 @@ namespace Ham
         // HAM_PROFILE_SCOPE("Application Init");
         HAM_CORE_INFO("Ham Engine Version: 0.0.1");
         m_Window.Init(this);
+        Random::Init();
+        ShaderLibrary::Init();
         Input::Init();
 
         auto cameraEntity = m_Scene.CreateEntity("Camera");
@@ -129,6 +134,16 @@ namespace Ham
         m_Window.SetIsRunning(true);
         m_FramebufferResized = true;
 
+        FrameBufferSpecification frameBufferSpec;
+        frameBufferSpec.Width = display.x;
+        frameBufferSpec.Height = display.y;
+        frameBufferSpec.Samples = 1;
+        frameBufferSpec.ClearColor = {1.0f, 1.0f, 1.0f, 1.0f};
+        frameBufferSpec.ColorAttachments = {TextureFormat::COLOR_RGBA8};
+        frameBufferSpec.MinFilter = TextureFilter::NEAREST;
+        frameBufferSpec.MagFilter = TextureFilter::NEAREST;
+        FrameBuffer objectPickerFramebuffer(frameBufferSpec);
+
         while (m_Window.IsRunning())
         {
             // HAM_PROFILE_FRAME("Render Frame");
@@ -151,17 +166,17 @@ namespace Ham
             if (m_FramebufferResized)
             {
                 // HAM_PROFILE_SCOPE("Framebuffer Resized");
-                auto display = m_Window.GetFramebufferSize();
+                display = m_Window.GetFramebufferSize();
                 glViewport(0, 0, display.x, display.y);
                 m_FramebufferResized = false;
                 m_Scene.GetActiveCamera().GetComponent<Component::Camera>().Update((float)display.x, (float)display.y);
+
+                objectPickerFramebuffer.Resize(display.x, display.y);
             }
 
             float time = GetTime();
             TimeStep timestep = time - m_LastFrameTime;
             m_LastFrameTime = time;
-
-            m_Window.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
             {
                 // HAM_PROFILE_SCOPE("LayerStack OnUpdate");
@@ -179,6 +194,48 @@ namespace Ham
                 {
                     m_imgui.SetupPreRender();
                     layer->OnUIRender(timestep);
+                }
+            }
+
+            {
+                m_Window.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+                Systems::RenderScene(*this, m_Scene, timestep);
+
+                objectPickerFramebuffer.Bind();
+                objectPickerFramebuffer.Clear(AttachmentType::COLOR | AttachmentType::DEPTH | AttachmentType::STENCIL);
+                Systems::RenderObjectPickerFrame(*this, m_Scene, timestep);
+                objectPickerFramebuffer.Unbind();
+
+                ImGui::Begin("Object Picker");
+                auto image = objectPickerFramebuffer.GetColorAttachmentID(0);
+                auto windowWidth = ImGui::GetWindowSize().x;
+                auto windowHeight = windowWidth * ((float)display.y / (float)display.x);
+                ImGui::Image((void *)(intptr_t)image, {windowWidth, windowHeight}, ImVec2(0, 1), ImVec2(1, 0));
+
+                std::vector<unsigned char> value = objectPickerFramebuffer.ReadPixels((int)Input::GetMousePosition().x, display.y - (int)Input::GetMousePosition().y, 1, 1);
+                uint32_t r = value[0];
+                uint32_t g = value[1];
+                uint32_t b = value[2];
+                uint32_t a = value[3];
+
+                uint32_t id = r + (g << 8) + (b << 16); // + (a << 24);
+
+                ImGui::Text("R: %d, G: %d, B: %d, A: %d", r, g, b, a);
+                ImGui::Text("ID: %d", id);
+                ImGui::End();
+
+                auto view = m_Scene.m_Registry.view<Component::Mesh>();
+                if (id == -1)
+                    m_Scene.ClearHoveredEntity();
+                else
+                    m_Scene.SetHoveredEntity({view[id], &m_Scene});
+
+                if (Input::IsMouseButtonUpThisFrame(MouseButton::LEFT))
+                {
+                    if (id == -1)
+                        m_Scene.ClearSelectedEntity();
+                    else
+                        m_Scene.SetSelectedEntity({view[id], &m_Scene});
                 }
             }
 

@@ -25,6 +25,7 @@
 #include "Ham/Renderer/Shader.h"
 #include "Ham/Renderer/Buffer.h"
 
+#include "Ham/Util/Random.h"
 #include "Ham/Util/TimeStep.h"
 #include "Ham/Util/UUID.h"
 #include "Ham/Util/File.h"

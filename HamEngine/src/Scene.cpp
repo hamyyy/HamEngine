@@ -18,11 +18,13 @@ namespace Ham
 
     Entity Scene::CreateEntity(std::string name)
     {
+        static uint32_t order = 0;
         Entity entity = {m_Registry.create(), this};
         entity.AddComponent<Component::UUID>(UUIDGenerator::Create());
-        entity.AddComponent<Component::Tag>(name);
+        entity.AddComponent<Component::Tag>(name).Order = order++;
         entity.AddComponent<Component::Transform>();
         entity.AddComponent<Component::EntityList>();
+        entity.AddComponent<Component::ShaderList>();
         return entity;
     }
 
@@ -91,6 +93,22 @@ namespace Ham
     void Scene::ClearSelectedEntity()
     {
         GetSelectedEntity() = {};
+    }
+
+    Entity &Scene::GetHoveredEntity()
+    {
+        static Entity hoveredEntity = {};
+        return hoveredEntity;
+    }
+
+    void Scene::SetHoveredEntity(Entity entity)
+    {
+        GetHoveredEntity() = entity;
+    }
+
+    void Scene::ClearHoveredEntity()
+    {
+        GetHoveredEntity() = {};
     }
 
     std::vector<Entity> Scene::GetEntities()

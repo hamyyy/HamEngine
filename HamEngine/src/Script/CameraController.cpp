@@ -44,7 +44,7 @@ namespace Ham
         static auto betaOffset = 0.0f;
         static auto savedDistance = 0.0f;
 
-        static float speed = 5.0f;
+        static float speed = 20.0f;
         static auto pmousePos = Input::GetMousePosition();
         auto mousePos = Input::GetMousePosition();
 
@@ -161,7 +161,7 @@ namespace Ham
         }
 
         // clamp beta
-        m_Beta = glm::clamp(m_Beta, glm::radians(-89.0f), glm::radians(89.0f));
+        m_Beta = glm::clamp(m_Beta, glm::radians(-90.0f), glm::radians(90.0f));
 
         newTransform = m_Target                                            //
                        * glm::rotate(glm::mat4(1.0f), m_Alpha, upTarget)   //

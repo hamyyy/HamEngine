@@ -1,9 +1,13 @@
 #version 460 core
 
-in vec3 FragPos;
-in vec3 LocalFragPos;
-in vec3 Normal;
-in vec3 LocalNormal;
+in DATA
+{
+    vec3 Position;
+    vec3 Normal;
+    vec3 LocalPosition;
+    vec3 LocalNormal;
+}
+data_in;
 
 out vec4 FragColor;
 
@@ -22,6 +26,5 @@ void main()
         FragColor = vec4(uWireframeColor, 1.0);
         return;
     }
-    
-    FragColor = vec4(LocalNormal * uObjectColor, 1.0);
+    FragColor = vec4(vec3(1.0, 0.5, 0.06), 1.0);
 }

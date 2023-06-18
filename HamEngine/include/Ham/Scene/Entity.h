@@ -5,6 +5,7 @@
 #include "Ham/Core/Base.h"
 
 #include <entt/entt.hpp>
+#include <glm/glm.hpp>
 
 namespace Ham
 {
@@ -84,10 +85,21 @@ namespace Ham
             return {};
         }
 
+        glm::mat4 GetParentTransformRecursive()
+        {
+            HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
+            glm::mat4 transform = GetComponent<Component::Transform>().ToMatrix();
+            if (HasParent())
+            {
+                transform = GetParent().GetParentTransformRecursive() * transform;
+            }
+            return transform;
+        }
+
         void SetParent(Entity parent)
         {
             HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
-            
+
             if (!parent)
                 return;
 
