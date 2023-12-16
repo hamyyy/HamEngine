@@ -27,7 +27,9 @@ namespace Ham
             auto transform = m_Scene.GetSelectedEntity().GetComponent<Component::Transform>().ToMatrix();
 
             if (cameraEntity != m_Scene.GetSelectedEntity())
+            {
                 script->SetTarget(transform[3]);
+            }
         }
 
         if (Input::IsKeyDownThisFrame(KeyCode::ESCAPE))
@@ -323,17 +325,9 @@ namespace Ham
         {
             ImGui::Separator();
 
-            static std::string text = "Hello World";
-
+            static std::string text("Hello, world!", 256);
             ImGui::LabelText("##TextLabel", "%s", text.c_str());
-
-            static char textValue[256];
-            text.resize(IM_ARRAYSIZE(textValue));
-            std::strcpy(textValue, text.c_str());
-            if (ImGui::InputText("Name", textValue, IM_ARRAYSIZE(textValue)))
-            {
-                text = textValue;
-            }
+            ImGui::InputText("Name", (char *)text.c_str(), text.size());
         }
 
         ImGui::End();
