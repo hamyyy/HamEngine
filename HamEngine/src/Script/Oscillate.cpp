@@ -24,7 +24,7 @@ namespace Ham
 
         float x = Position.x;
         float y = Position.y;
-        Position.z = 10.0f * sin(0.15f * x + time) * cos(0.15f * y + time);
+        Position.z = 1.0f * sin(0.15f * x + time) * cos(0.15f * y + time);
     }
 
     void Oscillate::OnUIUpdate(TimeStep deltaTime)

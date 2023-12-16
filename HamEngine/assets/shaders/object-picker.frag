@@ -21,5 +21,5 @@ void main()
     float b = (uID >> 16 & 0xFF) / 255.0;
     float a = (uID >> 24 & 0xFF) / 255.0;
 
-    FragColor = vec4(r, g, b, 1.0f);
+    FragColor = vec4(r, g, b, a);
 }

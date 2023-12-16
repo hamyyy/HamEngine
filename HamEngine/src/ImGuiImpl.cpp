@@ -3,11 +3,14 @@
 #include "Ham/Core/Log.h"
 #include "Ham/Core/Assert.h"
 #include "Ham/Core/Window.h"
+#include "Ham/Core/FileSystem.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <ImGuizmo.h>
+
+#include <filesystem>
 
 namespace Ham
 {
@@ -23,7 +26,16 @@ namespace Ham
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
-        io.IniFilename = "settings.ini";
+
+        settings_file_path = (FileSystem::GetExecutableDir() / settings_file_name).string();
+
+        // if file doesn't exist, copy default settings file from assets
+        if (!std::filesystem::exists(settings_file_path))
+        {
+            std::filesystem::copy(ASSETS_PATH_CORE + "default_config.ini", settings_file_path);
+        }
+
+        io.IniFilename = settings_file_path.c_str();
 
         m_ImGuiSettingsHandler.UserData = m_Window->m_Application;
         m_ImGuiSettingsHandler.TypeName = "AppSettings";

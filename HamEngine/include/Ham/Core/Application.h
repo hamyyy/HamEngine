@@ -6,12 +6,14 @@
 #include "Ham/Core/LayerStack.h"
 #include "Ham/ImGui/ImGuiImpl.h"
 #include "Ham/Scene/Scene.h"
+#include "Ham/Renderer/FrameBuffer.h"
 
 #include <thread>
 #include <atomic>
 
 namespace Ham
 {
+    class EditorLayer;
 
     struct ApplicationCommandLineArgs
     {
@@ -74,6 +76,7 @@ namespace Ham
         ImGuiImpl &GetImGui() { return m_imgui; }
         float GetTime() { return m_Window.GetTime(); }
         const ApplicationSpecification &GetSpecification() const { return m_Specification; }
+        FrameBuffer& GetObjectPickerFramebuffer() { return m_ObjectPickerFramebuffer; }
 
         void SetWindowed() { m_Window.SetWindowed(); }
         void SetFullscreen() { m_Window.SetFullscreen(); }
@@ -89,6 +92,7 @@ namespace Ham
     private:
         static Application *s_Instance;
         Scene m_Scene;
+        std::shared_ptr<EditorLayer> m_EditorLayer;
 
         ApplicationSpecification m_Specification;
         LayerStack m_LayerStack;
@@ -97,9 +101,10 @@ namespace Ham
         std::thread m_RenderThread;
 
         std::atomic_bool m_FramebufferResized = false;
-        
 
         friend ::Ham::Window;
+
+        FrameBuffer m_ObjectPickerFramebuffer;
     };
 
     // To be defined in CLIENT

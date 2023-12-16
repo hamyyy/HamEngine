@@ -5,6 +5,8 @@
 #include <imgui_internal.h>
 #include <ImGuizmo.h>
 
+#include <string>
+
 namespace Ham
 {
     class Window;
@@ -53,5 +55,8 @@ namespace Ham
         Window *m_Window;
         bool m_IsShutDown = false;
         ImGuiSettingsHandler m_ImGuiSettingsHandler;
+
+        std::string settings_file_name = "config.ini";
+        std::string settings_file_path;
     };
 } // namespace Ham

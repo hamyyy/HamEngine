@@ -12,6 +12,7 @@ add_subdirectory(lib/spdlog)
 add_subdirectory(lib/optick)
 add_subdirectory(lib/entt)
 add_subdirectory(lib/stduuid)
+add_subdirectory(lib/whereami)
 # add_subdirectory(lib/filewatch) # dont need to add subdirectory, just need to include the header file
 
 file(GLOB_RECURSE HAM_SOURCES "src/*.cpp" "src/*.c")
@@ -39,4 +40,9 @@ target_link_libraries(${PROJECT_NAME}
     optick
     EnTT
     stduuid
+    whereami
 )
+
+add_compile_definitions(SOURCE_ASSETS_PATH_CORE="${CMAKE_CURRENT_SOURCE_DIR}/assets/")
+
+target_copy_assets(${PROJECT_NAME} assets)

@@ -8,7 +8,7 @@
 #include <sstream>
 #include <vector>
 
-namespace Ham
+namespace Ham::fs
 {
     template <typename T>
     static void ReadSTLFile(const std::string &filePath, std::vector<T> &vertices, std::vector<unsigned int> &indices)

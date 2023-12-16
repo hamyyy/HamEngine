@@ -29,3 +29,6 @@
 [submodule "HamEngine/lib/ImGuizmo"]
 	path = HamEngine/lib/ImGuizmo/ImGuizmo
 	url = https://github.com/hamyyy/ImGuizmo
+[submodule "HamEngine/lib/whereami/whereami"]
+	path = HamEngine/lib/whereami/whereami
+	url = https://github.com/gpakosz/whereami

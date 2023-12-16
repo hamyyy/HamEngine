@@ -14,6 +14,7 @@
 #include "Ham/Core/Macros.h"
 #include "Ham/Core/Base.h"
 #include "Ham/Core/Log.h"
+#include "Ham/Core/FileSystem.h"
 #include "Ham/Core/Assert.h"
 #include "Ham/Debug/Profiler.h"
 

@@ -75,8 +75,11 @@ namespace Ham
     class FrameBuffer
     {
     public:
+        FrameBuffer();
         FrameBuffer(const FrameBufferSpecification &spec);
         ~FrameBuffer();
+
+        void Init(const FrameBufferSpecification &spec);
 
         void Bind() const;
         void Unbind() const;

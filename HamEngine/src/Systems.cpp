@@ -246,4 +246,44 @@ namespace Ham
             index++;
         }
     }
+
+    void Systems::HandleObjectPicker(Application &app, Scene &scene, FrameBuffer &frameBuffer, TimeStep &deltaTime)
+    {
+        frameBuffer.Bind();
+        frameBuffer.Clear(AttachmentType::COLOR | AttachmentType::DEPTH | AttachmentType::STENCIL);
+        Systems::RenderObjectPickerFrame(app, scene, deltaTime);
+        frameBuffer.Unbind();
+
+        auto display = app.GetWindow().GetFramebufferSize();
+
+        std::vector<unsigned char> value = frameBuffer.ReadPixels((int)Input::GetMousePosition().x, display.y - (int)Input::GetMousePosition().y, 1, 1);
+        uint32_t r = value[0];
+        uint32_t g = value[1];
+        uint32_t b = value[2];
+        uint32_t a = value[3];
+
+        uint32_t id = r + (g << 8) + (b << 16) + (a << 24); // must be uint, dont change to int
+
+        auto view = scene.m_Registry.view<Component::Mesh>();
+        if (id > view.size())
+        {
+            scene.ClearHoveredEntity();
+        }
+        else
+        {
+            scene.SetHoveredEntity({view[id], &scene});
+        }
+
+        if (Input::IsMouseButtonUpThisFrame(MouseButton::LEFT))
+        {
+            if (id > view.size())
+            {
+                scene.ClearSelectedEntity();
+            }
+            else
+            {
+                scene.SetSelectedEntity({view[id], &scene});
+            }
+        }
+    }
 } // namespace Ham

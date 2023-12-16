@@ -7,6 +7,8 @@
 namespace Ham
 {
 
+    FrameBuffer::FrameBuffer() {}
+
     FrameBuffer::FrameBuffer(const FrameBufferSpecification &spec)
         : m_Specification(spec)
     {
@@ -18,6 +20,12 @@ namespace Ham
         glDeleteFramebuffers(1, &m_RendererID);
         glDeleteTextures(m_ColorAttachments.size(), m_ColorAttachments.data());
         glDeleteTextures(1, &m_DepthAttachment);
+    }
+
+    void FrameBuffer::Init(const FrameBufferSpecification &spec)
+    {
+        m_Specification = spec;
+        Invalidate();
     }
 
     void FrameBuffer::Bind() const

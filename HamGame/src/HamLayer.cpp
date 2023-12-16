@@ -190,6 +190,9 @@ namespace Ham
 
             mesh.ShowWireframe = true;
 
+            auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
+            scriptList.AddScript<Oscillate>("Oscillate");
+
             // mesh.VAO.Unbind();
             // mesh.Verticies.Unbind();
             // mesh.Indicies.Unbind();
@@ -198,10 +201,12 @@ namespace Ham
         {
             auto entity = m_Scene.CreateEntity("Monkey");
             auto &shaders = entity.GetComponent<Component::ShaderList>();
-            shaders.Add("funk");
-            std::vector<Ham::Component::VertexData> vertices;
+            // shaders.Add("funk");
+            shaders.Add("outline");
+            shaders.Add("face-normal");
+            std::vector<Component::VertexData> vertices;
             std::vector<unsigned int> indices;
-            ReadOBJFile(ASSETS_PATH + "models/monkey.obj", vertices, indices);
+            fs::ReadOBJFile(ASSETS_PATH + "models/monkey.obj", vertices, indices);
             CalculateNormals(vertices, indices);
 
             auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
@@ -216,44 +221,71 @@ namespace Ham
             // mesh.Verticies.Unbind();
             // mesh.Indicies.Unbind();
 
-            m_Scene.SetSelectedEntity(entity);
+            // m_Scene.SetSelectedEntity(entity);
         }
 
         auto cubesParent = m_Scene.CreateEntity("Cubes");
 
-        int width = 50;
-        int height = 50;
-        for (int y = -height / 2; y < height / 2; y++)
-            for (int x = -width / 2; x < width / 2; x++)
-            {
-                auto entity = m_Scene.CreateEntity("Cube-" + std::to_string(x) + "-" + std::to_string(y));
-                // entity.GetComponent<Component::Transform>().Position = glm::vec3(-2.0f, 0.0f, 0.0f);
+        // int width = 50;
+        // int height = 50;
+        // for (int y = -height / 2; y < height / 2; y++)
+        //     for (int x = -width / 2; x < width / 2; x++)
+        //     {
+        //         auto entity = m_Scene.CreateEntity("Cube-" + std::to_string(x) + "-" + std::to_string(y));
+        //         // entity.GetComponent<Component::Transform>().Position = glm::vec3(-2.0f, 0.0f, 0.0f);
 
-                // z as a function of x and y
-                float z = 10.0f * sin(0.15f * x) * cos(0.15f * y);
+        //         // z as a function of x and y
+        //         float z = 10.0f * sin(0.15f * x) * cos(0.15f * y);
 
-                entity.GetComponent<Component::Transform>().Position = glm::vec3(x, y, z);
-                auto &shaders = entity.GetComponent<Component::ShaderList>();
-                shaders.Add("face-normal");
-                shaders.Add("vertex-normal");
+        //         entity.GetComponent<Component::Transform>().Position = glm::vec3(x, y, z);
+        //         auto &shaders = entity.GetComponent<Component::ShaderList>();
+        //         shaders.Add("face-normal");
+        //         shaders.Add("vertex-normal");
 
-                auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
+        //         auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
 
-                // mesh.Indicies.Bind();
-                // mesh.Verticies.Bind();
+        //         // mesh.Indicies.Bind();
+        //         // mesh.Verticies.Bind();
 
-                mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
-                mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+        //         mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+        //         mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
-                // mesh.VAO.Unbind();
-                // mesh.Verticies.Unbind();
-                // mesh.Indicies.Unbind();
+        //         // mesh.VAO.Unbind();
+        //         // mesh.Verticies.Unbind();
+        //         // mesh.Indicies.Unbind();
 
-                auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
-                scriptList.AddScript<Oscillate>("Oscillate");
+        //         auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
+        //         scriptList.AddScript<Oscillate>("Oscillate");
 
-                entity.SetParent(cubesParent);
-            }
+        //         entity.SetParent(cubesParent);
+        //     }
+
+        {
+            auto entity = m_Scene.CreateEntity("Cube");
+            entity.GetComponent<Component::Transform>().Position = glm::vec3(-2.0f, 0.0f, 0.0f);
+
+            // z as a function of x and y
+
+            auto &shaders = entity.GetComponent<Component::ShaderList>();
+            shaders.Add("face-normal");
+
+            auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
+
+            // mesh.Indicies.Bind();
+            // mesh.Verticies.Bind();
+
+            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+
+            // mesh.VAO.Unbind();
+            // mesh.Verticies.Unbind();
+            // mesh.Indicies.Unbind();
+
+            auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
+            scriptList.AddScript<Oscillate>("Oscillate");
+
+            entity.SetParent(cubesParent);
+        }
 
         // {
         //     auto entity = m_Scene.CreateEntity("Living Room");
@@ -283,339 +315,10 @@ namespace Ham
 
     void HamLayer::OnUpdate(TimeStep deltaTime)
     {
-        static float speed = 10.0f;
-        // if (Input::IsKeyDown(KeyCode::W))
-        // {
-        //     transform = glm::translate(transform, glm::up() * speed * deltaTime);
-        // }
-
-        // if (Input::IsKeyDown(KeyCode::S))
-        // {
-        //     transform = glm::translate(transform, glm::down() * speed * deltaTime);
-        // }
-
-        // if (Input::IsKeyDown(KeyCode::A))
-        // {
-        //     transform = glm::translate(transform, glm::right() * speed * deltaTime);
-        // }
-
-        // if (Input::IsKeyDown(KeyCode::D))
-        // {
-        //     transform = glm::translate(transform, glm::left() * speed * deltaTime);
-        // }
-
-        if (Input::IsKeyDownThisFrame(KeyCode::F))
-        {
-            auto cameraEntity = GetActiveCamera();
-            auto &scriptList = cameraEntity.GetComponent<Component::NativeScriptList>();
-            auto script = scriptList.GetScript<CameraController>();
-
-            auto transform = m_Scene.GetSelectedEntity().GetComponent<Component::Transform>().ToMatrix();
-
-            if (cameraEntity != m_Scene.GetSelectedEntity())
-                script->SetTarget(transform[3]);
-        }
-
-        if (Input::IsKeyDownThisFrame(KeyCode::TAB))
-        {
-            auto cameraEntity = GetActiveCamera();
-            auto &scriptList = cameraEntity.GetComponent<Component::NativeScriptList>();
-            auto script = scriptList.GetScript<CameraController>();
-            script->SetTarget((glm::vec3(rand() % 1000, rand() % 1000, rand() % 1000) / 1000.0f - 0.5f) * 2.0f);
-        }
-
-        // if (Input::IsMouseButtonDownThisFrame(MouseButton::LEFT))
-        // {
-        //     Input::SetCursorMode(CursorMode::CAPTURED);
-        // }
-
-        if (Input::IsKeyDownThisFrame(KeyCode::ESCAPE))
-        {
-            Input::SetCursorMode(CursorMode::NORMAL);
-        }
-
-        glm::vec2 mouse = Input::GetMousePosition();
-        static glm::vec2 prevMouse = mouse;
-        static float sensitivity = 0.2f;
-        glm::vec2 mouseDelta = mouse - prevMouse;
-        prevMouse = mouse;
-        if (Input::IsMouseButtonDown(MouseButton::LEFT))
-        {
-            // local space
-            // view = glm::rotate(view, glm::radians(mouseDelta.x * sensitivity), glm::vec3(0.0f, 0.0f, 1.0f));
-            // view = glm::rotate(view, glm::radians(-mouseDelta.y * sensitivity), glm::vec3(1.0f, 0.0f, 0.0f));
-
-            // world space
-            // transform = glm::rotate(transform, glm::radians(-mouseDelta.y * sensitivity), glm::vec3(1.0f, 0.0f, 0.0f));
-            // transform = glm::rotate(transform, glm::radians(mouseDelta.x * sensitivity), glm::vec3(0.0f, 0.0f, 1.0f));
-        }
     }
 
     void HamLayer::OnUIRender(TimeStep deltaTime)
     {
-        // Our state
-        static bool show_demo_window = true;
-        static bool show_another_window = false;
-        static glm::vec4 clear_color = {0.45f, 0.55f, 0.60f, 1.00f};
-
-        ImGui::DockSpaceOverViewport(nullptr, ImGuiDockNodeFlags_PassthruCentralNode);
-
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
-
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            auto &io = ImGui::GetIO();
-
-            ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text. %f", deltaTime.GetMilliseconds()); // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);                        // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);                                    // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float *)&m_App->GetWindow().GetClearColor()); // Edit 3 floats representing a color
-
-            static glm::vec4 light = {0.95f, 0.88f, 0.77f, 1.0f};  // light
-            static glm::vec4 darker = {0.79f, 0.72f, 0.61f, 1.0f}; // darker but still light
-            static glm::vec4 red = {0.84f, 0.16f, 0.22f, 1.0f};    // red
-            static glm::vec4 green = {0.44f, 0.51f, 0.43f, 1.0f};  // greenish grey
-            static glm::vec4 brown = {0.2f, 0.16f, 0.13f, 1.0f};   // brown (dark)
-
-            ImGui::Separator();
-            ImGui::PushID("0");
-            if (ImGui::ColorButton("Clear Color", {light.r, light.g, light.b, light.a}))
-                m_App->GetWindow().SetClearColor(light);
-            ImGui::PopID();
-            ImGui::PushID("1");
-            ImGui::SameLine();
-            if (ImGui::ColorButton("Clear Color", {darker.r, darker.g, darker.b, darker.a}))
-                m_App->GetWindow().SetClearColor(darker);
-            ImGui::PopID();
-            ImGui::PushID("2");
-            ImGui::SameLine();
-            if (ImGui::ColorButton("Clear Color", {red.r, red.g, red.b, red.a}))
-                m_App->GetWindow().SetClearColor(red);
-            ImGui::PopID();
-            ImGui::PushID("3");
-            ImGui::SameLine();
-            if (ImGui::ColorButton("Clear Color", {green.r, green.g, green.b, green.a}))
-                m_App->GetWindow().SetClearColor(green);
-            ImGui::PopID();
-            ImGui::PushID("4");
-            ImGui::SameLine();
-            if (ImGui::ColorButton("Clear Color", {brown.r, brown.g, brown.b, brown.a}))
-                m_App->GetWindow().SetClearColor(brown);
-            ImGui::PopID();
-            ImGui::PushID("5");
-            ImGui::SameLine();
-            if (ImGui::ColorButton("Clear Color", {0.0f, 0.0f, 0.0f, 1.0f}))
-                m_App->GetWindow().SetClearColor({0.0f, 0.0f, 0.0f, 1.0f});
-            ImGui::PopID();
-            ImGui::Separator();
-
-            static bool transparent = false;
-            if (ImGui::Checkbox("Transparent Background", &transparent))
-            {
-                auto cc = m_App->GetWindow().GetClearColor();
-                cc.a = transparent ? 0.0f : 1.0f;
-                m_App->GetWindow().SetClearColor(cc);
-            }
-
-            if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-        }
-
-        // 3. Show another simple window.
-        if (show_another_window)
-        {
-            ImGui::Begin("Another Window", &show_another_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                show_another_window = false;
-            ImGui::End();
-        }
-
-        ImGui::Begin("Ham Engine");
-        if (ImGui::Button("Windowed"))
-            m_App->SetWindowed();
-        if (ImGui::Button("Fullscreen"))
-            m_App->SetFullscreen();
-        if (ImGui::Button("Fullscreen Borderless"))
-            m_App->SetFullscreenBorderless();
-        static auto vsync = m_App->IsVSync();
-        if (ImGui::Checkbox("VSync", &vsync))
-            m_App->SetVSync(vsync);
-
-        static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
-        static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::LOCAL);
-        static bool mouseInUse = false;
-        bool useSnap = false;
-        float snapValue = 0.25f;
-        if (Input::IsKeyDown(KeyCode::LEFT_CONTROL))
-            useSnap = true;
-
-        if (ImGui::Button("Translate") || Input::IsKeyDown(KeyCode::W))
-        {
-            mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Rotate") || Input::IsKeyDown(KeyCode::E))
-        {
-            mCurrentGizmoOperation = ImGuizmo::ROTATE;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Scale") || Input::IsKeyDown(KeyCode::R))
-        {
-            mCurrentGizmoOperation = ImGuizmo::SCALE;
-        }
-        if (ImGui::Button("World"))
-        {
-            mCurrentGizmoMode = ImGuizmo::WORLD;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Local"))
-        {
-            mCurrentGizmoMode = ImGuizmo::LOCAL;
-        }
-
-        if (useSnap)
-        {
-            switch (mCurrentGizmoOperation)
-            {
-            case ImGuizmo::OPERATION::ROTATE:
-                snapValue = 45.0f * 0.5f;
-                break;
-            default:
-                snapValue = 0.25f;
-                break;
-            }
-        }
-
-        if (Input::IsMouseButtonDownThisFrame(MouseButton::ANY) && (!ImGuizmo::IsOver() || !ImGuizmo::IsUsing()))
-            mouseInUse = true;
-
-        if (Input::IsMouseButtonUpThisFrame(MouseButton::ANY))
-            mouseInUse = false;
-
-        mouseInUse = false;
-
-        auto selectedEntity = m_Scene.GetSelectedEntity();
-
-        if (selectedEntity)
-        {
-            auto &transformComponent = selectedEntity.GetComponent<Component::Transform>();
-            auto transform = transformComponent.ToMatrix();
-
-            {
-                auto cameraEntity = GetActiveCamera();
-                auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
-                auto view = glm::inverse(cameraEntity.GetComponent<Component::Transform>().ToMatrix());
-
-                float snapValues[3] = {snapValue, snapValue, snapValue};
-
-                if (!mouseInUse)
-                {
-                    if (ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), mCurrentGizmoOperation, mCurrentGizmoMode, glm::value_ptr(transform), nullptr, useSnap ? snapValues : nullptr))
-                    {
-                        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), glm::value_ptr(transformComponent.Position), glm::value_ptr(transformComponent.Rotation), glm::value_ptr(transformComponent.Scale));
-                        transformComponent.Rotation = glm::radians(transformComponent.Rotation);
-                    }
-                }
-            }
-        }
-
-        {
-            auto cameraEntity = GetActiveCamera();
-            auto &cameraTransform = cameraEntity.GetComponent<Component::Transform>();
-
-            auto entity = m_Scene.GetSelectedEntity();
-
-            if (entity)
-            {
-                auto &transformComponent = entity.GetComponent<Component::Transform>();
-                auto &tagComponent = entity.GetComponent<Component::Tag>();
-                auto name = tagComponent.Name.c_str();
-
-                ImGui::Separator();
-                ImGui::Transform(name, transformComponent);
-                if (entity.HasComponent<Component::Mesh>())
-                {
-                    auto &meshComponent = entity.GetComponent<Component::Mesh>();
-                    auto &shaderList = entity.GetComponent<Component::ShaderList>();
-                    bool showNormals = shaderList.Has("vertex-normal");
-                    ImGui::Separator();
-                    ImGui::LabelText("##Mesh", "%s", "Mesh");
-                    ImGui::LabelText("##VertCount", "Vertex Count: %i", meshComponent.Vertices.Size());
-                    ImGui::LabelText("##IndexCount", "Index Count: %i", meshComponent.Indices.Size());
-                    if (ImGui::Checkbox("Show Normals", &showNormals))
-                    {
-                        if (showNormals)
-                            shaderList.Add("vertex-normal");
-                        else
-                            shaderList.Remove("vertex-normal");
-                    }
-                    ImGui::Checkbox("Show Wireframe", &meshComponent.ShowWireframe);
-                    ImGui::Checkbox("Show Fill", &meshComponent.ShowFill);
-                    ImGui::Checkbox("Enable Alpha Blending", &meshComponent.AlphaBlending);
-                    ImGui::Checkbox("Enable Backface Culling", &meshComponent.BackfaceCulling);
-                }
-
-                if (entity.HasComponent<Component::Camera>())
-                {
-                    ImGui::Separator();
-                    ImGui::LabelText("##Camera", "%s", "Camera");
-                    auto &cameraComponent = entity.GetComponent<Component::Camera>();
-                    bool update = false;
-                    if (ImGui::DragFloat("Aspect Ratio", &cameraComponent.AspectRatio, 0.1f, 0.1f, 10.0f))
-                        update = true;
-
-                    cameraComponent.FOV = glm::degrees(cameraComponent.FOV);
-                    if (ImGui::DragFloat("FOV", &cameraComponent.FOV, 0.1f, 0.1f, 180.0f))
-                        update = true;
-                    cameraComponent.FOV = glm::radians(cameraComponent.FOV);
-
-                    if (ImGui::DragFloat("Near", &cameraComponent.Near, 0.1f, 0.1f, cameraComponent.Far))
-                        update = true;
-                    if (ImGui::DragFloat("Far", &cameraComponent.Far, 0.1f, cameraComponent.Near, 2000.0f))
-                        update = true;
-
-                    if (update)
-                        cameraComponent.Update();
-                }
-            }
-        }
-
-        {
-            ImGui::Separator();
-
-            static std::string text = "Hello World";
-
-            ImGui::LabelText("##TextLabel", "%s", text.c_str());
-
-            static char textValue[256];
-            text.resize(IM_ARRAYSIZE(textValue));
-            std::strcpy(textValue, text.c_str());
-            if (ImGui::InputText("Name", textValue, IM_ARRAYSIZE(textValue)))
-            {
-                text = textValue;
-            }
-        }
-
-        ImGui::End();
-
-        ImGui::Begin("Scene Tree");
-        ImGui::SceneTree(m_Scene);
-        ImGui::End();
     }
 
     // void HamLayer::OnEvent(Event &event) {}

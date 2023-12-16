@@ -10,8 +10,12 @@ namespace Ham
     public:
         HamApp(const ApplicationSpecification &specification) : Application(specification)
         {
-            PushLayer(new HamLayer(this));
+            m_Layer = std::make_shared<HamLayer>(this);
+            PushLayer(m_Layer.get());
         }
+
+    private:
+        std::shared_ptr<HamLayer> m_Layer;
     };
 
     Application *CreateApplication(ApplicationCommandLineArgs args)

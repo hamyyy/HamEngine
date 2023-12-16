@@ -27,5 +27,9 @@ void main()
         return;
     }
 
-    FragColor = vec4(data_in.LocalNormal * uObjectColor, 1.0);
+    vec3 posNorm = max(vec3(0.0), data_in.LocalNormal);
+    vec3 negNorm = min(data_in.LocalNormal, vec3(0.0));
+    vec3 normColor = posNorm + abs(negNorm) * 0.7;
+
+    FragColor = vec4(normColor * uObjectColor, 1.0);
 }
