@@ -4,11 +4,11 @@
 #include <imgui.h>
 #include <ImGuizmo.h>
 #include <glad/gl.h>
-#include <glm/glm.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/ext.hpp>
-#include "Ham/Util/GlmExtra.h"
+#include <Ham/Core/Math.h>
 #include "Ham/Util/ImGuiExtra.h"
+
+// scripting
+//
 
 //  Ham Engine Core
 #include "Ham/Core/Macros.h"

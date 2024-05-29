@@ -1,6 +1,7 @@
 #pragma once
 
-#include "glm/glm.hpp"
+#include "Ham/Core/Math.h"
+
 #include "glad/gl.h"
 
 #include <cstdint>
@@ -61,7 +62,7 @@ namespace Ham
     struct FrameBufferSpecification
     {
         uint32_t Width, Height;
-        glm::vec4 ClearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+        math::vec4 ClearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 
         std::vector<TextureFormat> ColorAttachments = {TextureFormat::COLOR_RGBA8};
         TextureFormat DepthAttachment = TextureFormat::DEPTH24_STENCIL8;
@@ -88,8 +89,8 @@ namespace Ham
 
         void Clear(uint32_t attachmentType) const;
 
-        void SetClearColor(const glm::vec4 &color);
-        const glm::vec4 &GetClearColor() const;
+        void SetClearColor(const math::vec4 &color);
+        const math::vec4 &GetClearColor() const;
 
         void SetColorAttachment(uint32_t index, TextureFormat format);
         void SetDepthAttachment(TextureFormat format);

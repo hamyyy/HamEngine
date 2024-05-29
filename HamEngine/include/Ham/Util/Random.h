@@ -1,8 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
+#include "Ham/Core/Math.h"
 
 #include <random>
 #include <chrono>
@@ -23,16 +21,16 @@ namespace Ham
 
         static bool Bool();
 
-        static glm::vec2 Vec2();
-        static glm::vec2 Vec2Dir();
+        static math::vec2 Vec2();
+        static math::vec2 Vec2Dir();
 
-        static glm::vec3 Vec3();
-        static glm::vec3 Vec3Dir();
+        static math::vec3 Vec3();
+        static math::vec3 Vec3Dir();
 
-        static glm::vec4 Vec4();
-        static glm::vec4 Vec4Dir();
+        static math::vec4 Vec4();
+        static math::vec4 Vec4Dir();
 
-        static glm::quat Quat();
+        static math::quat Quat();
 
     private:
         static std::mt19937 s_RandomEngine;

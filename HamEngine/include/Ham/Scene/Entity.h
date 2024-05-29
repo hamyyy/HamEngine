@@ -3,9 +3,9 @@
 #include "Ham/Scene/Scene.h"
 #include "Ham/Scene/Component.h"
 #include "Ham/Core/Base.h"
+#include "Ham/Core/Math.h"
 
 #include <entt/entt.hpp>
-#include <glm/glm.hpp>
 
 namespace Ham
 {
@@ -85,10 +85,10 @@ namespace Ham
             return {};
         }
 
-        glm::mat4 GetParentTransformRecursive()
+        math::mat4 GetParentTransformRecursive()
         {
             HAM_CORE_ASSERT(m_EntityHandle != entt::null, "Entity is null!");
-            glm::mat4 transform = GetComponent<Component::Transform>().ToMatrix();
+            math::mat4 transform = GetComponent<Component::Transform>().ToMatrix();
             if (HasParent())
             {
                 transform = GetParent().GetParentTransformRecursive() * transform;

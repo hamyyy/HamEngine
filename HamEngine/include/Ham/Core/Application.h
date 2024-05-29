@@ -60,15 +60,25 @@ namespace Ham
         Application(const ApplicationSpecification &specification);
         ~Application();
 
-        int Run();
+        void Run();
         void Init();
-        void Shutdown();
         void RenderThread();
 
         static Application &Get() { return *s_Instance; }
 
         void PushLayer(Layer *layer);
+        void PushLayerUnique(Layer *layer);
         void PushOverlay(Layer *layer);
+        void PushOverlayUnique(Layer *layer);
+        void PopLayer(Layer *layer);
+        void PopOverlay(Layer *layer);
+
+        void EnableEditor();
+        void DisableEditor();
+        void ToggleEditor();
+        bool IsEditorEnabled() { return m_EditorEnabled; }
+
+        void TriggerCameraUpdate() { m_FramebufferResized = true; }
 
         Window &GetWindow() { return m_Window; }
         GLFWwindow *GetWindowHandle() { return m_Window.GetWindowHandle(); }
@@ -76,7 +86,7 @@ namespace Ham
         ImGuiImpl &GetImGui() { return m_imgui; }
         float GetTime() { return m_Window.GetTime(); }
         const ApplicationSpecification &GetSpecification() const { return m_Specification; }
-        FrameBuffer& GetObjectPickerFramebuffer() { return m_ObjectPickerFramebuffer; }
+        FrameBuffer &GetObjectPickerFramebuffer() { return m_ObjectPickerFramebuffer; }
 
         void SetWindowed() { m_Window.SetWindowed(); }
         void SetFullscreen() { m_Window.SetFullscreen(); }
@@ -99,6 +109,8 @@ namespace Ham
         float m_LastFrameTime;
 
         std::thread m_RenderThread;
+
+        bool m_EditorEnabled = false;
 
         std::atomic_bool m_FramebufferResized = false;
 

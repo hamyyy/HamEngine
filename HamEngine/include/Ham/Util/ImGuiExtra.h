@@ -1,10 +1,9 @@
 #pragma once
 
+#include "Ham/Core/Math.h"
 #include "Ham/Scene/Entity.h"
 #include "Ham/Scene/Scene.h"
 #include "Ham/Scene/Component.h"
-
-#include <glm/glm.hpp>
 
 #include <imgui.h>
 #include <ImGuizmo.h>
@@ -13,42 +12,43 @@
 
 namespace ImGui
 {
+    using namespace Ham;
 
     static bool Transform(const char *label, Ham::Component::Transform &transformComponent)
     {
         bool result = false;
         ImGui::LabelText((std::string("##") + label).c_str(), "%s Transform", label);
         ImGui::PushID(label);
-        result |= ImGui::DragFloat3("Position", glm::value_ptr(transformComponent.Position), 0.1f);
-        transformComponent.Rotation = glm::degrees(transformComponent.Rotation);
-        result |= ImGui::DragFloat3("Rotation", glm::value_ptr(transformComponent.Rotation), 0.1f);
-        transformComponent.Rotation = glm::radians(transformComponent.Rotation);
-        result |= ImGui::DragFloat3("Scale", glm::value_ptr(transformComponent.Scale), 0.1f);
+        result |= ImGui::DragFloat3("Position", transformComponent.Position.data(), 0.1f);
+        transformComponent.Rotation = math::degrees(transformComponent.Rotation);
+        result |= ImGui::DragFloat3("Rotation", transformComponent.Rotation.data(), 0.1f);
+        transformComponent.Rotation = math::radians(transformComponent.Rotation);
+        result |= ImGui::DragFloat3("Scale", transformComponent.Scale.data(), 0.1f);
         ImGui::PopID();
 
         return result;
     }
 
-    static bool Transform(const char *label, glm::mat4 &transform)
+    static bool Transform(const char *label, math::mat4 &transform)
     {
         bool result = false;
 
-        glm::vec3 position;
-        glm::vec3 rotation;
-        glm::vec3 scale;
-        glm::mat4 matrix = transform;
-        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(matrix), glm::value_ptr(position), glm::value_ptr(rotation), glm::value_ptr(scale));
+        math::vec3 position;
+        math::vec3 rotation;
+        math::vec3 scale;
+        math::mat4 matrix = transform;
+        ImGuizmo::DecomposeMatrixToComponents(matrix.stripes.data()->data(), position.data(), rotation.data(), scale.data());
 
         ImGui::LabelText((std::string("##") + label).c_str(), "%s Transform", label);
         ImGui::PushID(label);
-        result |= ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f);
-        result |= ImGui::DragFloat3("Rotation", glm::value_ptr(rotation), 0.1f);
-        result |= ImGui::DragFloat3("Scale", glm::value_ptr(scale), 0.1f);
+        result |= ImGui::DragFloat3("Position", position.data(), 0.1f);
+        result |= ImGui::DragFloat3("Rotation", rotation.data(), 0.1f);
+        result |= ImGui::DragFloat3("Scale", scale.data(), 0.1f);
         ImGui::PopID();
 
         if (result)
         {
-            ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(position), glm::value_ptr(rotation), glm::value_ptr(scale), glm::value_ptr(matrix));
+            ImGuizmo::RecomposeMatrixFromComponents(position.data(), rotation.data(), scale.data(), matrix.stripes.data()->data());
             transform = matrix;
         }
 
@@ -70,7 +70,7 @@ namespace ImGui
                 flags |= ImGuiTreeNodeFlags_Selected;
 
             bool node_open = ImGui::TreeNodeEx(id.c_str(), flags, entity.GetName().c_str());
-            
+
             if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
                 scene.SetSelectedEntity(entity);
 
@@ -84,9 +84,8 @@ namespace ImGui
 
     static void SortEntityList(std::vector<Ham::Entity> &entityList)
     {
-        std::sort(entityList.begin(), entityList.end(), [](Ham::Entity &a, Ham::Entity &b) {
-            return a.GetComponent<Ham::Component::Tag>().Order < b.GetComponent<Ham::Component::Tag>().Order;
-        });
+        std::sort(entityList.begin(), entityList.end(), [](Ham::Entity &a, Ham::Entity &b)
+                  { return a.GetComponent<Ham::Component::Tag>().Order < b.GetComponent<Ham::Component::Tag>().Order; });
     }
 
     static void SceneTree(Ham::Scene &scene)

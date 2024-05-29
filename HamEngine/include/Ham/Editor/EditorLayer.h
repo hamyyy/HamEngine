@@ -23,6 +23,7 @@ namespace Ham
         Scene &m_Scene;
         std::unique_ptr<Shader> shader;
         FrameBuffer &m_ObjectPickerFramebuffer;
+        Entity m_EditorCamera;
     };
 
 }

@@ -48,16 +48,16 @@ namespace Ham
 
     void FrameBuffer::Clear(uint32_t attachmentType) const
     {
-        glClearColor(m_Specification.ClearColor.r, m_Specification.ClearColor.g, m_Specification.ClearColor.b, m_Specification.ClearColor.a);
+        glClearColor(m_Specification.ClearColor.x, m_Specification.ClearColor.y, m_Specification.ClearColor.z, m_Specification.ClearColor.w);
         glClear(attachmentType);
     }
 
-    void FrameBuffer::SetClearColor(const glm::vec4 &color)
+    void FrameBuffer::SetClearColor(const math::vec4 &color)
     {
         m_Specification.ClearColor = color;
     }
 
-    const glm::vec4 &FrameBuffer::GetClearColor() const
+    const math::vec4 &FrameBuffer::GetClearColor() const
     {
         return m_Specification.ClearColor;
     }

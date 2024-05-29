@@ -41,38 +41,38 @@ namespace Ham
         return Float() > 0.5f;
     }
 
-    glm::vec2 Random::Vec2()
+    math::vec2 Random::Vec2()
     {
-        return glm::vec2(Float(), Float());
+        return math::vec2(Float(), Float());
     }
 
-    glm::vec2 Random::Vec2Dir()
+    math::vec2 Random::Vec2Dir()
     {
-        return glm::normalize(glm::vec2(Float(-1, 1), Float(-1, 1)));
+        return math::normalize(math::vec2(Float(-1, 1), Float(-1, 1)));
     }
 
-    glm::vec3 Random::Vec3()
+    math::vec3 Random::Vec3()
     {
-        return glm::vec3(Float(), Float(), Float());
+        return math::vec3(Float(), Float(), Float());
     }
 
-    glm::vec3 Random::Vec3Dir()
+    math::vec3 Random::Vec3Dir()
     {
-        return glm::normalize(glm::vec3(Float(-1, 1), Float(-1, 1), Float(-1, 1)));
+        return math::normalize(math::vec3(Float(-1, 1), Float(-1, 1), Float(-1, 1)));
     }
 
-    glm::vec4 Random::Vec4()
+    math::vec4 Random::Vec4()
     {
-        return glm::vec4(Float(), Float(), Float(), Float());
+        return math::vec4(Float(), Float(), Float(), Float());
     }
 
-    glm::vec4 Random::Vec4Dir()
+    math::vec4 Random::Vec4Dir()
     {
-        return glm::normalize(glm::vec4(Float(-1, 1), Float(-1, 1), Float(-1, 1), Float(-1, 1)));
+        return math::normalize(math::vec4(Float(-1, 1), Float(-1, 1), Float(-1, 1), Float(-1, 1)));
     }
 
-    glm::quat Random::Quat()
+    math::quat Random::Quat()
     {
-        return glm::quat(Vec3Dir() * glm::pi<float>());
+        return math::quat(Vec3Dir() * math::pi<float>);
     }
 } // namespace Ham

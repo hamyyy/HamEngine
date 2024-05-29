@@ -1,326 +1,315 @@
 #include "HamLayer.h"
 
+#include "Ham/Core/Math.h"
 #include "Ham/Script/CameraController.h"
 #include "Ham/Script/Oscillate.h"
 #include "Ham/Util/ImGuiExtra.h"
 #include "Ham/Parser/STLParser.h"
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/matrix_decompose.hpp>
+namespace Ham {
 
-namespace Ham
+std::vector<Component::VertexData> getCubeVertices()
 {
+  std::vector<Component::VertexData> vertices = {
+      // Front Face
+      {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
+      {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
+      {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
+      {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
 
-    std::vector<Component::VertexData> getCubeVertices()
-    {
-        std::vector<Component::VertexData> vertices = {
-            // Front Face
-            {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
-            {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
-            {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
-            {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
+      // Right Face
+      {{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+      {{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}},
+      {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}},
+      {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
 
-            // Right Face
-            {{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-            {{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}},
-            {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}},
-            {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+      // Back Face
+      {{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+      {{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+      {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+      {{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
 
-            // Back Face
-            {{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-            {{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-            {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-            {{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+      // Left Face
+      {{-0.5f, -0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}},
+      {{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}},
+      {{-0.5f, 0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}},
+      {{-0.5f, 0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}},
 
-            // Left Face
-            {{-0.5f, -0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}},
-            {{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}},
-            {{-0.5f, 0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}},
-            {{-0.5f, 0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}},
+      // Top Face
+      {{-0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+      {{0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+      {{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+      {{-0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
 
-            // Top Face
-            {{-0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-            {{0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-            {{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-            {{-0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+      // Bottom Face
+      {{-0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}},
+      {{0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}},
+      {{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}},
+      {{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}}};
 
-            // Bottom Face
-            {{-0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}},
-            {{0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}},
-            {{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}},
-            {{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}}};
+  return vertices;
+}
 
-        return vertices;
+std::vector<unsigned int> getCubeIndices()
+{
+  std::vector<unsigned int> indices =
+      {
+          0, 2, 1, 2, 0, 3,        // Front Face
+          4, 6, 5, 6, 4, 7,        // Right Face
+          8, 10, 9, 10, 8, 11,     // Back Face
+          12, 14, 13, 14, 12, 15,  // Left Face
+          16, 18, 17, 18, 16, 19,  // Top Face
+          20, 22, 21, 22, 20, 23   // Bottom Face
+      };
+
+  return indices;
+}
+
+std::vector<Component::VertexData> GetSphereVertices(float radius, int h_segments, int v_segments)
+{
+  std::vector<Component::VertexData> vertices;
+
+  float sectorStep = 2 * math::pi<float> / h_segments;
+  float stackStep = math::pi<float> / v_segments;
+
+  for (int i = 0; i <= v_segments; ++i) {
+    float stackAngle = math::pi<float> / 2 - i * stackStep;
+    float xy = radius * cosf(stackAngle);
+    float z = radius * sinf(stackAngle);
+
+    for (int j = 0; j <= h_segments; ++j) {
+      float sectorAngle = j * sectorStep;
+
+      float x = xy * cosf(sectorAngle);
+      float y = xy * sinf(sectorAngle);
+
+      math::vec3 position(x, y, z);
+      math::vec3 normal(math::normalize(position));
+
+      vertices.push_back({position, normal});
     }
+  }
 
-    std::vector<unsigned int> getCubeIndices()
-    {
-        std::vector<unsigned int> indices =
-            {
-                0, 2, 1, 2, 0, 3,       // Front Face
-                4, 6, 5, 6, 4, 7,       // Right Face
-                8, 10, 9, 10, 8, 11,    // Back Face
-                12, 14, 13, 14, 12, 15, // Left Face
-                16, 18, 17, 18, 16, 19, // Top Face
-                20, 22, 21, 22, 20, 23  // Bottom Face
-            };
+  return vertices;
+}
 
-        return indices;
+std::vector<unsigned int> GetSphereIndices(int h_segments, int v_segments)
+{
+  std::vector<unsigned int> indices;
+
+  int numStacks = v_segments + 1;
+  int numSectors = h_segments + 1;
+
+  for (int i = 0; i < numStacks; ++i) {
+    int k1 = i * numSectors;        // current stack
+    int k2 = (i + 1) * numSectors;  // next stack
+
+    for (int j = 0; j < numSectors; ++j) {
+      if (i != 0) {
+        indices.push_back(k1 + j);
+        indices.push_back(k2 + j);
+        indices.push_back(k1 + j + 1);
+      }
+
+      if (i != numStacks - 1) {
+        indices.push_back(k1 + j + 1);
+        indices.push_back(k2 + j);
+        indices.push_back(k2 + j + 1);
+      }
     }
+  }
+
+  return indices;
+}
+
+void CalculateNormals(std::vector<Component::VertexData> &vertices, const std::vector<unsigned int> &indices)
+{
+  // Initialize normals of all vertices to zero vectors
+  for (auto &vertex : vertices) {
+    vertex.Normal = math::vec3(0.0f);
+  }
+
+  // Calculate face normals and accumulate to vertex normals
+  for (size_t i = 0; i < indices.size(); i += 3) {
+    unsigned int index1 = indices[i];
+    unsigned int index2 = indices[i + 1];
+    unsigned int index3 = indices[i + 2];
+
+    auto &vertex1 = vertices[index1];
+    auto &vertex2 = vertices[index2];
+    auto &vertex3 = vertices[index3];
 
-    std::vector<Component::VertexData> GetSphereVertices(float radius, int h_segments, int v_segments)
-    {
-        std::vector<Component::VertexData> vertices;
-
-        float sectorStep = 2 * glm::pi<float>() / h_segments;
-        float stackStep = glm::pi<float>() / v_segments;
-
-        for (int i = 0; i <= v_segments; ++i)
-        {
-            float stackAngle = glm::pi<float>() / 2 - i * stackStep;
-            float xy = radius * cosf(stackAngle);
-            float z = radius * sinf(stackAngle);
-
-            for (int j = 0; j <= h_segments; ++j)
-            {
-                float sectorAngle = j * sectorStep;
-
-                float x = xy * cosf(sectorAngle);
-                float y = xy * sinf(sectorAngle);
-
-                glm::vec3 position(x, y, z);
-                glm::vec3 normal(glm::normalize(position));
-
-                vertices.push_back({position, normal});
-            }
-        }
-
-        return vertices;
-    }
-
-    std::vector<unsigned int> GetSphereIndices(int h_segments, int v_segments)
-    {
-        std::vector<unsigned int> indices;
-
-        int numStacks = v_segments + 1;
-        int numSectors = h_segments + 1;
-
-        for (int i = 0; i < numStacks; ++i)
-        {
-            int k1 = i * numSectors;       // current stack
-            int k2 = (i + 1) * numSectors; // next stack
-
-            for (int j = 0; j < numSectors; ++j)
-            {
-                if (i != 0)
-                {
-                    indices.push_back(k1 + j);
-                    indices.push_back(k2 + j);
-                    indices.push_back(k1 + j + 1);
-                }
-
-                if (i != numStacks - 1)
-                {
-                    indices.push_back(k1 + j + 1);
-                    indices.push_back(k2 + j);
-                    indices.push_back(k2 + j + 1);
-                }
-            }
-        }
-
-        return indices;
-    }
-
-    void CalculateNormals(std::vector<Component::VertexData> &vertices, const std::vector<unsigned int> &indices)
-    {
-        // Initialize normals of all vertices to zero vectors
-        for (auto &vertex : vertices)
-        {
-            vertex.Normal = glm::vec3(0.0f);
-        }
-
-        // Calculate face normals and accumulate to vertex normals
-        for (size_t i = 0; i < indices.size(); i += 3)
-        {
-            unsigned int index1 = indices[i];
-            unsigned int index2 = indices[i + 1];
-            unsigned int index3 = indices[i + 2];
-
-            auto &vertex1 = vertices[index1];
-            auto &vertex2 = vertices[index2];
-            auto &vertex3 = vertices[index3];
-
-            const glm::vec3 &v1 = vertex1.Position;
-            const glm::vec3 &v2 = vertex2.Position;
-            const glm::vec3 &v3 = vertex3.Position;
-
-            glm::vec3 faceNormal = glm::normalize(glm::cross(v2 - v1, v3 - v1));
-
-            vertex1.Normal += faceNormal;
-            vertex2.Normal += faceNormal;
-            vertex3.Normal += faceNormal;
-        }
-
-        // Normalize the vertex normals
-        for (auto &vertex : vertices)
-        {
-            vertex.Normal = glm::normalize(vertex.Normal);
-        }
-    }
-
-    HamLayer::HamLayer(Application *app) : Layer("HamLayer"), m_App(app), m_Scene(m_App->GetScene()) {}
+    const math::vec3 &v1 = vertex1.Position;
+    const math::vec3 &v2 = vertex2.Position;
+    const math::vec3 &v3 = vertex3.Position;
 
-    HamLayer::~HamLayer() {}
+    math::vec3 faceNormal = math::normalize(math::cross(v2 - v1, v3 - v1));
 
-    void HamLayer::OnAttach()
-    {
+    vertex1.Normal += faceNormal;
+    vertex2.Normal += faceNormal;
+    vertex3.Normal += faceNormal;
+  }
 
-        {
-            auto entity = m_Scene.CreateEntity("Sphere");
-            entity.GetComponent<Component::Transform>().Position = glm::vec3(2.0f, 0.0f, 0.0f);
-            auto &shaders = entity.GetComponent<Component::ShaderList>();
-            shaders.Add("face-normal");
-            auto &mesh = entity.AddComponent<Component::Mesh>(GetSphereVertices(0.5, 32, 32), GetSphereIndices(32, 32));
+  // Normalize the vertex normals
+  for (auto &vertex : vertices) {
+    vertex.Normal = math::normalize(vertex.Normal);
+  }
+}
 
-            // mesh.Indicies.Bind();
-            // mesh.Verticies.Bind();
+HamLayer::HamLayer(Application *app) : Layer("HamLayer"), m_App(app), m_Scene(m_App->GetScene()) {}
 
-            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
-            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+HamLayer::~HamLayer() {}
 
-            mesh.ShowWireframe = true;
+void HamLayer::OnAttach()
+{
+  {
+      auto entity = m_Scene.CreateEntity("Sphere");
+      entity.GetComponent<Component::Transform>().Position = math::vec3(2.0f, 0.0f, 0.0f);
+      auto &shaders = entity.GetComponent<Component::ShaderList>();
+      shaders.Add("face-normal");
+      auto &mesh = entity.AddComponent<Component::Mesh>(GetSphereVertices(0.5, 32, 32), GetSphereIndices(32, 32));
 
-            auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
-            scriptList.AddScript<Oscillate>("Oscillate");
+      // mesh.Indicies.Bind();
+      // mesh.Verticies.Bind();
 
-            // mesh.VAO.Unbind();
-            // mesh.Verticies.Unbind();
-            // mesh.Indicies.Unbind();
-        }
+      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
-        {
-            auto entity = m_Scene.CreateEntity("Monkey");
-            auto &shaders = entity.GetComponent<Component::ShaderList>();
-            // shaders.Add("funk");
-            shaders.Add("outline");
-            shaders.Add("face-normal");
-            std::vector<Component::VertexData> vertices;
-            std::vector<unsigned int> indices;
-            fs::ReadOBJFile(ASSETS_PATH + "models/monkey.obj", vertices, indices);
-            CalculateNormals(vertices, indices);
+      mesh.ShowWireframe = true;
 
-            auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
+      auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
+      scriptList.AddScript<Oscillate>("Oscillate");
 
-            // mesh.Indicies.Bind();
-            // mesh.Verticies.Bind();
+      // mesh.VAO.Unbind();
+      // mesh.Verticies.Unbind();
+      // mesh.Indicies.Unbind();
+  }
 
-            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
-            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+  {
+      auto entity = m_Scene.CreateEntity("Monkey");
+      auto &shaders = entity.GetComponent<Component::ShaderList>();
+      // shaders.Add("funk");
+      shaders.Add("outline");
+      shaders.Add("face-normal");
+      std::vector<Component::VertexData> vertices;
+      std::vector<unsigned int> indices;
+      fs::ReadOBJFile(ASSETS_PATH + "models/monkey.obj", vertices, indices);
+      CalculateNormals(vertices, indices);
 
-            // mesh.VAO.Unbind();
-            // mesh.Verticies.Unbind();
-            // mesh.Indicies.Unbind();
+      auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
 
-            // m_Scene.SetSelectedEntity(entity);
-        }
+      // mesh.Indicies.Bind();
+      // mesh.Verticies.Bind();
 
-        auto cubesParent = m_Scene.CreateEntity("Cubes");
+      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
-        // int width = 50;
-        // int height = 50;
-        // for (int y = -height / 2; y < height / 2; y++)
-        //     for (int x = -width / 2; x < width / 2; x++)
-        //     {
-        //         auto entity = m_Scene.CreateEntity("Cube-" + std::to_string(x) + "-" + std::to_string(y));
-        //         // entity.GetComponent<Component::Transform>().Position = glm::vec3(-2.0f, 0.0f, 0.0f);
+      // mesh.VAO.Unbind();
+      // mesh.Verticies.Unbind();
+      // mesh.Indicies.Unbind();
 
-        //         // z as a function of x and y
-        //         float z = 10.0f * sin(0.15f * x) * cos(0.15f * y);
+      // m_Scene.SetSelectedEntity(entity);
+  }
 
-        //         entity.GetComponent<Component::Transform>().Position = glm::vec3(x, y, z);
-        //         auto &shaders = entity.GetComponent<Component::ShaderList>();
-        //         shaders.Add("face-normal");
-        //         shaders.Add("vertex-normal");
 
-        //         auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
+  auto cubesParent = m_Scene.CreateEntity("Cubes");
 
-        //         // mesh.Indicies.Bind();
-        //         // mesh.Verticies.Bind();
+  // int width = 50;
+  // int height = 50;
+  // for (int y = -height / 2; y < height / 2; y++)
+  //     for (int x = -width / 2; x < width / 2; x++)
+  //     {
+  //         auto entity = m_Scene.CreateEntity("Cube-" + std::to_string(x) + "-" + std::to_string(y));
+  //         // entity.GetComponent<Component::Transform>().Position = math::vec3(-2.0f, 0.0f, 0.0f);
 
-        //         mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
-        //         mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+  //         // z as a function of x and y
+  //         float z = 10.0f * sin(0.15f * x) * cos(0.15f * y);
 
-        //         // mesh.VAO.Unbind();
-        //         // mesh.Verticies.Unbind();
-        //         // mesh.Indicies.Unbind();
+  //         entity.GetComponent<Component::Transform>().Position = math::vec3(x, y, z);
+  //         auto &shaders = entity.GetComponent<Component::ShaderList>();
+  //         shaders.Add("face-normal");
+  //         shaders.Add("vertex-normal");
 
-        //         auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
-        //         scriptList.AddScript<Oscillate>("Oscillate");
+  //         auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
 
-        //         entity.SetParent(cubesParent);
-        //     }
+  //         // mesh.Indicies.Bind();
+  //         // mesh.Verticies.Bind();
 
-        {
-            auto entity = m_Scene.CreateEntity("Cube");
-            entity.GetComponent<Component::Transform>().Position = glm::vec3(-2.0f, 0.0f, 0.0f);
+  //         mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+  //         mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
-            // z as a function of x and y
+  //         // mesh.VAO.Unbind();
+  //         // mesh.Verticies.Unbind();
+  //         // mesh.Indicies.Unbind();
 
-            auto &shaders = entity.GetComponent<Component::ShaderList>();
-            shaders.Add("face-normal");
+  //         auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
+  //         scriptList.AddScript<Oscillate>("Oscillate");
 
-            auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
+  //         entity.SetParent(cubesParent);
+  //     }
 
-            // mesh.Indicies.Bind();
-            // mesh.Verticies.Bind();
+  {
+      auto entity = m_Scene.CreateEntity("Cube");
+      entity.GetComponent<Component::Transform>().Position = math::vec3(-2.0f, 0.0f, 0.0f);
 
-            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
-            mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+      // z as a function of x and y
 
-            // mesh.VAO.Unbind();
-            // mesh.Verticies.Unbind();
-            // mesh.Indicies.Unbind();
+      auto &shaders = entity.GetComponent<Component::ShaderList>();
+      shaders.Add("face-normal");
 
-            auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
-            scriptList.AddScript<Oscillate>("Oscillate");
+      auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
 
-            entity.SetParent(cubesParent);
-        }
+      // mesh.Indicies.Bind();
+      // mesh.Verticies.Bind();
 
-        // {
-        //     auto entity = m_Scene.CreateEntity("Living Room");
-        //     auto &shaders = entity.GetComponent<Component::ShaderList>();
-        //     shaders.Add("face-normal");
-        //     shaders.Add("vertex-normal");
-        //     std::vector<Ham::Component::VertexData> vertices;
-        //     std::vector<unsigned int> indices;
-        //     CalculateNormals(vertices, indices);
-        //     ReadOBJFile(ASSETS_PATH + "models/InteriorTest.obj", vertices, indices);
+      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
-        //     auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
+      // mesh.VAO.Unbind();
+      // mesh.Verticies.Unbind();
+      // mesh.Indicies.Unbind();
 
-        //     // mesh.Indicies.Bind();
-        //     // mesh.Verticies.Bind();
+      auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
+      scriptList.AddScript<Oscillate>("Oscillate");
 
-        //     mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
-        //     mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+      entity.SetParent(cubesParent);
+  }
 
-        //     // mesh.VAO.Unbind();
-        //     // mesh.Verticies.Unbind();
-        //     // mesh.Indicies.Unbind();
-        // }
-    }
+  // {
+  //     auto entity = m_Scene.CreateEntity("Living Room");
+  //     auto &shaders = entity.GetComponent<Component::ShaderList>();
+  //     shaders.Add("face-normal");
+  //     shaders.Add("vertex-normal");
+  //     std::vector<Ham::Component::VertexData> vertices;
+  //     std::vector<unsigned int> indices;
+  //     CalculateNormals(vertices, indices);
+  //     ReadOBJFile(ASSETS_PATH + "models/InteriorTest.obj", vertices, indices);
 
-    void HamLayer::OnDetach() {}
+  //     auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
 
-    void HamLayer::OnUpdate(TimeStep deltaTime)
-    {
-    }
+  //     // mesh.Indicies.Bind();
+  //     // mesh.Verticies.Bind();
 
-    void HamLayer::OnUIRender(TimeStep deltaTime)
-    {
-    }
+  //     mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+  //     mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
-    // void HamLayer::OnEvent(Event &event) {}
+  //     // mesh.VAO.Unbind();
+  //     // mesh.Verticies.Unbind();
+  //     // mesh.Indicies.Unbind();
+  // }
+}
 
-} // namespace Ham
+void HamLayer::OnDetach() {}
+
+void HamLayer::OnUpdate(TimeStep deltaTime)
+{
+  
+}
+
+void HamLayer::OnUIRender(TimeStep deltaTime)
+{
+}
+
+// void HamLayer::OnEvent(Event &event) {}
+
+}  // namespace Ham

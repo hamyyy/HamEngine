@@ -4,8 +4,6 @@
 #include "Ham/Input/Input.h"
 #include "Ham/Scene/Entity.h"
 
-#include "Ham/Util/GlmExtra.h"
-
 namespace Ham
 {
     void Oscillate::OnCreate()

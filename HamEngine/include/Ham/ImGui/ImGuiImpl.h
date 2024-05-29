@@ -20,7 +20,6 @@ namespace Ham
         void NewFrame();
         void Render();
         void UpdateWindows();
-        void Shutdown();
         void SetupPreRender();
 
         bool WantsCaptureMouse() { return ImGui::GetIO().WantCaptureMouse || ImGuizmo::IsUsingAny(); }
@@ -53,7 +52,6 @@ namespace Ham
 
     private:
         Window *m_Window;
-        bool m_IsShutDown = false;
         ImGuiSettingsHandler m_ImGuiSettingsHandler;
 
         std::string settings_file_name = "config.ini";

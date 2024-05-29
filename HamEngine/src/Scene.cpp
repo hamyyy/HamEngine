@@ -2,140 +2,139 @@
 
 #include "Ham/Scene/Component.h"
 #include "Ham/Scene/Entity.h"
+#include "Ham/Util/Watcher.h"
 
-namespace Ham
+namespace Ham {
+Scene::Scene() : m_Registry() {}
+
+Scene::~Scene()
 {
-    Scene::Scene() : m_Registry() {}
+  m_Registry.clear();
+}
 
-    Scene::~Scene() { Shutdown(); }
+void Scene::Init() {}
 
-    void Scene::Init() {}
+Entity Scene::CreateEntity(std::string name)
+{
+  static uint32_t order = 0;
+  Entity entity = {m_Registry.create(), this};
+  entity.AddComponent<Component::UUID>(UUIDGenerator::Create());
+  entity.AddComponent<Component::Tag>(name).Order = order++;
+  entity.AddComponent<Component::Transform>();
+  entity.AddComponent<Component::EntityList>();
+  entity.AddComponent<Component::ShaderList>();
+  return entity;
+}
 
-    void Scene::Shutdown()
-    {
-        m_Registry.clear();
+void Scene::DestroyEntity(Entity entity)
+{
+  entity.Destroy();
+}
+
+Entity Scene::GetEntityByID(UUID id)
+{
+  const auto &view = m_Registry.view<Component::UUID>();
+
+  for (auto entity : view) {
+    if (view.get<Component::UUID>(entity) == id) {
+      return {entity, this};
     }
+  }
 
-    Entity Scene::CreateEntity(std::string name)
-    {
-        static uint32_t order = 0;
-        Entity entity = {m_Registry.create(), this};
-        entity.AddComponent<Component::UUID>(UUIDGenerator::Create());
-        entity.AddComponent<Component::Tag>(name).Order = order++;
-        entity.AddComponent<Component::Transform>();
-        entity.AddComponent<Component::EntityList>();
-        entity.AddComponent<Component::ShaderList>();
-        return entity;
+  return {};
+}
+
+std::vector<Entity> Scene::GetEntitiesByTag(std::string name)
+{
+  std::vector<Entity> entities;
+  const auto &view = m_Registry.view<Component::Tag>();
+
+  for (auto entity : view) {
+    if (view.get<Component::Tag>(entity).Name == name) {
+      entities.push_back({entity, this});
     }
+  }
 
-    void Scene::DestroyEntity(Entity entity)
-    {
-        entity.Destroy();
-    }
+  return entities;
+}
 
-    Entity Scene::GetEntityByID(UUID id)
-    {
-        const auto &view = m_Registry.view<Component::UUID>();
+entt::registry *Scene::GetRegistry() { return &m_Registry; }
 
-        for (auto entity : view)
-        {
-            if (view.get<Component::UUID>(entity) == id)
-            {
-                return {entity, this};
-            }
-        }
+Entity Scene::GetActiveCamera()
+{
+  if (m_ActiveCamera != nullptr)
+    return *m_ActiveCamera;
 
-        return {};
-    }
+  const auto &view = m_Registry.view<Component::Camera>();
 
-    std::vector<Entity> Scene::GetEntitiesByTag(std::string name)
-    {
-        std::vector<Entity> entities;
-        const auto &view = m_Registry.view<Component::Tag>();
+  for (auto entity : view) {
+    if (view.get<Component::Camera>(entity).Active)
+      return {entity, this};
+  }
 
-        for (auto entity : view)
-        {
-            if (view.get<Component::Tag>(entity).Name == name)
-            {
-                entities.push_back({entity, this});
-            }
-        }
+  return {};
+}
 
-        return entities;
-    }
+void Scene::SetActiveCamera(Entity *cameraEntity)
+{
+  m_ActiveCamera = cameraEntity;
+}
 
-    entt::registry *Scene::GetRegistry() { return &m_Registry; }
+Entity &Scene::GetSelectedEntity()
+{
+  static Entity selectedEntity = {};
+  return selectedEntity;
+}
 
-    Entity Scene::GetActiveCamera()
-    {
-        const auto &view = m_Registry.view<Component::Camera>();
+void Scene::SetSelectedEntity(Entity entity)
+{
+  GetSelectedEntity() = entity;
+}
 
-        for (auto entity : view)
-        {
-            if (view.get<Component::Camera>(entity).Active)
-                return {entity, this};
-        }
+void Scene::ClearSelectedEntity()
+{
+  GetSelectedEntity() = {};
+}
 
-        return {};
-    }
+Entity &Scene::GetHoveredEntity()
+{
+  static Entity hoveredEntity = {};
+  return hoveredEntity;
+}
 
-    Entity &Scene::GetSelectedEntity()
-    {
-        static Entity selectedEntity = {};
-        return selectedEntity;
-    }
+void Scene::SetHoveredEntity(Entity entity)
+{
+  GetHoveredEntity() = entity;
+}
 
-    void Scene::SetSelectedEntity(Entity entity)
-    {
-        GetSelectedEntity() = entity;
-    }
+void Scene::ClearHoveredEntity()
+{
+  GetHoveredEntity() = {};
+}
 
-    void Scene::ClearSelectedEntity()
-    {
-        GetSelectedEntity() = {};
-    }
+std::vector<Entity> Scene::GetEntities()
+{
+  std::vector<Entity> entities;
+  const auto &view = m_Registry.view<Component::UUID>();
 
-    Entity &Scene::GetHoveredEntity()
-    {
-        static Entity hoveredEntity = {};
-        return hoveredEntity;
-    }
+  for (auto entity : view) {
+    entities.push_back({entity, this});
+  }
 
-    void Scene::SetHoveredEntity(Entity entity)
-    {
-        GetHoveredEntity() = entity;
-    }
+  return entities;
+}
 
-    void Scene::ClearHoveredEntity()
-    {
-        GetHoveredEntity() = {};
-    }
+std::vector<Entity> Scene::GetTopLevelEntities()
+{
+  std::vector<Entity> entities;
+  const auto &view = m_Registry.view<Component::UUID>();
 
-    std::vector<Entity> Scene::GetEntities()
-    {
-        std::vector<Entity> entities;
-        const auto &view = m_Registry.view<Component::UUID>();
+  for (auto entity : view) {
+    Entity e = {entity, this};
+    if (!e.HasComponent<Component::Parent>())
+      entities.push_back(e);
+  }
 
-        for (auto entity : view)
-        {
-            entities.push_back({entity, this});
-        }
-
-        return entities;
-    }
-
-    std::vector<Entity> Scene::GetTopLevelEntities()
-    {
-        std::vector<Entity> entities;
-        const auto &view = m_Registry.view<Component::UUID>();
-
-        for (auto entity : view)
-        {
-            Entity e = {entity, this};
-            if (!e.HasComponent<Component::Parent>())
-                entities.push_back(e);
-        }
-
-        return entities;
-    }
-} // namespace Ham
+  return entities;
+}
+}  // namespace Ham

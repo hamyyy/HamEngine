@@ -10,6 +10,7 @@ namespace Ham
     {
     public:
         static void AttachNativeScripts(Scene &scene);
+        static void AttachNativeScriptsForEntity(Scene &scene, Entity entity);
         static void DetachNativeScripts(Scene &scene);
         static void UpdateNativeScripts(Scene &scene, TimeStep &deltaTime);
         static void UpdateNativeScriptsUI(Scene &scene, TimeStep &deltaTime);

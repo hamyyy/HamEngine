@@ -2,7 +2,7 @@
 
 #include "Ham/Util/TimeStep.h"
 
-#include <glm/glm.hpp>
+// #include <glm/glm.hpp>
 
 #if !defined(Y_UP) && !defined(Z_UP)
 #define Z_UP

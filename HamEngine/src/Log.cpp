@@ -22,7 +22,7 @@ namespace Ham
 
         s_CoreLogger = std::make_shared<spdlog::logger>("HAM", begin(coreLogSinks), end(coreLogSinks));
         spdlog::register_logger(s_CoreLogger);
-        s_CoreLogger->set_level(spdlog::level::trace);
+        s_CoreLogger->set_level(spdlog::level::debug);
         s_CoreLogger->flush_on(spdlog::level::trace);
 
         std::vector<spdlog::sink_ptr> clientLogSinks;
@@ -34,7 +34,7 @@ namespace Ham
 
         s_ClientLogger = std::make_shared<spdlog::logger>(name, begin(clientLogSinks), end(clientLogSinks));
         spdlog::register_logger(s_ClientLogger);
-        s_ClientLogger->set_level(spdlog::level::trace);
+        s_ClientLogger->set_level(spdlog::level::debug);
         s_ClientLogger->flush_on(spdlog::level::trace);
     }
 

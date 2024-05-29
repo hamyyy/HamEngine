@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Ham/Input/KeyCodes.h"
-
-#include <glm/glm.hpp>
+#include "Ham/Core/Math.h"
 
 #include <map>
 
@@ -25,7 +24,9 @@ namespace Ham
 		static bool IsMouseButtonUpThisFrame(MouseButton button);
 		static int GetMouseWheelDelta();
 
-		static glm::vec2 GetMousePosition();
+		static math::vec2 GetMousePosition();
+		static math::vec2 GetPreviousMousePosition();
+		static math::vec2 GetMouseDelta();
 		static void SetCursorMode(CursorMode mode);
 
 		static void Update();
@@ -37,7 +38,9 @@ namespace Ham
 	private:
 		static int s_MouseWheelDelta;
 		static int s_MouseWheelChanged;
-		
+
+		static math::vec2 s_PreviousMousePosition;
+
 		static CursorMode s_CurrentCursorMode;
 		static CursorMode s_DesiredCursorMode;
 	};

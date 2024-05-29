@@ -4,6 +4,8 @@
 
 #include <entt/entt.hpp>
 
+#include <vector>
+
 namespace Ham
 {
     class Entity;
@@ -15,7 +17,6 @@ namespace Ham
         ~Scene();
 
         void Init();
-        void Shutdown();
 
         Scene &operator=(const Scene &other) { return *this; }
 
@@ -23,6 +24,7 @@ namespace Ham
         void DestroyEntity(Entity entity);
         Entity GetEntityByID(UUID id);
 
+        void SetActiveCamera(Entity* cameraEntity);
         Entity GetActiveCamera();
 
         Entity &GetSelectedEntity(); // TODO: Move entity selection to editor
@@ -40,6 +42,8 @@ namespace Ham
 
     private:
         entt::registry m_Registry;
+
+        Entity* m_ActiveCamera = nullptr;
 
         friend class Entity;
         friend class Systems;

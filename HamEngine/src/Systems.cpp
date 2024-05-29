@@ -29,6 +29,23 @@ namespace Ham
         }
     }
 
+    void Systems::AttachNativeScriptsForEntity(Scene &scene, Entity entity)
+    {
+        auto &list = entity.GetComponent<Component::NativeScriptList>();
+        for (auto &script : list.Scripts)
+        {
+            if (!script->Active)
+            {
+                if (script->World == nullptr)
+                    script->World = &scene;
+                if (script->GameObject == nullptr || !!entity)
+                    script->GameObject = &entity;
+                script->Active = true;
+                script->OnCreate();
+            }
+        }
+    }
+
     void Systems::DetachNativeScripts(Scene &scene)
     {
         auto view = scene.m_Registry.view<Component::NativeScriptList>();
@@ -93,8 +110,8 @@ namespace Ham
     void Systems::RenderScene(Application &app, Scene &scene, TimeStep &deltaTime)
     {
 
-        static auto lightPos = glm::vec3(1.0f, 0.0f, 0.0f);
-        static auto lightColor = glm::vec3(1.0f, 0.1f, 0.1f);
+        static auto lightPos = math::vec3(1.0f, 0.0f, 0.0f);
+        static auto lightColor = math::vec3(1.0f, 0.1f, 0.1f);
 
         auto camview = scene.m_Registry.view<Component::Camera>();
         if (camview.size() == 0)
@@ -106,7 +123,7 @@ namespace Ham
         auto cameraEntity = scene.GetActiveCamera();
         auto &cameraProjection = cameraEntity.GetComponent<Component::Camera>().Projection;
         auto &cameraTransform = cameraEntity.GetComponent<Component::Transform>();
-        auto cameraView = glm::inverse(cameraTransform.ToMatrix());
+        auto cameraView = math::inverse(cameraTransform.ToMatrix());
 
         auto view = scene.m_Registry.view<Component::Mesh, Component::Transform, Component::ShaderList>();
 
@@ -140,8 +157,8 @@ namespace Ham
                     shader->SetUniform1f("uTime", app.GetTime());
                     shader->SetUniform2f("uResolution", app.GetWindow().GetSize());
 
-                    shader->SetUniform3f("uObjectColor", glm::vec3(1, 1, 1));
-                    shader->SetUniform3f("uWireframeColor", glm::vec3());
+                    shader->SetUniform3f("uObjectColor", math::vec3(1, 1, 1));
+                    shader->SetUniform3f("uWireframeColor", math::vec3());
 
                     shader->SetUniform1i("uID", index);
                 }
@@ -190,7 +207,7 @@ namespace Ham
         }
 
         // rotate light about z axis
-        lightPos = glm::rotate(lightPos, glm::radians(90.0f) * deltaTime, glm::vec3(0.0f, 0.0f, 1.0f));
+        lightPos = (math::rotateAxisAngle(math::vec3(0.0f, 0.0f, 1.0f), math::radians(90.0f) * deltaTime) * math::vec4(lightPos, 1.0f)).xyz;
     }
 
     void Systems::RenderObjectPickerFrame(Application &app, Scene &scene, TimeStep &deltaTime)
@@ -205,7 +222,7 @@ namespace Ham
         auto cameraEntity = scene.GetActiveCamera();
         auto &cameraProjection = cameraEntity.GetComponent<Component::Camera>().Projection;
         auto &cameraTransform = cameraEntity.GetComponent<Component::Transform>();
-        auto cameraView = glm::inverse(cameraTransform.ToMatrix());
+        auto cameraView = math::inverse(cameraTransform.ToMatrix());
 
         auto view = scene.m_Registry.view<Component::Mesh>();
 
@@ -231,8 +248,8 @@ namespace Ham
                 shader->SetUniform1f("uTime", app.GetTime());
                 shader->SetUniform2f("uResolution", app.GetWindow().GetSize());
 
-                shader->SetUniform3f("uObjectColor", glm::vec3(1, 1, 1));
-                shader->SetUniform3f("uWireframeColor", glm::vec3());
+                shader->SetUniform3f("uObjectColor", math::vec3(1, 1, 1));
+                shader->SetUniform3f("uWireframeColor", math::vec3());
                 shader->SetUniform1i("uID", index);
                 shader->SetUniform1i("uTotalObjects", (int)view.size());
             }

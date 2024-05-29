@@ -13,6 +13,7 @@ namespace Ham
 	int Input::s_MouseWheelChanged = 0;
 	CursorMode Input::s_CurrentCursorMode = CursorMode::NORMAL;
 	CursorMode Input::s_DesiredCursorMode = CursorMode::NORMAL;
+	math::vec2 Input::s_PreviousMousePosition = {0, 0};
 
 	void Input::Init()
 	{
@@ -256,7 +257,17 @@ namespace Ham
 		return s_MouseWheelDelta;
 	}
 
-	glm::vec2 Input::GetMousePosition()
+	math::vec2 Input::GetMouseDelta()
+	{
+		return GetMousePosition() - GetPreviousMousePosition();
+	}
+
+	math::vec2 Input::GetPreviousMousePosition()
+	{
+		return s_PreviousMousePosition;
+	}
+
+	math::vec2 Input::GetMousePosition()
 	{
 		GLFWwindow *windowHandle = Application::Get().GetWindowHandle();
 
@@ -300,6 +311,8 @@ namespace Ham
 		}
 
 		s_MouseWheelDelta = 0;
+
+		s_PreviousMousePosition = GetMousePosition();
 	}
 
 }
