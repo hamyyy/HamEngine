@@ -17,11 +17,6 @@
 #include "Ham/Util/Watcher.h"
 
 #include <imgui.h>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/string_cast.hpp>
-#include <glm/gtx/transform.hpp>
 
 #include <ranges>
 
@@ -96,16 +91,6 @@ void Application::Init()
   auto cameraEntity = m_Scene.CreateEntity("Camera");
   cameraEntity.AddComponent<Component::Camera>();
   cameraEntity.GetComponent<Component::Transform>() = Component::Transform(math::inverse(math::lookAt(math::vec3(3.0f, 3.0f, 3.0f), math::zero<math::vec3>())));  // Component::Transform(math::inverse(math::camera()) * math::translate((math::camera() * math::vec4(math::backward(), 0.0f)).xyz * 10.0f));
-
-  auto mat1 = math::inverse(math::lookAt(math::vec3(3, 3, 3), math::vec3(0.0f)));
-  auto mat2 = glm::inverse(glm::lookAt(glm::vec3(3, 3, 3), glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-  auto mat3 = math::perspective(math::radians(45.0f), {1.0f, 1.0f}, 0.1f, 100.0f);
-  auto mat4 = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
-
-  HAM_INFO("mat1: {0}", mat1);
-  // HAM_INFO("mat2: {0}", mat2);
-  HAM_INFO("mat3: {0}", mat3);
-  // HAM_INFO("mat4: {0}", mat4);
 
   auto &scriptList = cameraEntity.AddComponent<Component::NativeScriptList>();
   scriptList.AddScript<CameraController>("CameraController");

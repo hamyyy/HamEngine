@@ -26,9 +26,6 @@
 [submodule "HamEngine/lib/whereami/whereami"]
 	path = HamEngine/lib/whereami/whereami
 	url = https://github.com/gpakosz/whereami
-[submodule "HamEngine/lib/glm"]
-	path = HamEngine/lib/glm
-	url = https://github.com/g-truc/glm
 [submodule "HamEngine/lib/simplefilewatcher/simplefilewatcher"]
 	path = HamEngine/lib/simplefilewatcher/simplefilewatcher
 	url = https://github.com/apetrone/simplefilewatcher
