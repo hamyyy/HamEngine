@@ -35,7 +35,7 @@ void ImGuiImpl::Init(Window *window)
 
   // if file doesn't exist, copy default settings file from assets
   if (!std::filesystem::exists(settings_file_path)) {
-    std::filesystem::copy(ASSETS_PATH_CORE + "default_config.ini", settings_file_path);
+    std::filesystem::copy(ASSETS_PATH_CORE "default_config.ini", settings_file_path);
   }
 
   io.IniFilename = settings_file_path.c_str();

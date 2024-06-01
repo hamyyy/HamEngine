@@ -8,117 +8,118 @@
 #include "Ham/Scene/Scene.h"
 #include "Ham/Renderer/FrameBuffer.h"
 
+#include <sol/sol.hpp>
+
 #include <thread>
 #include <atomic>
 
-namespace Ham
-{
-    class EditorLayer;
+namespace Ham {
+class EditorLayer;
 
-    struct ApplicationCommandLineArgs
-    {
-        int Count = 0;
-        char **Args = nullptr;
+struct ApplicationCommandLineArgs {
+  int Count = 0;
+  char **Args = nullptr;
 
-        const char *operator[](int index) const
-        {
-            HAM_CORE_ASSERT(index < Count);
-            return Args[index];
-        }
-    };
+  const char *operator[](int index) const
+  {
+    HAM_CORE_ASSERT(index < Count);
+    return Args[index];
+  }
+};
 
-    enum FullscreenMode
-    {
-        APPLICATION_WINDOWED,
-        APPLICATION_FULLSCREEN,
-        APPLICATION_FULLSCREEN_BORDERLESS
-    };
+enum FullscreenMode {
+  APPLICATION_WINDOWED,
+  APPLICATION_FULLSCREEN,
+  APPLICATION_FULLSCREEN_BORDERLESS
+};
 
-    struct ApplicationSpecification
-    {
-        std::string Name = "Ham Engine Application";
+struct ApplicationSpecification {
+  std::string Name = "Ham Engine Application";
 
-        // settings
-        int DefaultWidth = 1280;
-        int DefaultHeight = 720;
+  // settings
+  int DefaultWidth = 1280;
+  int DefaultHeight = 720;
 
-        int Width = DefaultWidth;
-        int Height = DefaultHeight;
-        int XPos = -1;
-        int YPos = -1;
-        bool VSync = true;
-        bool Maximized = false;
-        int Display = 0;
-        FullscreenMode Fullscreen = APPLICATION_WINDOWED;
+  int Width = DefaultWidth;
+  int Height = DefaultHeight;
+  int XPos = -1;
+  int YPos = -1;
+  bool VSync = true;
+  bool Maximized = false;
+  int Display = 0;
+  FullscreenMode Fullscreen = APPLICATION_WINDOWED;
 
-        ApplicationCommandLineArgs CommandLineArgs;
-    };
+  ApplicationCommandLineArgs CommandLineArgs;
+};
 
-    class Application
-    {
-    public:
-        Application(const ApplicationSpecification &specification);
-        ~Application();
+class Application {
+ public:
+  Application(const ApplicationSpecification &specification);
+  ~Application();
 
-        void Run();
-        void Init();
-        void RenderThread();
+  void Run();
+  void Init();
+  void RenderThread();
 
-        static Application &Get() { return *s_Instance; }
+  static Application &Get() { return *s_Instance; }
 
-        void PushLayer(Layer *layer);
-        void PushLayerUnique(Layer *layer);
-        void PushOverlay(Layer *layer);
-        void PushOverlayUnique(Layer *layer);
-        void PopLayer(Layer *layer);
-        void PopOverlay(Layer *layer);
+  void PushLayer(Layer *layer);
+  void PushLayerUnique(Layer *layer);
+  void PushOverlay(Layer *layer);
+  void PushOverlayUnique(Layer *layer);
+  void PopLayer(Layer *layer);
+  void PopOverlay(Layer *layer);
 
-        void EnableEditor();
-        void DisableEditor();
-        void ToggleEditor();
-        bool IsEditorEnabled() { return m_EditorEnabled; }
+  void EnableEditor();
+  void DisableEditor();
+  void ToggleEditor();
+  bool IsEditorEnabled() { return m_EditorEnabled; }
 
-        void TriggerCameraUpdate() { m_FramebufferResized = true; }
+  void TriggerCameraUpdate() { m_FramebufferResized = true; }
 
-        Window &GetWindow() { return m_Window; }
-        GLFWwindow *GetWindowHandle() { return m_Window.GetWindowHandle(); }
-        Scene &GetScene() { return m_Scene; }
-        ImGuiImpl &GetImGui() { return m_imgui; }
-        float GetTime() { return m_Window.GetTime(); }
-        const ApplicationSpecification &GetSpecification() const { return m_Specification; }
-        FrameBuffer &GetObjectPickerFramebuffer() { return m_ObjectPickerFramebuffer; }
+  Window &GetWindow() { return m_Window; }
+  GLFWwindow *GetWindowHandle() { return m_Window.GetWindowHandle(); }
+  Scene &GetScene() { return m_Scene; }
+  ImGuiImpl &GetImGui() { return m_imgui; }
+  float GetTime() { return m_Window.GetTime(); }
+  const ApplicationSpecification &GetSpecification() const { return m_Specification; }
+  FrameBuffer &GetObjectPickerFramebuffer() { return m_ObjectPickerFramebuffer; }
 
-        void SetWindowed() { m_Window.SetWindowed(); }
-        void SetFullscreen() { m_Window.SetFullscreen(); }
-        void SetFullscreenBorderless() { m_Window.SetFullscreenBorderless(); }
-        void SetVSync(bool enabled) { m_Window.SetVSync(enabled); }
+  void SetWindowed() { m_Window.SetWindowed(); }
+  void SetFullscreen() { m_Window.SetFullscreen(); }
+  void SetFullscreenBorderless() { m_Window.SetFullscreenBorderless(); }
+  void SetVSync(bool enabled) { m_Window.SetVSync(enabled); }
 
-        bool IsVSync() const { return m_Window.IsVSync(); }
+  bool IsVSync() const { return m_Window.IsVSync(); }
 
-    protected:
-        Window m_Window;
-        ImGuiImpl m_imgui;
+  sol::state &GetLua() { return m_LuaState; }
 
-    private:
-        static Application *s_Instance;
-        Scene m_Scene;
-        std::shared_ptr<EditorLayer> m_EditorLayer;
+ protected:
+  Window m_Window;
+  ImGuiImpl m_imgui;
 
-        ApplicationSpecification m_Specification;
-        LayerStack m_LayerStack;
-        float m_LastFrameTime;
+ private:
+  static Application *s_Instance;
+  Scene m_Scene;
+  std::shared_ptr<EditorLayer> m_EditorLayer;
 
-        std::thread m_RenderThread;
+  ApplicationSpecification m_Specification;
+  LayerStack m_LayerStack;
+  float m_LastFrameTime;
 
-        bool m_EditorEnabled = false;
+  std::thread m_RenderThread;
 
-        std::atomic_bool m_FramebufferResized = false;
+  bool m_EditorEnabled = false;
 
-        friend ::Ham::Window;
+  std::atomic_bool m_FramebufferResized = false;
 
-        FrameBuffer m_ObjectPickerFramebuffer;
-    };
+  friend ::Ham::Window;
 
-    // To be defined in CLIENT
-    Application *CreateApplication(ApplicationCommandLineArgs args);
-}
+  FrameBuffer m_ObjectPickerFramebuffer;
+
+  sol::state m_LuaState;
+};
+
+// To be defined in CLIENT
+Application *CreateApplication(ApplicationCommandLineArgs args);
+}  // namespace Ham

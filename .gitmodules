@@ -32,3 +32,9 @@
 [submodule "HamEngine/lib/simplefilewatcher/simplefilewatcher"]
 	path = HamEngine/lib/simplefilewatcher/simplefilewatcher
 	url = https://github.com/apetrone/simplefilewatcher
+[submodule "HamEngine/lib/lua-cmake"]
+	path = HamEngine/lib/lua-cmake
+	url = https://github.com/lubgr/lua-cmake
+[submodule "HamEngine/lib/sol2"]
+	path = HamEngine/lib/sol2
+	url = https://github.com/ThePhD/sol2

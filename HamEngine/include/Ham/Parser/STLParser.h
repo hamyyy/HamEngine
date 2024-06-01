@@ -17,7 +17,7 @@ static void ReadSTLString(const std::string &stlStr, std::vector<T> &vertices, s
   std::istringstream file(stlStr);
   std::string line;
   std::vector<math::vec3> positions;
-  
+
   while (std::getline(file, line)) {
     std::stringstream ss(line);
     std::string keyword;

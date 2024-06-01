@@ -2,17 +2,15 @@
 
 #include "Ham/Scene/Component.h"
 
-namespace Ham
-{
+namespace Ham {
 
-    class Oscillate : public NativeScript
-    {
-        using NativeScript::NativeScript;
+class Oscillate : public NativeScript {
+  using NativeScript::NativeScript;
 
-    public:
-        void OnCreate();
-        void OnDestroy();
-        void OnUpdate(TimeStep deltaTime);
-        void OnUIUpdate(TimeStep deltaTime);
-    };
-}
+ public:
+  void OnCreate();
+  void OnDestroy();
+  void OnUpdate(TimeStep deltaTime);
+  void OnUIUpdate(TimeStep deltaTime);
+};
+}  // namespace Ham

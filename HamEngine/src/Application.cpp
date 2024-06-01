@@ -16,7 +16,6 @@
 #include "Ham/Util/UUID.h"
 #include "Ham/Util/Watcher.h"
 
-
 #include <imgui.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
@@ -36,6 +35,7 @@ Application::Application(const ApplicationSpecification &spec) : m_Specification
   m_Specification.DefaultWidth = m_Specification.Width;
   m_Specification.DefaultHeight = m_Specification.Height;
 }
+
 Application::~Application()
 {
   // FIXME: App doesnt like this for some reason
@@ -57,6 +57,27 @@ void Application::Init()
   Random::Init();
   ShaderLibrary::Init();
   Input::Init();
+
+  m_LuaState.open_libraries(sol::lib::base, sol::lib::io, sol::lib::math, sol::lib::table);
+
+  try {
+    m_LuaState.safe_script_file(SCRIPTS_PATH "add.lua");
+  }
+  catch (const sol::error &err) {
+    HAM_CORE_ERROR("Error loading script.lua: {0}", err.what());
+  }
+
+  sol::protected_function func = m_LuaState["add"];
+  if (func) {
+    auto result = func(10.0f, 133.0f);
+    if (result.valid()) {
+      HAM_CORE_INFO("Result: {}", result.get<float>());
+    }
+    else {
+      sol::error err = result;
+      HAM_CORE_ERROR("Unable to run lua script:\n{}", err.what());
+    }
+  }
 
   m_EditorLayer = std::make_shared<EditorLayer>(this);
   // PushLayer(m_EditorLayer.get());

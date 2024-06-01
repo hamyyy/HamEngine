@@ -15,9 +15,8 @@ add_subdirectory(lib/stduuid)
 add_subdirectory(lib/whereami)
 add_subdirectory(lib/Mathter)
 add_subdirectory(lib/simplefilewatcher)
-
-# find open casecade
-find_package(OpenCASCADE REQUIRED)
+add_subdirectory(lib/lua-cmake)
+add_subdirectory(lib/sol2)
 
 file(GLOB_RECURSE HAM_SOURCES "src/*.cpp" "src/*.c")
 file(GLOB_RECURSE HAM_HEADERS "src/*.hpp" "src/*.h")
@@ -45,6 +44,8 @@ target_link_libraries(${PROJECT_NAME}
     whereami
     Mathter
     simplefilewatcher
+    lua::lib
+    sol2
 )
 
 # foreach(LIB ${OpenCASCADE_LIBRARIES})

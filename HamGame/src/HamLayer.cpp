@@ -6,6 +6,8 @@
 #include "Ham/Util/ImGuiExtra.h"
 #include "Ham/Parser/STLParser.h"
 
+#include <sol/sol.hpp>
+
 namespace Ham {
 
 std::vector<Component::VertexData> getCubeVertices()
@@ -163,54 +165,53 @@ HamLayer::~HamLayer() {}
 void HamLayer::OnAttach()
 {
   {
-      auto entity = m_Scene.CreateEntity("Sphere");
-      entity.GetComponent<Component::Transform>().Position = math::vec3(2.0f, 0.0f, 0.0f);
-      auto &shaders = entity.GetComponent<Component::ShaderList>();
-      shaders.Add("face-normal");
-      auto &mesh = entity.AddComponent<Component::Mesh>(GetSphereVertices(0.5, 32, 32), GetSphereIndices(32, 32));
+    auto entity = m_Scene.CreateEntity("Sphere");
+    entity.GetComponent<Component::Transform>().Position = math::vec3(2.0f, 0.0f, 0.0f);
+    auto &shaders = entity.GetComponent<Component::ShaderList>();
+    shaders.Add("face-normal");
+    auto &mesh = entity.AddComponent<Component::Mesh>(GetSphereVertices(0.5, 32, 32), GetSphereIndices(32, 32));
 
-      // mesh.Indicies.Bind();
-      // mesh.Verticies.Bind();
+    // mesh.Indicies.Bind();
+    // mesh.Verticies.Bind();
 
-      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
-      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+    mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+    mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
-      mesh.ShowWireframe = true;
+    mesh.ShowWireframe = true;
 
-      auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
-      scriptList.AddScript<Oscillate>("Oscillate");
+    auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
+    scriptList.AddScript<Oscillate>("Oscillate");
 
-      // mesh.VAO.Unbind();
-      // mesh.Verticies.Unbind();
-      // mesh.Indicies.Unbind();
+    // mesh.VAO.Unbind();
+    // mesh.Verticies.Unbind();
+    // mesh.Indicies.Unbind();
   }
 
   {
-      auto entity = m_Scene.CreateEntity("Monkey");
-      auto &shaders = entity.GetComponent<Component::ShaderList>();
-      // shaders.Add("funk");
-      shaders.Add("outline");
-      shaders.Add("face-normal");
-      std::vector<Component::VertexData> vertices;
-      std::vector<unsigned int> indices;
-      fs::ReadOBJFile(ASSETS_PATH + "models/monkey.obj", vertices, indices);
-      CalculateNormals(vertices, indices);
+    auto entity = m_Scene.CreateEntity("Monkey");
+    auto &shaders = entity.GetComponent<Component::ShaderList>();
+    // shaders.Add("funk");
+    // shaders.Add("outline");
+    shaders.Add("face-normal");
+    std::vector<Component::VertexData> vertices;
+    std::vector<unsigned int> indices;
+    fs::ReadOBJFile(ASSETS_PATH "models/monkey.obj", vertices, indices);
+    CalculateNormals(vertices, indices);
 
-      auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
+    auto &mesh = entity.AddComponent<Component::Mesh>(vertices, indices);
 
-      // mesh.Indicies.Bind();
-      // mesh.Verticies.Bind();
+    // mesh.Indicies.Bind();
+    // mesh.Verticies.Bind();
 
-      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
-      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+    mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+    mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
-      // mesh.VAO.Unbind();
-      // mesh.Verticies.Unbind();
-      // mesh.Indicies.Unbind();
+    // mesh.VAO.Unbind();
+    // mesh.Verticies.Unbind();
+    // mesh.Indicies.Unbind();
 
-      // m_Scene.SetSelectedEntity(entity);
+    // m_Scene.SetSelectedEntity(entity);
   }
-
 
   auto cubesParent = m_Scene.CreateEntity("Cubes");
 
@@ -249,30 +250,30 @@ void HamLayer::OnAttach()
   //     }
 
   {
-      auto entity = m_Scene.CreateEntity("Cube");
-      entity.GetComponent<Component::Transform>().Position = math::vec3(-2.0f, 0.0f, 0.0f);
+    auto entity = m_Scene.CreateEntity("Cube");
+    entity.GetComponent<Component::Transform>().Position = math::vec3(-2.0f, 0.0f, 0.0f);
 
-      // z as a function of x and y
+    // z as a function of x and y
 
-      auto &shaders = entity.GetComponent<Component::ShaderList>();
-      shaders.Add("face-normal");
+    auto &shaders = entity.GetComponent<Component::ShaderList>();
+    shaders.Add("face-normal");
 
-      auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
+    auto &mesh = entity.AddComponent<Component::Mesh>(getCubeVertices(), getCubeIndices());
 
-      // mesh.Indicies.Bind();
-      // mesh.Verticies.Bind();
+    // mesh.Indicies.Bind();
+    // mesh.Verticies.Bind();
 
-      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
-      mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
+    mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Position));
+    mesh.Vertices.DefineAttribute3f(offsetof(Component::VertexData, Normal));
 
-      // mesh.VAO.Unbind();
-      // mesh.Verticies.Unbind();
-      // mesh.Indicies.Unbind();
+    // mesh.VAO.Unbind();
+    // mesh.Verticies.Unbind();
+    // mesh.Indicies.Unbind();
 
-      auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
-      scriptList.AddScript<Oscillate>("Oscillate");
+    auto &scriptList = entity.AddComponent<Component::NativeScriptList>();
+    scriptList.AddScript<Oscillate>("Oscillate");
 
-      entity.SetParent(cubesParent);
+    entity.SetParent(cubesParent);
   }
 
   // {
@@ -303,7 +304,6 @@ void HamLayer::OnDetach() {}
 
 void HamLayer::OnUpdate(TimeStep deltaTime)
 {
-  
 }
 
 void HamLayer::OnUIRender(TimeStep deltaTime)

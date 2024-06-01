@@ -6,47 +6,45 @@
 
 #include <vector>
 
-namespace Ham
-{
-    class Entity;
-    class Systems;
-    class Scene
-    {
-    public:
-        Scene();
-        ~Scene();
+namespace Ham {
+class Entity;
+class Systems;
+class Scene {
+ public:
+  Scene();
+  ~Scene();
 
-        void Init();
+  void Init();
 
-        Scene &operator=(const Scene &other) { return *this; }
+  Scene &operator=(const Scene &other) { return *this; }
 
-        Entity CreateEntity(std::string name);
-        void DestroyEntity(Entity entity);
-        Entity GetEntityByID(UUID id);
+  Entity CreateEntity(std::string name);
+  void DestroyEntity(Entity entity);
+  Entity GetEntityByID(UUID id);
 
-        void SetActiveCamera(Entity* cameraEntity);
-        Entity GetActiveCamera();
+  void SetActiveCamera(Entity *cameraEntity);
+  Entity GetActiveCamera();
 
-        Entity &GetSelectedEntity(); // TODO: Move entity selection to editor
-        void SetSelectedEntity(Entity entity);
-        void ClearSelectedEntity();
+  Entity &GetSelectedEntity();  // TODO: Move entity selection to editor
+  void SetSelectedEntity(Entity entity);
+  void ClearSelectedEntity();
 
-        Entity &GetHoveredEntity();
-        void SetHoveredEntity(Entity entity);
-        void ClearHoveredEntity();
+  Entity &GetHoveredEntity();
+  void SetHoveredEntity(Entity entity);
+  void ClearHoveredEntity();
 
-        std::vector<Entity> GetEntitiesByTag(std::string name);
-        entt::registry *GetRegistry();
-        std::vector<Entity> GetEntities();
-        std::vector<Entity> GetTopLevelEntities();
+  std::vector<Entity> GetEntitiesByTag(std::string name);
+  entt::registry *GetRegistry();
+  std::vector<Entity> GetEntities();
+  std::vector<Entity> GetTopLevelEntities();
 
-    private:
-        entt::registry m_Registry;
+ private:
+  entt::registry m_Registry;
 
-        Entity* m_ActiveCamera = nullptr;
+  Entity *m_ActiveCamera = nullptr;
 
-        friend class Entity;
-        friend class Systems;
-        friend class Application;
-    };
-} // namespace Ham
+  friend class Entity;
+  friend class Systems;
+  friend class Application;
+};
+}  // namespace Ham

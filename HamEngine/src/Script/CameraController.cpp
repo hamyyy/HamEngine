@@ -20,7 +20,7 @@ void CameraController::OnCreate()
   m_Distance = 10.0f;
 
   m_Target = transform * math::translate(m_Distance * math::forward());
-  m_Target.Submatrix<3, 3>(0, 0) =  math::inverse(math::camera()).Submatrix<3, 3>(0, 0);
+  m_Target.Submatrix<3, 3>(0, 0) = math::inverse(math::camera()).Submatrix<3, 3>(0, 0);
 
   CalculateAlphaBeta();
 
