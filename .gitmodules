@@ -35,3 +35,6 @@
 [submodule "HamEngine/lib/sol2"]
 	path = HamEngine/lib/sol2
 	url = https://github.com/ThePhD/sol2
+[submodule "HamEngine/lib/tracy"]
+	path = HamEngine/lib/tracy
+	url = https://github.com/wolfpld/tracy

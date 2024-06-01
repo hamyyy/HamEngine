@@ -45,7 +45,7 @@ Application::~Application()
 
 void Application::Init()
 {
-  HAM_PROFILE_SCOPE("Application Init");
+  HAM_PROFILE_SCOPE_NAMED("Application Init");
   HAM_CORE_INFO("Ham Engine Version: 0.0.1");
   FileWatcher::Init();
   m_Window.Init(this);
@@ -111,7 +111,7 @@ void Application::Init()
 
 void Application::PushLayer(Layer *layer)
 {
-  // HZ_PROFILE_FUNCTION();
+  HAM_PROFILE_SCOPE();
   m_LayerStack.PushLayer(layer);
   if (m_Window.IsRunning())
     layer->OnAttach();
@@ -119,7 +119,7 @@ void Application::PushLayer(Layer *layer)
 
 void Application::PushLayerUnique(Layer *layer)
 {
-  // HZ_PROFILE_FUNCTION();
+  HAM_PROFILE_SCOPE();
   m_LayerStack.PushLayerUnique(layer);
   if (m_Window.IsRunning())
     layer->OnAttach();
@@ -127,7 +127,7 @@ void Application::PushLayerUnique(Layer *layer)
 
 void Application::PushOverlay(Layer *layer)
 {
-  // HZ_PROFILE_FUNCTION();
+  HAM_PROFILE_SCOPE();
   m_LayerStack.PushOverlay(layer);
   if (m_Window.IsRunning())
     layer->OnAttach();
@@ -135,7 +135,7 @@ void Application::PushOverlay(Layer *layer)
 
 void Application::PushOverlayUnique(Layer *layer)
 {
-  // HZ_PROFILE_FUNCTION();
+  HAM_PROFILE_SCOPE();
   m_LayerStack.PushOverlayUnique(layer);
   if (m_Window.IsRunning())
     layer->OnAttach();
@@ -143,7 +143,7 @@ void Application::PushOverlayUnique(Layer *layer)
 
 void Application::PopLayer(Layer *layer)
 {
-  // HZ_PROFILE_FUNCTION();
+  HAM_PROFILE_SCOPE();
   m_LayerStack.PopLayer(layer);
   if (m_Window.IsRunning())
     layer->OnDetach();
@@ -151,7 +151,7 @@ void Application::PopLayer(Layer *layer)
 
 void Application::PopOverlay(Layer *layer)
 {
-  // HZ_PROFILE_FUNCTION();
+  HAM_PROFILE_SCOPE();
   m_LayerStack.PopOverlay(layer);
   if (m_Window.IsRunning())
     layer->OnDetach();
@@ -215,10 +215,8 @@ void Application::RenderThread()
   m_FramebufferResized = true;
 
   while (m_Window.IsRunning()) {
-    HAM_PROFILE_FRAME("Render Frame");
-
     {
-      HAM_PROFILE_SCOPE("Render Poll Events");
+      HAM_PROFILE_SCOPE_NAMED("Render Poll Events");
       m_Window.PollEvents();
       Input::BeginFrame();
     }
@@ -236,7 +234,7 @@ void Application::RenderThread()
       m_Window.SetContextCurrent();
 
     if (m_FramebufferResized) {
-      HAM_PROFILE_SCOPE("Framebuffer Resized");
+      HAM_PROFILE_SCOPE_NAMED("Framebuffer Resized");
       display = m_Window.GetFramebufferSize();
       glViewport(0, 0, display.x, display.y);
       m_FramebufferResized = false;
@@ -251,7 +249,7 @@ void Application::RenderThread()
     m_LastFrameTime = time;
 
     {
-      HAM_PROFILE_SCOPE("LayerStack OnUpdate");
+      HAM_PROFILE_SCOPE_NAMED("LayerStack OnUpdate");
       Systems::UpdateNativeScripts(m_Scene, timestep);
       for (Layer *layer : m_LayerStack)
         layer->OnUpdate(timestep);
@@ -259,7 +257,7 @@ void Application::RenderThread()
 
     m_imgui.NewFrame();
     {
-      HAM_PROFILE_SCOPE("LayerStack OnUIRender");
+      HAM_PROFILE_SCOPE_NAMED("LayerStack OnUIRender");
       m_imgui.SetupPreRender();
       Systems::UpdateNativeScriptsUI(m_Scene, timestep);
       for (Layer *layer : m_LayerStack) {
@@ -275,17 +273,17 @@ void Application::RenderThread()
     }
 
     {
-      HAM_PROFILE_SCOPE("ImGui Render");
+      HAM_PROFILE_SCOPE_NAMED("ImGui Render");
       m_imgui.Render();
     }
 
     {
-      HAM_PROFILE_SCOPE("ImGui Update Windows");
+      HAM_PROFILE_SCOPE_NAMED("ImGui Update Windows");
       m_imgui.UpdateWindows();
     }
 
     {
-      HAM_PROFILE_SCOPE("Present");
+      HAM_PROFILE_SCOPE_NAMED("Present");
       m_Window.Present();
     }
 
@@ -294,6 +292,7 @@ void Application::RenderThread()
     }
 
     Input::EndFrame();
+    HAM_PROFILE_FRAME("Render Frame");
   }
 
   // make sure the main thread knows we're done
@@ -330,10 +329,8 @@ void Application::Run()
   m_Window.ApplySavedSettings();
   // Main loop
   while (m_Window.IsRunning()) {
-    HAM_PROFILE_FRAME("Main Frame");
-
     {
-      HAM_PROFILE_SCOPE("Main Poll Events");
+      HAM_PROFILE_SCOPE_NAMED("Main Poll Events");
       m_Window.PollEvents();
       Input::Update();
       FileWatcher::Update();
@@ -343,6 +340,8 @@ void Application::Run()
       m_Window.SetIsRunning(false);
       break;
     }
+
+    HAM_PROFILE_FRAME("Main Frame");
   }
 
   m_Window.SetIsRunning(false);
