@@ -15,6 +15,7 @@
 #include "Ham/Util/TimeStep.h"
 #include "Ham/Util/UUID.h"
 #include "Ham/Util/Watcher.h"
+#include "Ham/Events/Event.h"
 
 #include <imgui.h>
 
@@ -217,7 +218,7 @@ void Application::RenderThread()
   while (m_Window.IsRunning()) {
     {
       HAM_PROFILE_SCOPE_NAMED("Render Poll Events");
-      m_Window.PollEvents();
+      // m_Window.PollEvents();
       Input::BeginFrame();
     }
 
@@ -332,8 +333,66 @@ void Application::Run()
     {
       HAM_PROFILE_SCOPE_NAMED("Main Poll Events");
       m_Window.PollEvents();
-      Input::Update();
+      // Input::Update();
       FileWatcher::Update();
+
+      std::shared_ptr<Events::Event> event;
+      do {
+        try {
+          event = Events::PollEvent();
+        }
+        catch ([[maybe_unused]] const std::runtime_error &e) {
+          break;
+        }
+
+        Events::EventHandler handler(event);
+        handler.Dispatch<Events::WindowClosed>([this](Events::WindowClosed &e) {
+          m_Window.SetIsRunning(false);
+          return true;
+        });
+        handler.Dispatch<Events::WindowResized>([this](Events::WindowResized &e) {
+          m_FramebufferResized = true;
+          return true;
+        });
+        handler.Dispatch<Events::KeyPressed>([](Events::KeyPressed &e) {
+          return true;
+        });
+        handler.Dispatch<Events::KeyReleased>([](Events::KeyReleased &e) {
+          return true;
+        });
+        handler.Dispatch<Events::KeyTyped>([](Events::KeyTyped &e) {
+          // HAM_CORE_INFO("Key Typed: {0} {1}", (char)e.GetASCII(), e.GetASCII());
+          return true;
+        });
+        handler.Dispatch<Events::MouseMoved>([](Events::MouseMoved &e) {
+          return true;
+        });
+        handler.Dispatch<Events::MouseButtonPressed>([](Events::MouseButtonPressed &e) {
+          return true;
+        });
+        handler.Dispatch<Events::MouseButtonReleased>([](Events::MouseButtonReleased &e) {
+          return true;
+        });
+        handler.Dispatch<Events::MouseScrolled>([this](Events::MouseScrolled &e) {
+          Input::OnScroll(this, e.GetXOffset(), e.GetYOffset());
+          return true;
+        });
+
+        for (Layer *layer : m_LayerStack) {
+          if (event->Handled)
+            break;
+          if (layer->OnEvent(event))
+            break;
+        }
+
+        if (!event->Handled) {
+          HAM_CORE_ERROR("Unhandled Event: {0}", event->GetName());
+          event->Handled = true;
+        }
+
+      } while (event);
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     if (m_Window.ShouldClose()) {

@@ -94,6 +94,9 @@ class Application {
 
   sol::state &GetLua() { return m_LuaState; }
 
+ private:
+  ApplicationSpecification &GetSpecificationMutable() { return m_Specification; }
+
  protected:
   Window m_Window;
   ImGuiImpl m_imgui;

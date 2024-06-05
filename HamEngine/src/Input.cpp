@@ -19,19 +19,19 @@ void Input::Init()
   //  mouse wheel callback
   auto &app = Application::Get();
   GLFWwindow *windowHandle = app.GetWindowHandle();
-  glfwSetScrollCallback(windowHandle, [](GLFWwindow *window, double xOffset, double yOffset) {
-    auto &app = Application::Get();
-    if (app.GetImGui().WantsCaptureMouse())
-      return;
+  // glfwSetScrollCallback(windowHandle, [](GLFWwindow *window, double xOffset, double yOffset) {
+  //   auto &app = Application::Get();
+  //   if (app.GetImGui().WantsCaptureMouse())
+  //     return;
 
-    if (yOffset > 0)
-      Input::s_MouseWheelChanged = 1;
-    else if (yOffset < 0)
-      Input::s_MouseWheelChanged = -1;
-    else
-      Input::s_MouseWheelChanged = 0;
-    //
-  });
+  //   if (yOffset > 0)
+  //     Input::s_MouseWheelChanged = 1;
+  //   else if (yOffset < 0)
+  //     Input::s_MouseWheelChanged = -1;
+  //   else
+  //     Input::s_MouseWheelChanged = 0;
+  //   //
+  // });
 
   glfwSetWindowFocusCallback(windowHandle, [](GLFWwindow *window, int focused) {
     auto &app = Application::Get();
@@ -39,6 +39,19 @@ void Input::Init()
       Input::s_DesiredCursorMode = CursorMode::NORMAL;
     //
   });
+}
+
+void Input::OnScroll(Application* app, float xOffset, float yOffset)
+{
+  if (app->GetImGui().WantsCaptureMouse())
+    return;
+
+  if (yOffset > 0)
+    Input::s_MouseWheelChanged = 1;
+  else if (yOffset < 0)
+    Input::s_MouseWheelChanged = -1;
+  else
+    Input::s_MouseWheelChanged = 0;
 }
 
 bool Input::IsKeyDown(KeyCode keycode)

@@ -4,6 +4,7 @@
 #include "Ham/Core/Math.h"
 #include "Ham/Input/Input.h"
 #include "Ham/Scene/Entity.h"
+#include "Ham/Events/Event.h"
 
 #include <imgui.h>
 #include <ImGuizmo.h>
@@ -83,6 +84,12 @@ void CameraController::OnUIUpdate(TimeStep deltaTime)
     m_Alpha -= mouseDelta.x * 0.007f;
     m_Beta -= mouseDelta.y * 0.007f;
     m_Beta = math::clamp(m_Beta, -math::pi<float> / 2.0f + 0.01f, math::pi<float> / 2.0f - 0.01f);
+  }
+
+  // dispatch a mousebutton event if the mouse is down
+  if (Input::IsMouseButtonDownThisFrame(MouseButton::LEFT)) {
+    Events::PushEvent<Events::MouseMoved>(Input::GetMousePosition().x, Input::GetMousePosition().y);
+    Events::PushEvent<Events::MouseButtonPressed>(MouseButton::LEFT);
   }
 
   auto wheelDelta = Input::GetMouseWheelDelta();

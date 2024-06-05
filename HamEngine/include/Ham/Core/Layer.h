@@ -2,7 +2,7 @@
 
 #include "Ham/Core/Base.h"
 #include "Ham/Util/TimeStep.h"
-// #include "Hazel/Events/Event.h"
+#include "Ham/Events/Event.h"
 
 namespace Ham {
 class Layer {
@@ -14,7 +14,7 @@ class Layer {
   virtual void OnDetach() {}
   virtual void OnUpdate(TimeStep deltaTime) {}
   virtual void OnUIRender(TimeStep deltaTime) {}
-  // virtual void OnEvent(Event &event) {}
+  bool OnEvent(std::shared_ptr<Events::Event> &event) { return false; }
 
   const std::string &GetName() const { return m_DebugName; }
 

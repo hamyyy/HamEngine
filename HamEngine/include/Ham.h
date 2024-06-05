@@ -23,6 +23,8 @@
 #include "Ham/Core/Log.h"
 #include "Ham/Core/Assert.h"
 
+#include "Ham/Events/Event.h"
+
 #include "Ham/Renderer/Shader.h"
 #include "Ham/Renderer/Buffer.h"
 

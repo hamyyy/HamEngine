@@ -6,6 +6,7 @@
 #include <map>
 
 namespace Ham {
+class Application;
 class Input {
  public:
   static void Init();
@@ -30,6 +31,8 @@ class Input {
   static void Update();
   static void BeginFrame();
   static void EndFrame();
+
+  static void OnScroll(Application* app, float xOffset, float yOffset);
 
   static std::map<KeyCode, std::pair<bool, bool>> m_KeyStates;              // <isDown, wasDown>
   static std::map<MouseButton, std::pair<bool, bool>> m_MouseButtonStates;  // <isDown, wasDown>

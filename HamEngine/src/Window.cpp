@@ -4,6 +4,7 @@
 #include "Ham/Core/Assert.h"
 #include "Ham/Core/Log.h"
 #include "Ham/Util/GLFWExtra.h"
+#include "Ham/Events/Event.h"
 #include "imgui.h"
 
 #ifdef _MSC_VER
@@ -58,6 +59,71 @@ void Window::Init(Application *app)
   HAM_CORE_INFO("OpenGL Version: {}", std::string((char *)glGetString(GL_VERSION)));
   HAM_CORE_INFO("GLSL Version: {}", std::string((char *)glGetString(GL_SHADING_LANGUAGE_VERSION)));
   HAM_CORE_INFO("Dear ImGui Version: {}", std::string((char *)ImGui::GetVersion()));
+
+  {
+    // Set GLFW callbacks
+    glfwSetWindowSizeCallback(m_Window, [](GLFWwindow *window, int width, int height) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      app.GetSpecificationMutable().Width = width;
+      app.GetSpecificationMutable().Height = height;
+      Events::PushEvent<Events::WindowResized>(width, height);
+    });
+
+    glfwSetWindowCloseCallback(m_Window, [](GLFWwindow *window) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      Events::PushEvent<Events::WindowClosed>();
+    });
+
+    glfwSetKeyCallback(m_Window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+
+      switch (action) {
+        case GLFW_PRESS: {
+          Events::PushEvent<Events::KeyPressed>((Ham::KeyCode)key, 0);
+          break;
+        }
+        case GLFW_RELEASE: {
+          Events::PushEvent<Events::KeyReleased>((Ham::KeyCode)key);
+          break;
+        }
+        case GLFW_REPEAT: {
+          Events::PushEvent<Events::KeyPressed>((Ham::KeyCode)key, 1);
+          break;
+        }
+      }
+    });
+
+    glfwSetCharCallback(m_Window, [](GLFWwindow *window, unsigned int keycode) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      Events::PushEvent<Events::KeyTyped>(keycode);
+    });
+
+    glfwSetMouseButtonCallback(m_Window, [](GLFWwindow *window, int button, int action, int mods) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+
+      switch (action) {
+        case GLFW_PRESS: {
+          Events::PushEvent<Events::MouseButtonPressed>((Ham::MouseButton)button);
+          break;
+        }
+        case GLFW_RELEASE: {
+          Events::PushEvent<Events::MouseButtonReleased>((Ham::MouseButton)button);
+          break;
+        }
+      }
+    });
+
+    auto value = glfwSetScrollCallback(m_Window, [](GLFWwindow *window, double xOffset, double yOffset) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      Events::PushEvent<Events::MouseScrolled>((float)xOffset, (float)yOffset);
+    });
+    HAM_CORE_INFO("Scroll callback set: {0}", (bool)value);
+
+    glfwSetCursorPosCallback(m_Window, [](GLFWwindow *window, double xPos, double yPos) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      Events::PushEvent<Events::MouseMoved>((float)xPos, (float)yPos);
+    });
+  }
 }
 
 void Window::Update()

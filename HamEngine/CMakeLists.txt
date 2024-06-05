@@ -57,7 +57,7 @@ target_link_libraries(${PROJECT_NAME}
 
 add_compile_definitions(
     SOURCE_ASSETS_PATH_CORE="${CMAKE_CURRENT_SOURCE_DIR}/assets/"
-    TRACY_ENABLE=1
+    TRACY_ENABLE
 )
 
 target_copy_assets(${PROJECT_NAME} assets)

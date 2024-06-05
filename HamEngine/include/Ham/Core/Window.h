@@ -2,6 +2,7 @@
 
 #include "Ham/ImGui/ImGuiImpl.h"
 #include "Ham/Core/Math.h"
+#include "Ham/Events/Event.h"
 
 #ifndef GL_SILENCE_DEPRECATION
 #define GL_SILENCE_DEPRECATION
