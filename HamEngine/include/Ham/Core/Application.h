@@ -7,6 +7,7 @@
 #include "Ham/ImGui/ImGuiImpl.h"
 #include "Ham/Scene/Scene.h"
 #include "Ham/Renderer/FrameBuffer.h"
+#include "Ham/Events/EventBase.h"
 
 #include <sol/sol.hpp>
 
@@ -94,6 +95,24 @@ class Application {
 
   sol::state &GetLua() { return m_LuaState; }
 
+  template <typename T>
+  std::shared_ptr<Events::Subscriber<T>> Subscribe(const std::function<void(T &)> &func)
+  {
+    return m_SubscriberPool.Add(func);
+  }
+
+  template <typename T>
+  void Unsubscribe(std::shared_ptr<Events::Subscriber<T>> subscriber)
+  {
+    m_SubscriberPool.Remove(subscriber);
+  }
+
+  template <typename T, typename... Args>
+  void Emit(Args &&...args)
+  {
+    Events::Emit<T>(std::forward<Args>(args)...);
+  }
+
  private:
   ApplicationSpecification &GetSpecificationMutable() { return m_Specification; }
 
@@ -121,6 +140,8 @@ class Application {
   FrameBuffer m_ObjectPickerFramebuffer;
 
   sol::state m_LuaState;
+
+  Events::SubscriberPool m_SubscriberPool;
 };
 
 // To be defined in CLIENT

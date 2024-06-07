@@ -66,12 +66,12 @@ void Window::Init(Application *app)
       Application &app = *(Application *)glfwGetWindowUserPointer(window);
       app.GetSpecificationMutable().Width = width;
       app.GetSpecificationMutable().Height = height;
-      Events::PushEvent<Events::WindowResized>(width, height);
+      Events::Emit<Events::WindowResized>(width, height);
     });
 
     glfwSetWindowCloseCallback(m_Window, [](GLFWwindow *window) {
       Application &app = *(Application *)glfwGetWindowUserPointer(window);
-      Events::PushEvent<Events::WindowClosed>();
+      Events::Emit<Events::WindowClosed>();
     });
 
     glfwSetKeyCallback(m_Window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
@@ -79,15 +79,15 @@ void Window::Init(Application *app)
 
       switch (action) {
         case GLFW_PRESS: {
-          Events::PushEvent<Events::KeyPressed>((Ham::KeyCode)key, 0);
+          Events::Emit<Events::KeyPressed>((Ham::KeyCode)key, 0);
           break;
         }
         case GLFW_RELEASE: {
-          Events::PushEvent<Events::KeyReleased>((Ham::KeyCode)key);
+          Events::Emit<Events::KeyReleased>((Ham::KeyCode)key);
           break;
         }
         case GLFW_REPEAT: {
-          Events::PushEvent<Events::KeyPressed>((Ham::KeyCode)key, 1);
+          Events::Emit<Events::KeyPressed>((Ham::KeyCode)key, 1);
           break;
         }
       }
@@ -95,7 +95,7 @@ void Window::Init(Application *app)
 
     glfwSetCharCallback(m_Window, [](GLFWwindow *window, unsigned int keycode) {
       Application &app = *(Application *)glfwGetWindowUserPointer(window);
-      Events::PushEvent<Events::KeyTyped>(keycode);
+      Events::Emit<Events::KeyTyped>(keycode);
     });
 
     glfwSetMouseButtonCallback(m_Window, [](GLFWwindow *window, int button, int action, int mods) {
@@ -103,11 +103,11 @@ void Window::Init(Application *app)
 
       switch (action) {
         case GLFW_PRESS: {
-          Events::PushEvent<Events::MouseButtonPressed>((Ham::MouseButton)button);
+          Events::Emit<Events::MouseButtonPressed>((Ham::MouseButton)button);
           break;
         }
         case GLFW_RELEASE: {
-          Events::PushEvent<Events::MouseButtonReleased>((Ham::MouseButton)button);
+          Events::Emit<Events::MouseButtonReleased>((Ham::MouseButton)button);
           break;
         }
       }
@@ -115,13 +115,80 @@ void Window::Init(Application *app)
 
     auto value = glfwSetScrollCallback(m_Window, [](GLFWwindow *window, double xOffset, double yOffset) {
       Application &app = *(Application *)glfwGetWindowUserPointer(window);
-      Events::PushEvent<Events::MouseScrolled>((float)xOffset, (float)yOffset);
+      Events::Emit<Events::MouseScrolled>((float)xOffset, (float)yOffset);
     });
     HAM_CORE_INFO("Scroll callback set: {0}", (bool)value);
 
     glfwSetCursorPosCallback(m_Window, [](GLFWwindow *window, double xPos, double yPos) {
       Application &app = *(Application *)glfwGetWindowUserPointer(window);
-      Events::PushEvent<Events::MouseMoved>((float)xPos, (float)yPos);
+      Events::Emit<Events::MouseMoved>((float)xPos, (float)yPos);
+    });
+
+    glfwSetWindowFocusCallback(m_Window, [](GLFWwindow *window, int focused) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      if (!focused)
+        Events::Emit<Events::WindowBlurred>();
+      else
+        Events::Emit<Events::WindowFocused>();
+    });
+
+    glfwSetWindowMaximizeCallback(m_Window, [](GLFWwindow *window, int maximized) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      if (maximized)
+        Events::Emit<Events::WindowMaximized>();
+      else
+        Events::Emit<Events::WindowRestored>();
+    });
+
+    glfwSetWindowIconifyCallback(m_Window, [](GLFWwindow *window, int iconified) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      if (iconified)
+        Events::Emit<Events::WindowMinimized>();
+      else
+        Events::Emit<Events::WindowRestored>();
+    });
+
+    glfwSetWindowPosCallback(m_Window, [](GLFWwindow *window, int xPos, int yPos) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      Events::Emit<Events::WindowMoved>(xPos, yPos);
+    });
+
+    glfwSetDropCallback(m_Window, [](GLFWwindow *window, int count, const char **paths) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      Events::Emit<Events::FileDropped>(count, paths);
+    });
+
+    glfwSetWindowContentScaleCallback(m_Window, [](GLFWwindow *window, float xScale, float yScale) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      Events::Emit<Events::WindowContentScaled>(xScale, yScale);
+    });
+
+    glfwSetWindowRefreshCallback(m_Window, [](GLFWwindow *window) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      Events::Emit<Events::WindowRefreshed>();
+    });
+
+    glfwSetFramebufferSizeCallback(m_Window, [](GLFWwindow *window, int width, int height) {
+      Application &app = *(Application *)glfwGetWindowUserPointer(window);
+      Events::Emit<Events::FramebufferResized>(width, height);
+    });
+
+    glfwSetJoystickCallback([](int jid, int event) {
+      if (event == GLFW_CONNECTED) {
+        Events::Emit<Events::JoystickConnected>(jid);
+      }
+      else if (event == GLFW_DISCONNECTED) {
+        Events::Emit<Events::JoystickDisconnected>(jid);
+      }
+    });
+
+    glfwSetMonitorCallback([](GLFWmonitor *monitor, int event) {
+      if (event == GLFW_CONNECTED) {
+        Events::Emit<Events::MonitorConnected>(monitor);
+      }
+      else if (event == GLFW_DISCONNECTED) {
+        Events::Emit<Events::MonitorDisconnected>(monitor);
+      }
     });
   }
 }

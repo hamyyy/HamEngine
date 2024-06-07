@@ -52,6 +52,10 @@ void EditorLayer::OnAttach()
   // m_EditorCamera.GetComponent<Component::Transform>() = Component::Transform(math::inverse(math::lookAt(math::vec3(3.0f, 3.0f, 3.0f), math::zero<math::vec3>())));
 
   m_App->TriggerCameraUpdate();
+
+  m_MouseButtonPressedSubscriber = m_App->Subscribe<Events::MouseButtonPressed>([](Events::MouseButtonPressed &e) {
+    HAM_INFO("Mouse Pressed: {0}", (int)e.GetButton());
+  });
 }
 
 void EditorLayer::OnDetach()

@@ -104,9 +104,9 @@ class WindowFocused : public Event {
   const char* GetName() const override { return "WindowFocused"; }
 };
 
-class WindowLostFocus : public Event {
+class WindowBlurred : public Event {
  public:
-  const char* GetName() const override { return "WindowLostFocus"; }
+  const char* GetName() const override { return "WindowBlurred"; }
 };
 
 class WindowMoved : public Event {
@@ -132,6 +132,114 @@ class KeyTyped : public Event {
 
  private:
   uint32_t m_Key;
+};
+
+class WindowMaximized : public Event {
+ public:
+  const char* GetName() const override { return "WindowMaximized"; }
+};
+
+class WindowMinimized : public Event {
+ public:
+  const char* GetName() const override { return "WindowMinimized"; }
+};
+
+class WindowRestored : public Event {
+ public:
+  const char* GetName() const override { return "WindowRestored"; }
+};
+
+class FileDropped : public Event {
+ public:
+  FileDropped(int count, const char** paths) : m_Count(count), m_Paths(paths) {}
+
+  int GetCount() const { return m_Count; }
+  const char** GetPaths() const { return m_Paths; }
+
+  const char* GetName() const override { return "FileDropped"; }
+
+ private:
+  int m_Count;
+  const char** m_Paths;
+};
+
+class WindowContentScaled : public Event {
+ public:
+  WindowContentScaled(float xScale, float yScale) : m_XScale(xScale), m_YScale(yScale) {}
+
+  float GetXScale() const { return m_XScale; }
+  float GetYScale() const { return m_YScale; }
+
+  const char* GetName() const override { return "WindowContentScaled"; }
+
+ private:
+  float m_XScale, m_YScale;
+};
+
+class WindowRefreshed : public Event {
+ public:
+  const char* GetName() const override { return "WindowRefreshed"; }
+};
+
+class FramebufferResized : public Event {
+ public:
+  FramebufferResized(int width, int height) : m_Width(width), m_Height(height) {}
+
+  int GetWidth() const { return m_Width; }
+  int GetHeight() const { return m_Height; }
+
+  const char* GetName() const override { return "FramebufferResized"; }
+
+ private:
+  int m_Width, m_Height;
+};
+
+class JoystickConnected : public Event {
+ public:
+  JoystickConnected(int jid) : m_JoystickID(jid) {}
+
+  int GetJoystickID() const { return m_JoystickID; }
+
+  const char* GetName() const override { return "JoystickConnected"; }
+
+ private:
+  int m_JoystickID;
+};
+
+class JoystickDisconnected : public Event {
+ public:
+  JoystickDisconnected(int jid) : m_JoystickID(jid) {}
+
+  int GetJoystickID() const { return m_JoystickID; }
+
+  const char* GetName() const override { return "JoystickDisconnected"; }
+
+ private:
+  int m_JoystickID;
+};
+
+class MonitorConnected : public Event {
+ public:
+  MonitorConnected(void* monitor) : m_Monitor(monitor) {}
+
+  void* GetMonitor() const { return m_Monitor; }
+
+  const char* GetName() const override { return "MonitorConnected"; }
+
+ private:
+  void* m_Monitor;
+};
+
+class MonitorDisconnected : public Event {
+ public:
+  MonitorDisconnected(void* monitor) : m_Monitor(monitor) {}
+
+  void* GetMonitor() const { return m_Monitor; }
+
+  const char* GetName() const override { return "MonitorDisconnected"; }
+
+ private:
+  void* m_Monitor;
 };
 
 }  // namespace Ham::Events

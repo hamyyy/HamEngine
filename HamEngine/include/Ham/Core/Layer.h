@@ -14,7 +14,11 @@ class Layer {
   virtual void OnDetach() {}
   virtual void OnUpdate(TimeStep deltaTime) {}
   virtual void OnUIRender(TimeStep deltaTime) {}
-  bool OnEvent(std::shared_ptr<Events::Event> &event) { return false; }
+  bool OnEvent(std::shared_ptr<Events::Event> &event)
+  {
+    // HAM_CORE_INFO("Layer \"{0}\" got event: {1}", m_DebugName, event->GetName());
+    return false;
+  }
 
   const std::string &GetName() const { return m_DebugName; }
 

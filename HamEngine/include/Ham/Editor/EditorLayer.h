@@ -22,6 +22,8 @@ class EditorLayer : public Layer {
   std::unique_ptr<Shader> shader;
   FrameBuffer &m_ObjectPickerFramebuffer;
   Entity m_EditorCamera;
+
+  Ham::Subscriber m_MouseButtonPressedSubscriber;
 };
 
 }  // namespace Ham

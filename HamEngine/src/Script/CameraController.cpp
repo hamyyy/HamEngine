@@ -88,8 +88,8 @@ void CameraController::OnUIUpdate(TimeStep deltaTime)
 
   // dispatch a mousebutton event if the mouse is down
   if (Input::IsMouseButtonDownThisFrame(MouseButton::LEFT)) {
-    Events::PushEvent<Events::MouseMoved>(Input::GetMousePosition().x, Input::GetMousePosition().y);
-    Events::PushEvent<Events::MouseButtonPressed>(MouseButton::LEFT);
+    Events::Emit<Events::MouseMoved>(Input::GetMousePosition().x, Input::GetMousePosition().y);
+    Events::Emit<Events::MouseButtonPressed>(MouseButton::LEFT);
   }
 
   auto wheelDelta = Input::GetMouseWheelDelta();

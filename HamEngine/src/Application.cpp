@@ -337,15 +337,11 @@ void Application::Run()
       FileWatcher::Update();
 
       std::shared_ptr<Events::Event> event;
-      do {
-        try {
-          event = Events::PollEvent();
-        }
-        catch ([[maybe_unused]] const std::runtime_error &e) {
-          break;
-        }
+      while (event = Events::PollEvent()) {
+        m_SubscriberPool.Dispatch(event);
 
         Events::EventHandler handler(event);
+
         handler.Dispatch<Events::WindowClosed>([this](Events::WindowClosed &e) {
           m_Window.SetIsRunning(false);
           return true;
@@ -378,21 +374,21 @@ void Application::Run()
           return true;
         });
 
-        for (Layer *layer : m_LayerStack) {
-          if (event->Handled)
-            break;
+        if (event->Handled) continue;
+
+        for (int i = (int)m_LayerStack.GetSize() - 1; i >= 0; i--) {
+          Layer *layer = m_LayerStack[i];
           if (layer->OnEvent(event))
             break;
         }
 
-        if (!event->Handled) {
-          HAM_CORE_ERROR("Unhandled Event: {0}", event->GetName());
-          event->Handled = true;
-        }
+        if (event->Handled) continue;
 
-      } while (event);
+        HAM_CORE_ERROR_REPEATED("Unhandled Event: {0}", event->GetName());
+        event->Handled = true;
+      }
 
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      // std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     if (m_Window.ShouldClose()) {
