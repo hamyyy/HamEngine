@@ -218,7 +218,7 @@ void Application::RenderThread()
   while (m_Window.IsRunning()) {
     {
       HAM_PROFILE_SCOPE_NAMED("Render Poll Events");
-      // m_Window.PollEvents();
+      m_Window.PollEvents();
       Input::BeginFrame();
     }
 
