@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ham/Scene/Component.h"
+#include "Ham/Events/Event.h"
 
 namespace Ham {
 enum class CameraMode {
@@ -16,6 +17,8 @@ class CameraController : public NativeScript {
   void OnDestroy();
   void OnUpdate(TimeStep deltaTime);
   void OnUIUpdate(TimeStep deltaTime);
+
+  void OnMouseDragged(const Events::MouseDragged &event);
 
   void SetTarget(const math::vec3 &target, bool animate = true)
   {

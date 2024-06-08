@@ -237,7 +237,7 @@ void Systems::RenderObjectPickerFrame(Application &app, Scene &scene, TimeStep &
   }
 }
 
-void Systems::HandleObjectPicker(Application &app, Scene &scene, FrameBuffer &frameBuffer, TimeStep &deltaTime)
+void Systems::HandleObjectPicker(Application &app, Scene &scene, FrameBuffer &frameBuffer, TimeStep &deltaTime, std::atomic_bool &clicked)
 {
   frameBuffer.Bind();
   frameBuffer.Clear(AttachmentType::COLOR | AttachmentType::DEPTH | AttachmentType::STENCIL);
@@ -262,7 +262,8 @@ void Systems::HandleObjectPicker(Application &app, Scene &scene, FrameBuffer &fr
     scene.SetHoveredEntity({view[id], &scene});
   }
 
-  if (Input::IsMouseButtonUpThisFrame(MouseButton::LEFT)) {
+  if (clicked) {
+    clicked = false;
     if (id > view.size()) {
       scene.ClearSelectedEntity();
     }

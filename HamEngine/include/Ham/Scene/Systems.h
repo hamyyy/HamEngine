@@ -14,6 +14,6 @@ class Systems {
   static void UpdateNativeScriptsUI(Scene &scene, TimeStep &deltaTime);
   static void RenderScene(Application &app, Scene &scene, TimeStep &deltaTime);
   static void RenderObjectPickerFrame(Application &app, Scene &scene, TimeStep &deltaTime);
-  static void HandleObjectPicker(Application &app, Scene &scene, FrameBuffer &frameBuffer, TimeStep &deltaTime);
+  static void HandleObjectPicker(Application &app, Scene &scene, FrameBuffer &frameBuffer, TimeStep &deltaTime, std::atomic_bool& clicked);
 };
 }  // namespace Ham

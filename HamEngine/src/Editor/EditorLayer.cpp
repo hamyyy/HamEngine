@@ -52,10 +52,6 @@ void EditorLayer::OnAttach()
   // m_EditorCamera.GetComponent<Component::Transform>() = Component::Transform(math::inverse(math::lookAt(math::vec3(3.0f, 3.0f, 3.0f), math::zero<math::vec3>())));
 
   m_App->TriggerCameraUpdate();
-
-  m_MouseButtonPressedSubscriber = m_App->Subscribe<Events::MouseButtonPressed>([](Events::MouseButtonPressed &e) {
-    HAM_INFO("Mouse Pressed: {0}", (int)e.GetButton());
-  });
 }
 
 void EditorLayer::OnDetach()
@@ -73,7 +69,7 @@ void EditorLayer::OnUpdate(TimeStep deltaTime)
 
     auto transform = m_Scene.GetSelectedEntity().GetComponent<Component::Transform>().ToMatrix();
 
-    if (script && GetActiveCamera() != m_Scene.GetSelectedEntity()) {
+    if (script) {
       script->SetTarget(math::vec4(transform.Column(3)).xyz);
     }
   }
@@ -362,6 +358,24 @@ void EditorLayer::OnUIRender(TimeStep deltaTime)
   ImGui::End();
 }
 
-// void EditorLayer::OnEvent(Event &event) {}
+bool EditorLayer::OnEvent(const Events::Event &event)
+{
+  auto &scriptList = GetActiveCamera().GetComponent<Component::NativeScriptList>();
+  auto script = scriptList.GetScript<CameraController>();
+
+  if (Application::Get().GetImGui().WantsCaptureMouseWheel() && event.Is<Events::MouseScrolled>()) return true;
+  if (Application::Get().GetImGui().WantsCaptureMouse() && (event.Is<Events::MousePressed>() || event.Is<Events::MouseReleased>() || event.Is<Events::MouseMoved>())) return true;
+
+  if (event.Is<Events::MouseDragged>()) {
+    auto &e = event.As<Events::MouseDragged>();
+
+    if (script) {
+      script->OnMouseDragged(e);
+      return true;
+    }
+  }
+
+  return false;
+}
 
 }  // namespace Ham

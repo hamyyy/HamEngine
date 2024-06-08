@@ -18,15 +18,10 @@ void Input::Init()
 {
   //  mouse wheel callback
   auto &app = Application::Get();
-  
-  
 }
 
-void Input::OnScroll(Application* app, float xOffset, float yOffset)
+void Input::OnScroll(Application *app, float xOffset, float yOffset)
 {
-  if (app->GetImGui().WantsCaptureMouse())
-    return;
-
   if (yOffset > 0)
     Input::s_MouseWheelChanged = 1;
   else if (yOffset < 0)
@@ -229,6 +224,10 @@ bool Input::IsMouseButtonUpThisFrame(MouseButton button)
 
 int Input::GetMouseWheelDelta()
 {
+  auto &app = Application::Get();
+  if (app.GetImGui().WantsCaptureMouseWheel())
+    return 0;
+
   return s_MouseWheelDelta;
 }
 

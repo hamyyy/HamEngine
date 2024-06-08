@@ -31,28 +31,94 @@ class MouseScrolled : public Event {
   float m_XOffset, m_YOffset;
 };
 
-class MouseButtonPressed : public Event {
+class MousePressed : public Event {
  public:
-  MouseButtonPressed(Ham::MouseButton button) : m_Button(button) {}
+  MousePressed(Ham::MouseButton button) : m_Button(button) {}
 
   Ham::MouseButton GetButton() const { return m_Button; }
 
-  const char* GetName() const override { return "MouseButtonPressed"; }
+  const char* GetName() const override { return "MousePressed"; }
 
  private:
   Ham::MouseButton m_Button;
 };
 
-class MouseButtonReleased : public Event {
+class MouseReleased : public Event {
  public:
-  MouseButtonReleased(Ham::MouseButton button) : m_Button(button) {}
+  MouseReleased(Ham::MouseButton button) : m_Button(button) {}
 
   Ham::MouseButton GetButton() const { return m_Button; }
 
-  const char* GetName() const override { return "MouseButtonReleased"; }
+  const char* GetName() const override { return "MouseReleased"; }
 
  private:
   Ham::MouseButton m_Button;
+};
+
+class MouseClicked : public Event {
+ public:
+  struct ClickData {
+    Ham::MouseButton button;
+    int tollerance = 2;              // amount of pixels the mouse can move while pressed before click is invalid
+    uint32_t doubleClickTime = 250;  // ms
+    bool isPressed = false;
+    bool isDragging = false;
+    math::vec2 pos = {0, 0};
+    int clickCount = 0;
+    uint32_t timer = 0;
+    uint32_t timeSinceLastClick = 0;
+  };
+  MouseClicked(const ClickData& clickData) : m_Button(clickData.button), m_Pos(clickData.pos), m_ClickCount(clickData.clickCount), m_TimeSinceLastClick(clickData.timeSinceLastClick) {}
+
+  Ham::MouseButton GetButton() const { return m_Button; }
+  math::vec2 GetPos() const { return m_Pos; }
+  int GetClickCount() const { return m_ClickCount; }
+  uint32_t GetTimeSinceLastClick() const { return m_TimeSinceLastClick; }
+
+  const char* GetName() const override { return "MouseClicked"; }
+
+ private:
+  const Ham::MouseButton& m_Button;
+  const math::vec2& m_Pos;
+  const int& m_ClickCount;
+  const uint32_t& m_TimeSinceLastClick;
+};
+
+class MouseDragged : public Event {
+ public:
+  struct DragData {
+    Ham::MouseButton button;
+    int tollerance = 3;  // amount of pixels the mouse can move before drag starts
+    bool isPressed = false;
+    bool isDragging = false;
+    math::vec2 startPos = {0, 0};
+    math::vec2 pos = {0, 0};
+    math::vec2 delta = {0, 0};
+    math::vec2 deltaThisFrame = {0, 0};
+  };
+
+ public:
+  MouseDragged(const DragData& dragData)
+      : m_Button(dragData.button),
+        m_StartPos(dragData.startPos),
+        m_Pos(dragData.pos),
+        m_Delta(dragData.delta),
+        m_DeltaThisFrame(dragData.deltaThisFrame) {}
+
+  Ham::MouseButton GetButton() const { return m_Button; }
+  const math::vec2& GetStartPos() const { return m_StartPos; }
+  const math::vec2& GetPos() const { return m_Pos; }
+  const math::vec2& GetDelta() const { return m_Delta; }
+  const math::vec2& GetDeltaThisFrame() const { return m_DeltaThisFrame; }
+
+  const char* GetName() const override { return "MouseDragged"; }
+
+ private:
+  const Ham::MouseButton& m_Button;
+  const math::vec2& m_StartPos;
+  const math::vec2& m_Pos;
+  const math::vec2& m_Delta;
+  const math::vec2& m_DeltaThisFrame;
 };
 
 class KeyPressed : public Event {

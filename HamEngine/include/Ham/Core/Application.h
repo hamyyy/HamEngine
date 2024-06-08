@@ -96,7 +96,7 @@ class Application {
   sol::state &GetLua() { return m_LuaState; }
 
   template <typename T>
-  std::shared_ptr<Events::Subscriber<T>> Subscribe(const std::function<void(T &)> &func)
+  std::shared_ptr<Events::Subscriber<T>> Subscribe(const std::function<void(const T &)> &func)
   {
     return m_SubscriberPool.Add(func);
   }
@@ -135,6 +135,8 @@ class Application {
 
   std::atomic_bool m_FramebufferResized = false;
 
+  std::atomic_bool m_MouseLeftClickedThisFrame = false;
+
   friend ::Ham::Window;
 
   FrameBuffer m_ObjectPickerFramebuffer;
@@ -146,4 +148,22 @@ class Application {
 
 // To be defined in CLIENT
 Application *CreateApplication(ApplicationCommandLineArgs args);
+
 }  // namespace Ham
+
+namespace Ham::Events {
+
+template <typename T>
+inline static std::shared_ptr<Events::Subscriber<T>> Subscribe(const std::function<void(const T &)> &func)
+{
+  return ::Ham::Application::Get().Subscribe(std::move(func));
+}
+
+template <typename EventT, typename ClassT>
+inline static std::shared_ptr<Subscriber<EventT>> Subscribe(void (ClassT::*func)(const EventT &), ClassT *instance)
+{
+  const std::function<void(const EventT &)> wrapper = [instance, func](const EventT &event) { (instance->*func)(event); };
+  return Subscribe(std::move(wrapper));
+}
+
+}  // namespace Ham::Events

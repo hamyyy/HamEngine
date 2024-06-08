@@ -165,6 +165,15 @@ HamLayer::~HamLayer() {}
 void HamLayer::OnAttach()
 {
   {
+    auto cameraEntity = m_Scene.CreateEntity("Camera");
+    cameraEntity.AddComponent<Component::Camera>();
+    cameraEntity.GetComponent<Component::Transform>() = Component::Transform(math::inverse(math::lookAt(math::vec3(3.0f, 3.0f, 3.0f), math::zero<math::vec3>())));  // Component::Transform(math::inverse(math::camera()) * math::translate((math::camera() * math::vec4(math::backward(), 0.0f)).xyz * 10.0f));
+
+    auto &scriptList = cameraEntity.AddComponent<Component::NativeScriptList>();
+    scriptList.AddScript<CameraController>("CameraController");
+  }
+
+  {
     auto entity = m_Scene.CreateEntity("Sphere");
     entity.GetComponent<Component::Transform>().Position = math::vec3(2.0f, 0.0f, 0.0f);
     auto &shaders = entity.GetComponent<Component::ShaderList>();
@@ -308,6 +317,23 @@ void HamLayer::OnUpdate(TimeStep deltaTime)
 
 void HamLayer::OnUIRender(TimeStep deltaTime)
 {
+}
+
+bool HamLayer::OnEvent(const Events::Event &event)
+{
+  auto &scriptList = GetActiveCamera().GetComponent<Component::NativeScriptList>();
+  auto script = scriptList.GetScript<CameraController>();
+
+  if (event.Is<Events::MouseDragged>()) {
+    auto &e = event.As<Events::MouseDragged>();
+
+    if (script) {
+      script->OnMouseDragged(e);
+      return true;
+    }
+  }
+
+  return false;
 }
 
 // void HamLayer::OnEvent(Event &event) {}

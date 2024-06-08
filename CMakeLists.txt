@@ -9,7 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules/")
 
 include(Utils)
 
-add_compile_definitions(HAM_DEBUG)
+add_compile_definitions(HAM_DEBUG_ENABLED)
 
 add_subdirectory(HamEngine)
 add_subdirectory(HamGame)

@@ -15,6 +15,19 @@ class Event {
  public:
   virtual const char* GetName() const = 0;
   bool Handled = false;
+
+  template <typename T>
+  bool Is() const
+  {
+    return typeid(T) == typeid(*this);
+  }
+
+  template <typename T>
+  const T& As() const
+  {
+    HAM_CORE_ASSERT((Is<T>()), fmt::format("Event::As: Event is not of type {}", typeid(T).name()));
+    return *static_cast<const T*>(this);
+  }
 };
 
 class EventHandler {
@@ -46,7 +59,7 @@ class SubscriberBase : public std::enable_shared_from_this<SubscriberBase> {
 template <typename T>
 class Subscriber : public SubscriberBase {
  public:
-  Subscriber(const std::function<void(T&)>& func) : m_Func(func) {}
+  Subscriber(const std::function<void(const T&)>& func) : m_Func(func) {}
 
   bool Dispatch(std::shared_ptr<Event> event)
   {
@@ -58,16 +71,17 @@ class Subscriber : public SubscriberBase {
 
  private:
   friend class SubscriberPool;
-  std::function<void(T&)> m_Func;
+  std::function<void(const T&)> m_Func;
 };
 
 class SubscriberPool {
  public:
   template <typename T>
-  std::shared_ptr<Events::Subscriber<T>> Add(const std::function<void(T&)>& func)
+  std::shared_ptr<Events::Subscriber<T>> Add(const std::function<void(const T&)>& func)
   {
     auto s = std::make_shared<Subscriber<T>>(func);
     m_Subscribers.push_back(std::weak_ptr<Subscriber<T>>(s));
+    HAM_CORE_TRACE("Added subscriber to pool. Total: {}", m_Subscribers.size());
     return s;
   }
 
@@ -97,6 +111,7 @@ class SubscriberPool {
     }
 
     m_Subscribers.swap(validSubscribers);
+    HAM_CORE_TRACE_IF(m_Subscribers.size() != validSubscribers.size(), "Cleaned up {} subscriber(s). Total: {}", std::abs((int)(m_Subscribers.size() - validSubscribers.size())), m_Subscribers.size());
   }
 
   void Cleanup()

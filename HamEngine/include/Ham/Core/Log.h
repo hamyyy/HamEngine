@@ -56,46 +56,67 @@ class Log {
 
 // Core log macros
 #define HAM_CORE_TRACE(...)
+#define HAM_CORE_DEBUG(...)
 #define HAM_CORE_INFO(...)
 #define HAM_CORE_WARN(...)
 #define HAM_CORE_ERROR(...)
 #define HAM_CORE_CRITICAL(...)
 
 #define HAM_CORE_TRACE_ONCE(...)
+#define HAM_CORE_DEBUG_ONCE(...)
 #define HAM_CORE_INFO_ONCE(...)
 #define HAM_CORE_WARN_ONCE(...)
 #define HAM_CORE_ERROR_ONCE(...)
 #define HAM_CORE_CRITICAL_ONCE(...)
 
 #define HAM_CORE_TRACE_REPEATED(...)
+#define HAM_CORE_DEBUG_REPEATED(...)
 #define HAM_CORE_INFO_REPEATED(...)
 #define HAM_CORE_WARN_REPEATED(...)
 #define HAM_CORE_ERROR_REPEATED(...)
 #define HAM_CORE_CRITICAL_REPEATED(...)
 
+#define HAM_CORE_TRACE_IF(...)
+#define HAM_CORE_DEBUG_IF(...)
+#define HAM_CORE_INFO_IF(...)
+#define HAM_CORE_WARN_IF(...)
+#define HAM_CORE_ERROR_IF(...)
+#define HAM_CORE_CRITICAL_IF(...)
+
 // Client log macros
 #define HAM_TRACE(...)
+#define HAM_DEBUG(...)
 #define HAM_INFO(...)
 #define HAM_WARN(...)
 #define HAM_ERROR(...)
 #define HAM_CRITICAL(...)
 
 #define HAM_TRACE_ONCE(...)
+#define HAM_DEBUG_ONCE(...)
 #define HAM_INFO_ONCE(...)
 #define HAM_WARN_ONCE(...)
 #define HAM_ERROR_ONCE(...)
 #define HAM_CRITICAL_ONCE(...)
 
 #define HAM_TRACE_REPEATED(...)
+#define HAM_DEBUG_REPEATED(...)
 #define HAM_INFO_REPEATED(...)
 #define HAM_WARN_REPEATED(...)
 #define HAM_ERROR_REPEATED(...)
 #define HAM_CRITICAL_REPEATED(...)
 
+#define HAM_TRACE_IF(...)
+#define HAM_DEBUG_IF(...)
+#define HAM_INFO_IF(...)
+#define HAM_WARN_IF(...)
+#define HAM_ERROR_IF(...)
+#define HAM_CRITICAL_IF(...)
+
 #else
 
 // Core log macros
 #define HAM_CORE_TRACE(...)    ::Ham::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define HAM_CORE_DEBUG(...)    ::Ham::Log::GetCoreLogger()->debug(__VA_ARGS__)
 #define HAM_CORE_INFO(...)     ::Ham::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define HAM_CORE_WARN(...)     ::Ham::Log::GetCoreLogger()->warn(__VA_ARGS__)
 #define HAM_CORE_ERROR(...)    ::Ham::Log::GetCoreLogger()->error(__VA_ARGS__)
@@ -103,6 +124,7 @@ class Log {
 
 // Client log macros
 #define HAM_TRACE(...)         ::Ham::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define HAM_DEBUG(...)         ::Ham::Log::GetClientLogger()->debug(__VA_ARGS__)
 #define HAM_INFO(...)          ::Ham::Log::GetClientLogger()->info(__VA_ARGS__)
 #define HAM_WARN(...)          ::Ham::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define HAM_ERROR(...)         ::Ham::Log::GetClientLogger()->error(__VA_ARGS__)
@@ -135,27 +157,49 @@ class Log {
   }
 
 #define HAM_CORE_TRACE_ONCE(...)    HAM_INTERNAL_LOG_ONCE_IMPL(CORE_TRACE, __VA_ARGS__)
+#define HAM_CORE_DEBUG_ONCE(...)    HAM_INTERNAL_LOG_ONCE_IMPL(CORE_DEBUG, __VA_ARGS__)
 #define HAM_CORE_INFO_ONCE(...)     HAM_INTERNAL_LOG_ONCE_IMPL(CORE_INFO, __VA_ARGS__)
 #define HAM_CORE_WARN_ONCE(...)     HAM_INTERNAL_LOG_ONCE_IMPL(CORE_WARN, __VA_ARGS__)
 #define HAM_CORE_ERROR_ONCE(...)    HAM_INTERNAL_LOG_ONCE_IMPL(CORE_ERROR, __VA_ARGS__)
 #define HAM_CORE_CRITICAL_ONCE(...) HAM_INTERNAL_LOG_ONCE_IMPL(CORE_CRITICAL, __VA_ARGS__)
 
 #define HAM_CORE_TRACE_REPEATED(...)    HAM_INTERNAL_LOG_REPEATED_IMPL(CORE_TRACE, __VA_ARGS__)
+#define HAM_CORE_DEBUG_REPEATED(...)    HAM_INTERNAL_LOG_REPEATED_IMPL(CORE_DEBUG, __VA_ARGS__)
 #define HAM_CORE_INFO_REPEATED(...)     HAM_INTERNAL_LOG_REPEATED_IMPL(CORE_INFO, __VA_ARGS__)
 #define HAM_CORE_WARN_REPEATED(...)     HAM_INTERNAL_LOG_REPEATED_IMPL(CORE_WARN, __VA_ARGS__)
 #define HAM_CORE_ERROR_REPEATED(...)    HAM_INTERNAL_LOG_REPEATED_IMPL(CORE_ERROR, __VA_ARGS__)
 #define HAM_CORE_CRITICAL_REPEATED(...) HAM_INTERNAL_LOG_REPEATED_IMPL(CORE_CRITICAL, __VA_ARGS__)
 
+// clang-format off
+#define HAM_CORE_TRACE_IF(condition, ...)    if (condition) HAM_CORE_TRACE(__VA_ARGS__)
+#define HAM_CORE_DEBUG_IF(condition, ...)    if (condition) HAM_CORE_DEBUG(__VA_ARGS__)
+#define HAM_CORE_INFO_IF(condition, ...)     if (condition) HAM_CORE_INFO(__VA_ARGS__)
+#define HAM_CORE_WARN_IF(condition, ...)     if (condition) HAM_CORE_WARN(__VA_ARGS__)
+#define HAM_CORE_ERROR_IF(condition, ...)    if (condition) HAM_CORE_ERROR(__VA_ARGS__)
+#define HAM_CORE_CRITICAL_IF(condition, ...) if (condition) HAM_CORE_CRITICAL(__VA_ARGS__)
+// clang-format on
+
 #define HAM_TRACE_ONCE(...)    HAM_INTERNAL_LOG_ONCE_IMPL(TRACE, __VA_ARGS__)
+#define HAM_DEBUG_ONCE(...)    HAM_INTERNAL_LOG_ONCE_IMPL(DEBUG, __VA_ARGS__)
 #define HAM_INFO_ONCE(...)     HAM_INTERNAL_LOG_ONCE_IMPL(INFO, __VA_ARGS__)
 #define HAM_WARN_ONCE(...)     HAM_INTERNAL_LOG_ONCE_IMPL(WARN, __VA_ARGS__)
 #define HAM_ERROR_ONCE(...)    HAM_INTERNAL_LOG_ONCE_IMPL(ERROR, __VA_ARGS__)
 #define HAM_CRITICAL_ONCE(...) HAM_INTERNAL_LOG_ONCE_IMPL(CRITICAL, __VA_ARGS__)
 
 #define HAM_TRACE_REPEATED(...)    HAM_INTERNAL_LOG_REPEATED_IMPL(TRACE, __VA_ARGS__)
+#define HAM_DEBUG_REPEATED(...)    HAM_INTERNAL_LOG_REPEATED_IMPL(DEBUG, __VA_ARGS__)
 #define HAM_INFO_REPEATED(...)     HAM_INTERNAL_LOG_REPEATED_IMPL(INFO, __VA_ARGS__)
 #define HAM_WARN_REPEATED(...)     HAM_INTERNAL_LOG_REPEATED_IMPL(WARN, __VA_ARGS__)
 #define HAM_ERROR_REPEATED(...)    HAM_INTERNAL_LOG_REPEATED_IMPL(ERROR, __VA_ARGS__)
 #define HAM_CRITICAL_REPEATED(...) HAM_INTERNAL_LOG_REPEATED_IMPL(CRITICAL, __VA_ARGS__)
+
+// clang-format off
+#define HAM_TRACE_IF(condition, ...)    if (condition) HAM_TRACE(__VA_ARGS__)
+#define HAM_DEBUG_IF(condition, ...)    if (condition) HAM_DEBUG(__VA_ARGS__)
+#define HAM_INFO_IF(condition, ...)     if (condition) HAM_INFO(__VA_ARGS__)
+#define HAM_WARN_IF(condition, ...)     if (condition) HAM_WARN(__VA_ARGS__)
+#define HAM_ERROR_IF(condition, ...)    if (condition) HAM_ERROR(__VA_ARGS__)
+#define HAM_CRITICAL_IF(condition, ...) if (condition) HAM_CRITICAL(__VA_ARGS__)
+// clang-format on
 
 #endif

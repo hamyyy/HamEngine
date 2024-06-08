@@ -89,12 +89,14 @@ void Application::Init()
   frameBufferSpec.MagFilter = TextureFilter::NEAREST;
   m_ObjectPickerFramebuffer.Init(frameBufferSpec);
 
-  auto cameraEntity = m_Scene.CreateEntity("Camera");
-  cameraEntity.AddComponent<Component::Camera>();
-  cameraEntity.GetComponent<Component::Transform>() = Component::Transform(math::inverse(math::lookAt(math::vec3(3.0f, 3.0f, 3.0f), math::zero<math::vec3>())));  // Component::Transform(math::inverse(math::camera()) * math::translate((math::camera() * math::vec4(math::backward(), 0.0f)).xyz * 10.0f));
+  // *******
+  // auto cameraEntity = m_Scene.CreateEntity("Camera");
+  // cameraEntity.AddComponent<Component::Camera>();
+  // cameraEntity.GetComponent<Component::Transform>() = Component::Transform(math::inverse(math::lookAt(math::vec3(3.0f, 3.0f, 3.0f), math::zero<math::vec3>())));  // Component::Transform(math::inverse(math::camera()) * math::translate((math::camera() * math::vec4(math::backward(), 0.0f)).xyz * 10.0f));
 
-  auto &scriptList = cameraEntity.AddComponent<Component::NativeScriptList>();
-  scriptList.AddScript<CameraController>("CameraController");
+  // auto &scriptList = cameraEntity.AddComponent<Component::NativeScriptList>();
+  // scriptList.AddScript<CameraController>("CameraController");
+  // *******
 
   // auto &projection = cameraEntity.GetComponent<Component::Camera>().Projection;
   // auto view = math::inverse(cameraEntity.GetComponent<Component::Transform>().ToMatrix());
@@ -270,7 +272,7 @@ void Application::RenderThread()
     {
       m_Window.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
       Systems::RenderScene(*this, m_Scene, timestep);
-      Systems::HandleObjectPicker(*this, m_Scene, m_ObjectPickerFramebuffer, timestep);
+      Systems::HandleObjectPicker(*this, m_Scene, m_ObjectPickerFramebuffer, timestep, m_MouseLeftClickedThisFrame);
     }
 
     {
@@ -337,6 +339,7 @@ void Application::Run()
       FileWatcher::Update();
 
       std::shared_ptr<Events::Event> event;
+    handle_event_loop:
       while (event = Events::PollEvent()) {
         m_SubscriberPool.Dispatch(event);
 
@@ -363,14 +366,24 @@ void Application::Run()
         handler.Dispatch<Events::MouseMoved>([](Events::MouseMoved &e) {
           return true;
         });
-        handler.Dispatch<Events::MouseButtonPressed>([](Events::MouseButtonPressed &e) {
+        handler.Dispatch<Events::MousePressed>([](Events::MousePressed &e) {
           return true;
         });
-        handler.Dispatch<Events::MouseButtonReleased>([](Events::MouseButtonReleased &e) {
+        handler.Dispatch<Events::MouseReleased>([](Events::MouseReleased &e) {
           return true;
         });
         handler.Dispatch<Events::MouseScrolled>([this](Events::MouseScrolled &e) {
           Input::OnScroll(this, e.GetXOffset(), e.GetYOffset());
+          return true;
+        });
+        handler.Dispatch<Events::MouseDragged>([](Events::MouseDragged &e) {
+          return false;
+        });
+        handler.Dispatch<Events::MouseClicked>([this](Events::MouseClicked &e) {
+          if (e.GetButton() == MouseButton::LEFT) {
+            m_MouseLeftClickedThisFrame = true;
+            HAM_CORE_INFO("Mouse Clicked: {0}", e.GetButton());
+          }
           return true;
         });
 
@@ -378,11 +391,9 @@ void Application::Run()
 
         for (int i = (int)m_LayerStack.GetSize() - 1; i >= 0; i--) {
           Layer *layer = m_LayerStack[i];
-          if (layer->OnEvent(event))
-            break;
+          event->Handled = layer->OnEvent(*event);
+          if (event->Handled) goto handle_event_loop;
         }
-
-        if (event->Handled) continue;
 
         HAM_CORE_ERROR_REPEATED("Unhandled Event: {0}", event->GetName());
         event->Handled = true;

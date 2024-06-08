@@ -21,6 +21,8 @@ class ImGuiImpl {
   void SetupPreRender();
 
   bool WantsCaptureMouse() { return ImGui::GetIO().WantCaptureMouse || ImGuizmo::IsUsingAny(); }
+  bool WantsCaptureMouseWheel() { return WantsCaptureMouse() && !ImGuizmo::IsOver(); }
+  bool WantsCaptureDrag() { return ImGuizmo::IsUsingAny(); }
   bool WantsCaptureKeyboard() { return ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantTextInput; }
 
   bool WantsCaptureKey(KeyCode key)

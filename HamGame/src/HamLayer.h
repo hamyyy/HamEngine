@@ -12,7 +12,7 @@ class HamLayer : public Layer {
   virtual void OnDetach() override;
   virtual void OnUpdate(TimeStep deltaTime) override;
   virtual void OnUIRender(TimeStep deltaTime) override;
-  // virtual void OnEvent(Event &event) override;
+  virtual bool OnEvent(const Events::Event &event) override;
 
   Entity GetActiveCamera() { return m_Scene.GetActiveCamera(); }
 

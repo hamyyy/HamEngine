@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#ifdef HAM_DEBUG
+#ifdef HAM_DEBUG_ENABLED
 #if defined(HAM_PLATFORM_WINDOWS)
 #define HAM_DEBUGBREAK() __debugbreak()
 #elif defined(HAM_PLATFORM_LINUX)

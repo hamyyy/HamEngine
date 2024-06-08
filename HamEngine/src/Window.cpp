@@ -61,6 +61,15 @@ void Window::Init(Application *app)
   HAM_CORE_INFO("Dear ImGui Version: {}", std::string((char *)ImGui::GetVersion()));
 
   {
+    static std::vector<Events::MouseDragged::DragData> dragData;  // TODO: combine these into a single struct
+    static std::vector<Events::MouseClicked::ClickData> clickData;
+
+    // Initialize drag data for each mouse button
+    for (int i = 0; i < 6; i++) {
+      dragData.emplace_back((Ham::MouseButton)i);
+      clickData.emplace_back((Ham::MouseButton)i);
+    }
+
     // Set GLFW callbacks
     glfwSetWindowSizeCallback(m_Window, [](GLFWwindow *window, int width, int height) {
       Application &app = *(Application *)glfwGetWindowUserPointer(window);
@@ -101,13 +110,62 @@ void Window::Init(Application *app)
     glfwSetMouseButtonCallback(m_Window, [](GLFWwindow *window, int button, int action, int mods) {
       Application &app = *(Application *)glfwGetWindowUserPointer(window);
 
+      double x, y;
+      glfwGetCursorPos(window, &x, &y);
+
       switch (action) {
         case GLFW_PRESS: {
-          Events::Emit<Events::MouseButtonPressed>((Ham::MouseButton)button);
+          Events::Emit<Events::MousePressed>((Ham::MouseButton)button);
+
+          {
+            // Clicked
+            auto &data = clickData[button];
+            data.pos = {x, y};
+            data.isPressed = true;
+            data.isDragging = false;
+          }
+
+          {
+            // Dragging
+            if (app.GetImGui().WantsCaptureMouse()) break;
+            auto &data = dragData[button];
+            data.isPressed = true;
+            data.startPos = {x, y};
+            data.pos = {x, y};
+            data.delta = {0, 0};
+            data.isDragging = false;
+          }
+
           break;
         }
         case GLFW_RELEASE: {
-          Events::Emit<Events::MouseButtonReleased>((Ham::MouseButton)button);
+          Events::Emit<Events::MouseReleased>((Ham::MouseButton)button);
+
+          {
+            // Clicked
+            auto &data = clickData[button];
+            if (data.isPressed && !data.isDragging) {
+              uint32_t now = (uint32_t)(glfwGetTime() * 1000.0);
+              data.timeSinceLastClick = now - data.timer;
+
+              if (now > data.timer + data.doubleClickTime) {
+                data.clickCount = 0;
+              }
+              data.timer = now;
+
+              data.clickCount++;
+              Events::Emit<Events::MouseClicked>(data);
+              data.isPressed = false;
+            }
+          }
+
+          {  // Dragging
+            auto &data = dragData[button];
+            data.isPressed = false;
+            data.pos = {x, y};
+            data.isDragging = false;
+          }
+
           break;
         }
       }
@@ -122,6 +180,33 @@ void Window::Init(Application *app)
     glfwSetCursorPosCallback(m_Window, [](GLFWwindow *window, double xPos, double yPos) {
       Application &app = *(Application *)glfwGetWindowUserPointer(window);
       Events::Emit<Events::MouseMoved>((float)xPos, (float)yPos);
+
+      {
+        // Clicked
+        for (auto &data : clickData) {
+          if (data.isPressed && !data.isDragging) {
+            math::vec2 newPos = {(float)xPos, (float)yPos};
+            math::vec2 delta = newPos - data.pos;
+            if (math::length(delta) > data.tollerance) {
+              data.isDragging = true;
+            }
+          }
+        }
+      }
+
+      {  // Dragging
+        for (auto &data : dragData) {
+          math::vec2 newPos = {(float)xPos, (float)yPos};
+          math::vec2 delta = newPos - data.startPos;
+          if (data.isDragging || data.isPressed && math::length(delta) > data.tollerance) {
+            data.deltaThisFrame = newPos - data.pos;
+            data.pos = newPos;
+            data.delta = delta;
+            data.isDragging = true;
+            Events::Emit<Events::MouseDragged>(data);
+          }
+        }
+      }
     });
 
     glfwSetWindowFocusCallback(m_Window, [](GLFWwindow *window, int focused) {

@@ -76,20 +76,20 @@ void CameraController::OnUIUpdate(TimeStep deltaTime)
   }
   dir = math::normalize(dir);
 
-  math::vec2 mousePos = Input::GetMousePosition();
-  static math::vec2 lastMousePos = mousePos;
-  auto mouseDelta = mousePos - lastMousePos;
+  // math::vec2 mousePos = Input::GetMousePosition();
+  // static math::vec2 lastMousePos = mousePos;
+  // auto mouseDelta = mousePos - lastMousePos;
 
-  if (Input::IsMouseButtonDown(Button::BUTTON_0)) {
-    m_Alpha -= mouseDelta.x * 0.007f;
-    m_Beta -= mouseDelta.y * 0.007f;
-    m_Beta = math::clamp(m_Beta, -math::pi<float> / 2.0f + 0.01f, math::pi<float> / 2.0f - 0.01f);
-  }
+  // if (Input::IsMouseButtonDown(Button::BUTTON_0)) {
+  //   m_Alpha -= mouseDelta.x * 0.007f;
+  //   m_Beta -= mouseDelta.y * 0.007f;
+  //   m_Beta = math::clamp(m_Beta, -math::pi<float> / 2.0f + 0.01f, math::pi<float> / 2.0f - 0.01f);
+  // }
 
   // dispatch a mousebutton event if the mouse is down
   if (Input::IsMouseButtonDownThisFrame(MouseButton::LEFT)) {
     Events::Emit<Events::MouseMoved>(Input::GetMousePosition().x, Input::GetMousePosition().y);
-    Events::Emit<Events::MouseButtonPressed>(MouseButton::LEFT);
+    Events::Emit<Events::MousePressed>(MouseButton::LEFT);
   }
 
   auto wheelDelta = Input::GetMouseWheelDelta();
@@ -107,7 +107,7 @@ void CameraController::OnUIUpdate(TimeStep deltaTime)
 
   transformComponent = Component::Transform::FromMatrix(newTf);
 
-  lastMousePos = mousePos;
+  // lastMousePos = mousePos;
 }
 
 void CameraController::OnUpdate(TimeStep deltaTime)
@@ -116,6 +116,14 @@ void CameraController::OnUpdate(TimeStep deltaTime)
 
 void CameraController::DoAnimation(TimeStep deltaTime)
 {
+}
+
+void CameraController::OnMouseDragged(const Events::MouseDragged &event)
+{
+  auto sensitivity = 0.5f;
+  m_Alpha -= event.GetDeltaThisFrame().x * 0.007f * sensitivity;
+  m_Beta -= event.GetDeltaThisFrame().y * 0.007f * sensitivity;
+  m_Beta = math::clamp(m_Beta, -math::pi<float> / 2.0f + 0.01f, math::pi<float> / 2.0f - 0.01f);
 }
 
 }  // namespace Ham

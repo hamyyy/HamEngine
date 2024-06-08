@@ -13,6 +13,8 @@
       HAM_DEBUGBREAK();                                 \
     }                                                   \
   }
+
+#define HAM_INTERNAL_NUMARGS(...)                      (sizeof((int[]){__VA_ARGS__}) / sizeof(int))
 #define HAM_INTERNAL_ASSERT_WITH_MSG(type, check, ...) HAM_INTERNAL_ASSERT_IMPL(type, check, "Assertion failed: {0}", __VA_ARGS__)
 #define HAM_INTERNAL_ASSERT_NO_MSG(type, check)        HAM_INTERNAL_ASSERT_IMPL(type, check, "Assertion '{0}' failed at {1}:{2}", HAM_STRINGIFY_MACRO(check), std::filesystem::path(__FILE__).filename().string(), __LINE__)
 

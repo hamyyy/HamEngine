@@ -23,12 +23,15 @@ void Log::Init(std::string name)
   coreLogSinks.push_back(s_RingBufferSink);
 
   coreLogSinks[0]->set_pattern("%^[%T] %n: %v%$");
+  coreLogSinks[0]->set_level(spdlog::level::debug);
+
   coreLogSinks[1]->set_pattern("[%T] [%l] %n: %v");
+  coreLogSinks[1]->set_level(spdlog::level::trace);
   coreLogSinks[2]->set_pattern("%v");
 
   s_CoreLogger = std::make_shared<spdlog::logger>("HAM", begin(coreLogSinks), end(coreLogSinks));
   spdlog::register_logger(s_CoreLogger);
-  s_CoreLogger->set_level(spdlog::level::debug);
+  s_CoreLogger->set_level(spdlog::level::trace);
   s_CoreLogger->flush_on(spdlog::level::trace);
 
   std::vector<spdlog::sink_ptr> clientLogSinks;
@@ -37,11 +40,13 @@ void Log::Init(std::string name)
   clientLogSinks.push_back(s_RingBufferSink);
 
   clientLogSinks[0]->set_pattern("%^[%T] %n: %v%$");
+  clientLogSinks[0]->set_level(spdlog::level::debug);
   clientLogSinks[1]->set_pattern(s_ClientPattern);
+  clientLogSinks[1]->set_level(spdlog::level::trace);
 
   s_ClientLogger = std::make_shared<spdlog::logger>(name, begin(clientLogSinks), end(clientLogSinks));
   spdlog::register_logger(s_ClientLogger);
-  s_ClientLogger->set_level(spdlog::level::debug);
+  s_ClientLogger->set_level(spdlog::level::trace);
   s_ClientLogger->flush_on(spdlog::level::trace);
 }
 
